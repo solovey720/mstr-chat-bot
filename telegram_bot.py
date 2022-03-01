@@ -53,7 +53,7 @@ def show_report(call):
     bot.send_message(call.message.chat.id, "\'Показать все данные\' включает в себя не более 100 строк")
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('showTop'))
+@bot.callback_query_handler(func=lambda call: call.data.startswith('showTop_'))
 def show_report_data(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     top_data = int(call.data.split('_')[1])
