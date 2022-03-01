@@ -53,17 +53,6 @@ def show_report(call):
     bot.send_message(call.message.chat.id, "\'Показать все данные\' включает в себя не более 100 строк")
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('reportId_'))
-def sel_report(call):
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    report_id = call.data.split("_")[1]
-    markup = telebot.types.InlineKeyboardMarkup()
-    yes_button = telebot.types.InlineKeyboardButton('Да', callback_data='yes_' + report_id)
-    no_button = telebot.types.InlineKeyboardButton('Нет', callback_data='no_' + report_id)
-    markup.add(yes_button, no_button)
-    bot.send_message(call.message.chat.id, "Добавить фильтр на отчет?", reply_markup=markup)
-
-
 @bot.callback_query_handler(func=lambda call: call.data.startswith('showTop'))
 def show_report_data(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
