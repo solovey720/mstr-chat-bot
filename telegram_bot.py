@@ -2,8 +2,9 @@ import telebot
 import pandas as pd
 import dataframe_image as dfi
 import mstr_connect
+import os
 
-token = '5181481316:AAFrV0UNkG7to7AWhwFjFyviQbqHPHH1MtU'
+token = '<your_token>'
 bot = telebot.TeleBot(token)
 
 conn = mstr_connect.get_connection()
@@ -45,9 +46,60 @@ def search_report(message):
 def sel_report(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     report_id = call.data.split("_")[1]
-    df = pd.DataFrame(data=mstr_connect.show_report_info(conn, report_id))
-    dfi.export(df, report_id + '.png', table_conversion='matplotlib')
-    bot.send_photo(call.message.chat.id, open(report_id + '.png', 'rb'))
+    markup = telebot.types.InlineKeyboardMarkup()
+    yes_button = telebot.types.InlineKeyboardButton('Да', callback_data='yes_' + report_id)
+    no_button = telebot.types.InlineKeyboardButton('Нет', callback_data='no_' + report_id)
+    markup.add(yes_button, no_button)
+    bot.send_message(call.message.chat.id, "Добавить фильтр на отчет?", reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('no_'))
+def show_report(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    report_id = call.data.split("_")[1]
+    markup = telebot.types.InlineKeyboardMarkup()
+    part_data = telebot.types.InlineKeyboardButton('Показать первые 20 записей', callback_data='showTop20_' + report_id)
+    all_data = telebot.types.InlineKeyboardButton('Показать все данные', callback_data='showAllData_' + report_id)
+    markup.add(part_data, all_data)
+    bot.send_message(call.message.chat.id, "В каком виде показать отчет?", reply_markup=markup)
+    bot.send_message(call.message.chat.id, "\'Показать все данные\' может занять некоторое время")
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('showAllData_'))
+def show_report_all(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    report_id = call.data.split("_")[1]
+    df = pd.DataFrame(data=mstr_connect.get_report(conn, report_id).to_dataframe()[:100])
+    for i in range(len(df.index) // 20):
+        dfi.export(df[i * 20:i * 20 + 20], report_id + '_' + str(i) + '.png', table_conversion='matplotlib')
+        bot.send_photo(call.message.chat.id, open(report_id + '_' + str(i) + '.png', 'rb'))
+    dfi.export(df[(len(df.index) // 20) * 20:], report_id + '_' + str((len(df.index) // 20)) + '.png',
+               table_conversion='matplotlib')
+    bot.send_photo(call.message.chat.id, open(report_id + '_' + str((len(df.index) // 20)) + '.png', 'rb'))
+    remove_all_png_files()
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('showTop20_'))
+def show_report_top20(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    report_id = call.data.split("_")[1]
+    df = pd.DataFrame(data=mstr_connect.get_report(conn, report_id).to_dataframe()[:20])
+    dfi.export(df, report_id + '_top20.png', table_conversion='matplotlib')
+    bot.send_photo(call.message.chat.id, open(report_id + '_top20.png', 'rb'))
+    remove_all_png_files()
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('yes_'))
+def add_filter(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    report_id = call.data.split("_")[1]
+    print(mstr_connect.get_report_attributes(conn, report_id))
+
+
+# remove ALL .png files
+def remove_all_png_files():
+    for file in os.listdir(os.getcwd()):
+        if file.endswith('.png'):
+            os.remove(file)
 
 
 bot.infinity_polling()

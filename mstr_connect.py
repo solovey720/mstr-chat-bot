@@ -22,6 +22,21 @@ def search_report(connection, report_name):
     return rep
 
 
-def show_report_info(connection, report_id):
-    my_report = Report(connection=connection, id=report_id, parallel=False).to_dataframe()
+def get_report(connection, report_id):
+    my_report = Report(connection=connection, id=report_id, parallel=False)
     return my_report
+
+
+def get_report_attributes(connection, report_id):
+    report_attributes = Report(connection=connection, id=report_id, parallel=False).attributes
+    return report_attributes
+
+
+def get_report_metrics(connection, report_id):
+    report_metrics = Report(connection=connection, id=report_id, parallel=False).metrics
+    return report_metrics
+
+
+def get_report_attr_elements(connection, report_id):
+    attr_elements = Report(connection=connection, id=report_id, parallel=False).attr_elements
+    return attr_elements
