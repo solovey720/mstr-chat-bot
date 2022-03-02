@@ -3,17 +3,17 @@ import pandas as pd
 import dataframe_image as dfi
 import mstr_connect
 import os
+import sys
 
 token = '5181481316:AAFrV0UNkG7to7AWhwFjFyviQbqHPHH1MtU'
 bot = telebot.TeleBot(token)
 
 conn = mstr_connect.get_connection()
 
-
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id, 'Привет, я помогу тебе найти отчет, для этого введи /search')
-    
+
 
 @bot.message_handler(commands=['help'])
 def help_info(message):
@@ -48,27 +48,28 @@ def show_report(call):
     report_id = call.data.split("_")[1]
     markup = telebot.types.InlineKeyboardMarkup()
     markup.add(telebot.types.InlineKeyboardButton('Показать первые 20 записей', callback_data='showTop_20_' + report_id))
-    markup.add(telebot.types.InlineKeyboardButton('Показать все данные', callback_data='showTop_100_' + report_id))
+    markup.add(telebot.types.InlineKeyboardButton('Показать первые 100 записей', callback_data='showTop_100_' + report_id))
+    markup.add(telebot.types.InlineKeyboardButton('Показать все', callback_data='showTop_all_' + report_id))
     bot.send_message(call.message.chat.id, "В каком виде показать отчет?", reply_markup=markup)
-    bot.send_message(call.message.chat.id, "\'Показать все данные\' включает в себя не более 100 строк")
+    bot.send_message(call.message.chat.id, "\u26a0\ufe0fПоказать все может занять некоторое время\u26a0\ufe0f")
+
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('showTop_'))
 def show_report_data(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
-    top_data = int(call.data.split('_')[1])
+    top_data = sys.maxsize if (call.data.split('_')[1] == 'all') else int(call.data.split('_')[1])
     report_id = call.data.split('_')[2]
     df = pd.DataFrame(data=mstr_connect.get_report(conn, report_id).to_dataframe()[:top_data])
-    for i in range(len(df.index) // 20 + (0 if (len(df.index) % 20 == 0) else 1) ):
+    for i in range(len(df.index) // 20 + (0 if (len(df.index) % 20 == 0) else 1)):
         dfi.export(df[i * 20:i * 20 + 20], report_id + '_' + str(i) + '.png', table_conversion='matplotlib')
         bot.send_photo(call.message.chat.id, open(report_id + '_' + str(i) + '.png', 'rb'))
-        os.remove(report_id + '_' + str(i) + '.png')
+        #os.remove(report_id + '_' + str(i) + '.png')
     markup = telebot.types.InlineKeyboardMarkup()
     yes_button = telebot.types.InlineKeyboardButton('Да', callback_data='use_filter_' + report_id)
     no_button = telebot.types.InlineKeyboardButton('Нет', callback_data='dont_use_filter')
     markup.add(yes_button, no_button)
     bot.send_message(call.message.chat.id, "Добавить фильтр на отчет?", reply_markup=markup)
-
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('use_filter_'))
@@ -77,11 +78,11 @@ def add_filter(call):
     report_id = call.data.split("_")[1]
     print(mstr_connect.get_report_attributes(conn, report_id))
 
+
 @bot.callback_query_handler(func=lambda call: call.data.startswith('dont_use_filter'))
 def add_filter(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     bot.send_message(call.message.chat.id, "Для поиска другого отчета напиши /search")
-
 
 
 bot.infinity_polling()
