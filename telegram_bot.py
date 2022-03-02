@@ -4,7 +4,7 @@ import dataframe_image as dfi
 import mstr_connect
 import os
 
-token = '<your_token>'
+token = '5181481316:AAFrV0UNkG7to7AWhwFjFyviQbqHPHH1MtU'
 bot = telebot.TeleBot(token)
 
 conn = mstr_connect.get_connection()
