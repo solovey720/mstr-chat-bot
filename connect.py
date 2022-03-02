@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 import mstrio
 from mstrio.connection import Connection
 from mstrio.server import Cluster, ServerSettings
