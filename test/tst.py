@@ -4,7 +4,8 @@ from pyppeteer import launch
 #log 84293CF411EB296FDA820080EFF566F0
 #gfk 4E44AA6711EB13AC585C0080EFA5DBEF
 #sales 52969EFC11EA3C7B42930080EF857558
-docID = '52969EFC11EA3C7B42930080EF857558'
+#obs 0105984311EA440357CD0080EF354C4B
+docID = '0105984311EA440357CD0080EF354C4B'
 
 async def main():
     browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'defaultViewport': {'width': 1920, 'height': 1080}})
@@ -13,9 +14,10 @@ async def main():
     #'waitUntil':{'networkidle0')
  
 
-    await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':60000, 'visible': True} )
-    await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':60000, 'hidden': True} )
+    
     try :
+        await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':60000, 'visible': True} )
+        await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':60000, 'hidden': True} )
         await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':10000, 'visible': True} )
     except:
         await page.screenshot({'path': 'git/mstr-chat-bot/test/example.png'})
