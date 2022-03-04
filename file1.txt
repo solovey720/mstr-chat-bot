@@ -1,2 +1,3 @@
 text from branch 'misha'
 new line from branch 'misha'
+text from branch 'new_branch'
