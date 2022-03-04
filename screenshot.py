@@ -46,7 +46,7 @@ async def screenshot(options = dict()):
             try :
                 await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':options.get('timeout_short', 3000), 'visible': True} )
             except:
-                await page.screenshot({'path': options.get('path_screenshot', 'test/example.png')})
+                await page.screenshot({'path': options.get('path_screenshot', 'screenshots/example.png')})
                 break
             await page.waitForSelector('#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal', {'timeout':options.get('timeout_long', 60000), 'hidden': True} )
     except:

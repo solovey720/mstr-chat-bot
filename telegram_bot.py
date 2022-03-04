@@ -1,4 +1,5 @@
 import telebot
+#import screenshot
 import pandas as pd
 import dataframe_image as dfi
 import mstr_connect
@@ -84,5 +85,4 @@ def add_filter(call):
     bot.send_message(call.message.chat.id, "Для поиска другого отчета напиши /search")
 
 
-
-bot.infinity_polling()
+bot.polling(interval=1, skip_pending=True)
