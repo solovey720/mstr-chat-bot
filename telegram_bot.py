@@ -1,15 +1,24 @@
+import asyncio
 import telebot
-#import screenshot
+import screenshot
 import pandas as pd
 import dataframe_image as dfi
 import mstr_connect
 import os
-#sfff
-#sdf
+#743FFE22314887C8F2407C9B559ECB4C dos
+#https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb?evt=4001&src=mstrWeb.4001&visMode=0&reportViewMode=1&reportID=&S
+#asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': False,'docID':'743FFE22314887C8F2407C9B559ECB4C','docType': 'dossier','path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
+
+#asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': False,'docID':'2D189DE4CE4C01EF63C980A85CDE53A5','docType': 'report', 'path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
+
+
+print('DONE\n\n')
+
 token = '5098007657:AAEwiPhBn7k-CR8q4FtPSYPJFNwrUEyGDxk'
 bot = telebot.TeleBot(token)
 
 conn = mstr_connect.get_connection()
+
 
 
 @bot.message_handler(commands=['start'])
@@ -24,6 +33,12 @@ def help_info(message):
 
 @bot.message_handler(commands=['search'])
 def help_info(message):
+    bot.send_message(message.chat.id, 'Введи имя своего отчета:')
+    bot.register_next_step_handler(message, search_report)
+
+@bot.message_handler(commands=['test'])
+def help_info(message):
+    bot.send_message(message.chat.id, 'Введи имя своего отчета:')
     bot.send_message(message.chat.id, 'Введи имя своего отчета:')
     bot.register_next_step_handler(message, search_report)
 
@@ -85,4 +100,4 @@ def add_filter(call):
     bot.send_message(call.message.chat.id, "Для поиска другого отчета напиши /search")
 
 
-bot.polling(interval=1, skip_pending=True)
+bot.infinity_polling() # polling(interval=1, skip_pending=True)
