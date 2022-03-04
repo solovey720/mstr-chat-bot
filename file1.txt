@@ -1,1 +1,1 @@
-text from branch 'misha'
+text from branch 'new_branch'
