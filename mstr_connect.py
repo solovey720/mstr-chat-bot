@@ -4,16 +4,16 @@ from mstrio.project_objects import list_reports, Report
 
 from mstrio.types import ObjectTypes
 from mstrio.object_management import list_objects, list_folders, get_predefined_folder_contents, PredefinedFolders
-
-url = 'https://env-270933.customer.cloud.microstrategy.com/MicroStrategyLibrary/api/'
-mstr_username = 'mstr'
-mstr_password = 'kcTCSvc5RGG7'
-project_name = 'MicroStrategy Tutorial'
-
+# https://dashboard-temp/MicroStrategy/servlet/mstrWeb?evt=3010&src=mstrWeb.3010&loginReq=true&ServerAlias=10.191.2.88&mstrWeb=-2AAAADDX3ujwopszPc2vqk4N5i6g8gR9AQ2qJR4iwWe9VHkAP30grHo2*_SQ%3D%3D..2AAAADGZDSHmYweoMjyVh3kvUMRCxHHXUZTHiRnW8B5to_&welcome=*-1.*-1.0.0.0&Server=10.191.2.88&Port=0&Project=Business+Intelligence&
+url = 'https://mstr-sand-web.corp.mvideo.ru/MicroStrategyLibrary/api/'
+mstr_username = 'Administrator'
+mstr_password = 'SAdm1792@'
+project_name = 'Business Intelligence'
+# http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb
 
 def get_connection():
     conn = Connection(base_url=url, username=mstr_username, password=mstr_password, login_mode=1,
-                      project_name=project_name)
+                      project_name=project_name, ssl_verify=False)
     return conn
 
 
