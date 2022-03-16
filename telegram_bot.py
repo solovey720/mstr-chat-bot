@@ -6,13 +6,15 @@ import dataframe_image as dfi
 import mstr_connect
 import os
 
-#asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': True,'docID':'0105984311EA440357CD0080EF354C4B','docType': 'document','path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
+#asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': True,'docID':'52969EFC11EA3C7B42930080EF857558','docType': 'document'}))
 #asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': True,'docID':'743FFE22314887C8F2407C9B559ECB4C','docType': 'dossier','path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
-asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': True,'docID':'2D189DE4CE4C01EF63C980A85CDE53A5','docType': 'report', 'path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
+#asyncio.get_event_loop().run_until_complete(screenshot.screenshot({'headless': True,'docID':'2D189DE4CE4C01EF63C980A85CDE53A5','docType': 'report', 'path': 'https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb' ,'Server':'10.191.2.88', 'Project': '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0', 'password':'Ceo143566'}))
+
+asyncio.get_event_loop().run_until_complete(screenshot.screenshot_html({'timeout_short':1000, 'headless': False,'docID':'A76ADD394EC610BD76FFBCBE03023721','docType': 'document','path': 'http://localhost:8080/MicroStrategy/servlet/mstrWeb' ,'Server':'DESKTOP-2RSMLJR', 'Project': 'New+Project', 'password':''}))
 
 
 print('DONE\n\n')
-
+exit()
 token = '5098007657:AAEwiPhBn7k-CR8q4FtPSYPJFNwrUEyGDxk'
 bot = telebot.TeleBot(token)
 
