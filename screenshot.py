@@ -111,6 +111,11 @@ async def screenshot_html(options = dict()):
     browser = await launch({'headless': options.get('headless', True), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True), 'defaultViewport': options.get('defaultViewport', {'width': 1920, 'height': 1080})})
     page = await browser.newPage()
     await page.goto(path, {'timeout':timeout_long})
+    
+    ############################ kostyl
+    await page.waitForSelector('#\\33 054', {'timeout':timeout_long, 'visible': True} ) #ждем ухода самой загрузки документа и появления загрузки данных борда
+    await page.click('#\\33 054')    
+    ############################
 
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType', 'document') == 'document') or (options.get('docType', 'document') == 'dossier') else ( '#UniqueReportID' if options.get('docType', 'document') == 'report' else 'ERROR')
     selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType', 'document') == 'document') or (options.get('docType', 'document') == 'dossier') else ( '#divWaitBox' if options.get('docType', 'document') == 'report' else 'ERROR')
