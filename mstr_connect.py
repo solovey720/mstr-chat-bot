@@ -5,10 +5,11 @@ from mstrio.project_objects import list_reports, Report
 from mstrio.types import ObjectTypes
 from mstrio.object_management import list_objects, list_folders, get_predefined_folder_contents, PredefinedFolders
 
-url = 'https://env-270933.customer.cloud.microstrategy.com/MicroStrategyLibrary/api/'
-mstr_username = 'mstr'
-mstr_password = 'kcTCSvc5RGG7'
-project_name = 'MicroStrategy Tutorial'
+url = 'https://112d-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb'
+# https://53c6-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb
+mstr_username = 'administrator'
+mstr_password = ''
+project_name = 'New Project'
 
 
 def get_connection():
