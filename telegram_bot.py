@@ -50,7 +50,7 @@ async def get_screenshot(call: aio.types.CallbackQuery):
     await call.message.delete_reply_markup()
     await call.answer('Сейчас будет отправлен скриншот отчета')
     print(call.data.split('_')[1])
-    await screenshot.screenshot({'docID' : call.data.split('_')[1]})
+    await screenshot.screenshot({'docID' : call.data.split('_')[1], 'docType': 'report'})
 
 
 @dp.message_handler()
