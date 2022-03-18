@@ -91,7 +91,7 @@ async def screenshot_html(options=dict()):
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
 
-    path = options.get('path', 'http://112d-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb')
+    path = options.get('path', 'http://f5a7-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb')
     path += '?evt=' + evt + '&src=mstrWeb.' + evt
     path += '&' + ('document' if options.get('docType', 'document') == 'dossier' else options.get('docType','document')) + 'ID=' + options.get(
         'docID', '520F150011EB25866E6D0080EF154E9B') + '&currentViewMedia=1&visMode=0&'
@@ -101,9 +101,9 @@ async def screenshot_html(options=dict()):
     path += 'uid=' + options.get('login', 'administrator') + '&' + 'pwd=' + options.get('password', '')
     path += '&hiddensections=path,dockTop,dockLeft,footer'
     ##############
-    path += '&evt=' + '1024001' + '&src=mstrWeb.' + 'oivm.rwb.1024001'
-    path += '&events=-2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.WC5D6239510A84DC09D38527793A12086*.elemList*.h1;264614C648E9C743C4283B8137C8D9BA*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.W5121A375615A451CA272FD10697EA8EA*.elemList*.h1;77ECA0D9445F155A4B08DFAC49FC9624*.elemList*.h23;77ECA0D9445F155A4B08DFAC49FC9624*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048014*.mstrWeb***.oivm***.rwb***.2048014_'
-    path += '&evtorder=2048001%2c1024001&2048001=1&1024001=1'
+    #path += '&evt=' + '1024001' + '&src=mstrWeb.' + 'oivm.rwb.1024001'
+    #path += '&events=-2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.WC5D6239510A84DC09D38527793A12086*.elemList*.h1;264614C648E9C743C4283B8137C8D9BA*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.W5121A375615A451CA272FD10697EA8EA*.elemList*.h1;77ECA0D9445F155A4B08DFAC49FC9624*.elemList*.h23;77ECA0D9445F155A4B08DFAC49FC9624*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048014*.mstrWeb***.oivm***.rwb***.2048014_'
+    #path += '&evtorder=2048001%2c1024001&2048001=1&1024001=1'
     ##############
     print(path)
     ####################################################
@@ -118,7 +118,6 @@ async def screenshot_html(options=dict()):
                                              'visible': True})
     await page.click('#\\33 054')
     ############################
-    print('кликнул на континюе')
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType',
                                                                                     'document') == 'document') or (
                                                                                    options.get('docType',
@@ -138,11 +137,9 @@ async def screenshot_html(options=dict()):
         for i in range(
                 5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
             try:
-                print('зашел в try')
                 await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
 
             except:
-                print('зашел в except')
                 await page.screenshot({'path': options.get('path_screenshot', 'example.png')})
                 HTML = await page.evaluate('document.body.innerHTML')
                 break

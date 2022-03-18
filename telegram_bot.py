@@ -2,7 +2,7 @@ import random
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from mstrio.types import ObjectTypes, ObjectSubTypes
 import mstr_connect
 import aiogram as aio
@@ -42,24 +42,54 @@ async def search_report(message: aio.types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['find_name'] = message.text
     for report in mstr_connect.search_report(conn, message.text):
-        all_reports.add(InlineKeyboardButton(report.name, callback_data='reportID_'+report.id))
-        print(report.name)
-        print(report.type)
-        print(report.subtype)
-        print(report.ext_type)
-    #for document in mstr_connect.search_document(conn, message.text):
-        #all_documents.add(InlineKeyboardButton(document.name, callback_data='documentID_'+document.id))
+        if report.subtype == 768:
+            all_reports.add(InlineKeyboardButton(report.name, callback_data=f'report_{report.id}'))
+    for document in mstr_connect.search_document(conn, message.text):
+        all_documents.add(InlineKeyboardButton(document.name, callback_data=f'document_{document.id}'))
     await state.finish()
     await bot.send_message(message.from_user.id, 'Список доступных репортов:', reply_markup=all_reports)
-    #await bot.send_message(message.from_user.id, 'Список доступных документов:', reply_markup=all_documents)
+    await bot.send_message(message.from_user.id, 'Список доступных документов:', reply_markup=all_documents)
+    print('user_chat_id'+str(message.from_user.id))
 
 
-@dp.callback_query_handler(Text(startswith='reportID_'))
+@dp.callback_query_handler(Text(startswith=['report_', 'document_']))
 async def get_screenshot(call: aio.types.CallbackQuery):
-    await call.message.delete_reply_markup()
+    file_type = call.data.split('_')[0]
+    file_id = call.data.split('_')[1]
+
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.delete_message(call.message.chat.id, call.message.message_id+1) if file_type == 'report' else await bot.delete_message(call.message.chat.id, call.message.message_id-1)
+
     await call.answer('Сейчас будет отправлен скриншот отчета',)
-    print(call.data.split('_')[1])
-    await screenshot.screenshot({'docID' : call.data.split('_')[1], 'docType': 'report'})
+    print(file_type)
+    print(file_id)
+
+    html = await screenshot.screenshot_html({'docID': file_id, 'docType': file_type})
+    await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile('example.png'))
+
+    yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data=f'addFilter_{file_type}_{file_id}'),
+                                                 InlineKeyboardButton('No', callback_data='NoFilter'))
+    await bot.send_message(call.message.chat.id, 'Хотите добавить фильтр на отчет?', reply_markup=yes_no_keyboard)
+
+
+@dp.callback_query_handler(Text(startswith='documentID_'))
+async def get_screenshot(call: aio.types.CallbackQuery):
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await bot.delete_message(call.message.chat.id, call.message.message_id-1)
+
+    document_id = call.data.split('_')[1]
+
+    await call.answer('Сейчас будет отправлен скриншот отчета',)
+    print(document_id)
+    html = await screenshot.screenshot_html({'docID' : document_id, 'docType': 'document'})
+    await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile('example.png'))
+
+    yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data='addFilter_'+document_id),
+                                                 InlineKeyboardButton('No', callback_data='NoFilter'))
+    print('user_chat_id' + str(call.message.from_user.id))
+    await bot.send_message(call.message.chat.id, 'Хотите добавить фильтр на отчет?', reply_markup=yes_no_keyboard)
+
+
 
 
 @dp.message_handler()
@@ -76,11 +106,5 @@ async def send(message: aio.types.Message):
         await bot.send_photo(message.from_user.id, photo=photo)
 
 
-async def get_screen():
-    browser = await launch()
-    page = await browser.newPage()
-    await page.goto('https://github.com/pyppeteer/pyppeteer')
-    await page.screenshot({'path': 'screen.png'})
-    await browser.close()
 
 aio.executor.start_polling(dp)
