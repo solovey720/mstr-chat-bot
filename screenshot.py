@@ -12,17 +12,6 @@ import logging
 
 #https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=10.191.2.88&P
 
-async def get_screen():
-    browser = await launch()
-    page = await browser.newPage()
-    await page.goto('https://github.com/pyppeteer/pyppeteer')
-    await page.screenshot({'path': 'screen.png'})
-    await browser.close()
-
-
-
-
-
 async def screenshot(options = dict()):
 
     # headless режим
@@ -44,16 +33,16 @@ async def screenshot(options = dict()):
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
 
-    path=options.get('path', 'http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb')
+    path=options.get('path', 'http://112d-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb')
     path+='?evt=' + evt + '&src=mstrWeb.' + options.get('evt', '2048001')
-    path+='&' + ( 'document' if options.get('docType', 'document') == 'dossier' else options.get('docType', 'document')) + 'ID=' + options.get('docID', '520F150011EB25866E6D0080EF154E9B') + '&currentViewMedia=1&visMode=0&'
-    path+= 'Server=' + options.get('Server','MSTR-IS01.CORP.MVIDEO.RU') + '&'
-    path+= 'Project=' + options.get('Project', '%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0') + '&Port=0&share=1&'
-    path+= 'uid=' + options.get('login', 'administrator') + '&' + 'pwd=' + options.get('password', 'Ceo143566!@')
+    path+='&' + ('document' if options.get('docType', 'document') == 'dossier' else options.get('docType', 'document')) + 'ID=' + options.get('docID', '520F150011EB25866E6D0080EF154E9B') + '&currentViewMedia=1&visMode=0&'
+    path+= 'Server=' + options.get('Server', 'DESKTOP-2RSMLJR') + '&'
+    path+= 'Project=' + options.get('Project', 'New+Project') + '&Port=0&share=1&'
+    path+= 'uid=' + options.get('login', 'administrator') + '&' + 'pwd=' + options.get('password', '')
     path+='&hiddensections=path,dockTop,dockLeft,footer'
     print (path)
 
-    browser = await launch({'headless': options.get('headless', True), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True), 'defaultViewport': options.get('defaultViewport', {'width': 1920, 'height': 1080})})
+    browser = await launch({'headless': options.get('headless', False), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True), 'defaultViewport': options.get('defaultViewport', {'width': 1920, 'height': 1080})})
     page = await browser.newPage()
     await page.goto(path, {'timeout':timeout_long})
 
