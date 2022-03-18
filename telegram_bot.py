@@ -3,6 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from mstrio.types import ObjectTypes, ObjectSubTypes
 import mstr_connect
 import aiogram as aio
 from pyppeteer import launch
@@ -19,7 +20,7 @@ dp = aio.Dispatcher(bot, storage=MemoryStorage())
 conn = mstr_connect.get_connection()
 
 class get_info(StatesGroup):
-    report_name = State()
+    find_name = State()
 
 
 
@@ -31,24 +32,32 @@ async def start_message(message: aio.types.Message):
 @dp.message_handler(commands=['search'])
 async def start_message(message: aio.types.Message):
     await bot.send_message(message.from_user.id, 'Введи имя отчета:')
-    await get_info.report_name.set()
+    await get_info.find_name.set()
 
 
-@dp.message_handler(state=get_info.report_name)
+@dp.message_handler(state=get_info.find_name)
 async def search_report(message: aio.types.Message, state: FSMContext):
     all_reports = InlineKeyboardMarkup()
+    all_documents = InlineKeyboardMarkup()
     async with state.proxy() as data:
-        data['report_name'] = message.text
+        data['find_name'] = message.text
     for report in mstr_connect.search_report(conn, message.text):
         all_reports.add(InlineKeyboardButton(report.name, callback_data='reportID_'+report.id))
+        print(report.name)
+        print(report.type)
+        print(report.subtype)
+        print(report.ext_type)
+    #for document in mstr_connect.search_document(conn, message.text):
+        #all_documents.add(InlineKeyboardButton(document.name, callback_data='documentID_'+document.id))
     await state.finish()
-    await bot.send_message(message.from_user.id, 'Выбери нужный отчет:', reply_markup=all_reports)
+    await bot.send_message(message.from_user.id, 'Список доступных репортов:', reply_markup=all_reports)
+    #await bot.send_message(message.from_user.id, 'Список доступных документов:', reply_markup=all_documents)
 
 
 @dp.callback_query_handler(Text(startswith='reportID_'))
 async def get_screenshot(call: aio.types.CallbackQuery):
     await call.message.delete_reply_markup()
-    await call.answer('Сейчас будет отправлен скриншот отчета')
+    await call.answer('Сейчас будет отправлен скриншот отчета',)
     print(call.data.split('_')[1])
     await screenshot.screenshot({'docID' : call.data.split('_')[1], 'docType': 'report'})
 

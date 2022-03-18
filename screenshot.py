@@ -33,7 +33,7 @@ async def screenshot(options = dict()):
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
 
-    path=options.get('path', 'http://112d-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb')
+    path=options.get('path', 'http://f5a7-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb')
     path+='?evt=' + evt + '&src=mstrWeb.' + options.get('evt', '2048001')
     path+='&' + ('document' if options.get('docType', 'document') == 'dossier' else options.get('docType', 'document')) + 'ID=' + options.get('docID', '520F150011EB25866E6D0080EF154E9B') + '&currentViewMedia=1&visMode=0&'
     path+= 'Server=' + options.get('Server', 'DESKTOP-2RSMLJR') + '&'

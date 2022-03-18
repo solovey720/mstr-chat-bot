@@ -1,10 +1,11 @@
 from mstrio.connection import Connection
 from mstrio.server import Environment
-from mstrio.project_objects import list_reports, Report
+from mstrio.project_objects import list_reports, Report, list_documents
 
 from mstrio.types import ObjectTypes
 from mstrio.object_management import list_objects, list_folders, get_predefined_folder_contents, PredefinedFolders
-url = 'http://112d-213-135-80-34.ngrok.io/MicroStrategyLibrary/api/'
+url = 'http://f5a7-213-135-80-34.ngrok.io/MicroStrategyLibrary/api/'
+
 mstr_username = 'administrator'
 mstr_password = ''
 project_name = 'New Project'
@@ -19,6 +20,10 @@ def get_connection():
 def search_report(connection, report_name):
     rep = list_reports(connection, name_begins=report_name)
     return rep
+
+def search_document(connection, doc_name):
+    doc = list_documents(connection, doc_name)
+    return doc
 
 
 def get_report(connection, report_id):
