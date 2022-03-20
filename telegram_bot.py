@@ -19,14 +19,19 @@ bot = aio.Bot(token)
 dp = aio.Dispatcher(bot, storage=MemoryStorage())
 conn = mstr_connect.get_connection()
 
+
+
 class get_info(StatesGroup):
     find_name = State()
-
+    file_data = State()
+    final = State()
 
 
 @dp.message_handler(commands=['start'])
 async def start_message(message: aio.types.Message):
     await bot.send_message(message.from_user.id, 'Введите /search для поиска отчета')
+    keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Нужная кнопка', callback_data='document_A76ADD394EC610BD76FFBCBE03023721'))
+    await bot.send_message(message.from_user.id, 'нажми', reply_markup=keyboard)
 
 
 @dp.message_handler(commands=['search'])
@@ -46,14 +51,16 @@ async def search_report(message: aio.types.Message, state: FSMContext):
             all_reports.add(InlineKeyboardButton(report.name, callback_data=f'report_{report.id}'))
     for document in mstr_connect.search_document(conn, message.text):
         all_documents.add(InlineKeyboardButton(document.name, callback_data=f'document_{document.id}'))
-    await state.finish()
+        print(f'document_{document.id}')
+    #await state.finish()
     await bot.send_message(message.from_user.id, 'Список доступных репортов:', reply_markup=all_reports)
     await bot.send_message(message.from_user.id, 'Список доступных документов:', reply_markup=all_documents)
-    print('user_chat_id'+str(message.from_user.id))
+    await get_info.file_data.set()
 
 
 @dp.callback_query_handler(Text(startswith=['report_', 'document_']))
-async def get_screenshot(call: aio.types.CallbackQuery):
+async def get_screenshot(call: aio.types.CallbackQuery, state: FSMContext):
+    print(call.data)
     file_type = call.data.split('_')[0]
     file_id = call.data.split('_')[1]
 
@@ -61,49 +68,71 @@ async def get_screenshot(call: aio.types.CallbackQuery):
     await bot.delete_message(call.message.chat.id, call.message.message_id+1) if file_type == 'report' else await bot.delete_message(call.message.chat.id, call.message.message_id-1)
 
     await call.answer('Сейчас будет отправлен скриншот отчета',)
-    print(file_type)
-    print(file_id)
 
-    html = await screenshot.screenshot_html({'docID': file_id, 'docType': file_type})
+    async with state.proxy() as data:
+        data['file_type'] = file_type
+        data['file_id'] = file_id
+        data['html'] = await screenshot.screenshot_html({'docID': file_id, 'docType': file_type})
     await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile('example.png'))
 
-    yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data=f'addFilter_{file_type}_{file_id}'),
+    yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data=f'addFilter'),
                                                  InlineKeyboardButton('No', callback_data='NoFilter'))
     await bot.send_message(call.message.chat.id, 'Хотите добавить фильтр на отчет?', reply_markup=yes_no_keyboard)
 
 
-@dp.callback_query_handler(Text(startswith='documentID_'))
-async def get_screenshot(call: aio.types.CallbackQuery):
-    await bot.delete_message(call.message.chat.id, call.message.message_id)
-    await bot.delete_message(call.message.chat.id, call.message.message_id-1)
+@dp.callback_query_handler(Text(startswith='addFilter'))
+async def get_filters(call: aio.types.CallbackQuery, state: FSMContext):
+    await call.message.delete()
 
-    document_id = call.data.split('_')[1]
+    async with state.proxy() as data:
+        data['all_selectors'] = screenshot.get_selectors(data['html'])
+        data['active_selectors'] = screenshot.get_selectors(data['html'])
+        data['final'] = {}
 
-    await call.answer('Сейчас будет отправлен скриншот отчета',)
-    print(document_id)
-    html = await screenshot.screenshot_html({'docID' : document_id, 'docType': 'document'})
-    await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile('example.png'))
-
-    yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data='addFilter_'+document_id),
-                                                 InlineKeyboardButton('No', callback_data='NoFilter'))
-    print('user_chat_id' + str(call.message.from_user.id))
-    await bot.send_message(call.message.chat.id, 'Хотите добавить фильтр на отчет?', reply_markup=yes_no_keyboard)
-
-
+    if data['file_type'] == 'document':
+        selectors_keyboard = InlineKeyboardMarkup()
+        for selector_name in data['active_selectors'].keys():
+            print('selector_'+selector_name + '_' + data['active_selectors'][selector_name])
+            selectors_keyboard.add(InlineKeyboardButton(selector_name, callback_data='selector_'+selector_name + '_' + data['active_selectors'][selector_name]))
+        selectors_keyboard.add(InlineKeyboardButton('Продолжить', callback_data='continue'))
+        await bot.send_message(call.message.chat.id, 'Выберите селекторы на которые хотите добавить фильтр', reply_markup=selectors_keyboard)
 
 
-@dp.message_handler()
-async def send(message: aio.types.Message):
-    if len(message.text) != 32:
-        await bot.send_message(message.from_user.id, 'Некорректный ID отчета')
-    else:
-        await bot.send_message(message.from_user.id, 'Делаем скриншот. Может занять некоторое время...')
-        count = random.randint(0,100000)
-        print(count)
-        await screenshot.screenshot({'docID': message.text})
-        print(count)
-        photo = open('example.png', 'rb')
-        await bot.send_photo(message.from_user.id, photo=photo)
+@dp.callback_query_handler(Text(startswith='selector_'))
+async def add_selector(call: aio.types.CallbackQuery, state: FSMContext):
+    selector_name = call.data.split('_')[1]
+    ckey = call.data.split('_')[2]
+    new_keyboard = InlineKeyboardMarkup()
+    async with state.proxy() as data:
+        data[f'values_{selector_name}_{ckey}'] = screenshot.get_values(data['html'], ckey)
+        data['active_selectors'].pop(selector_name)
+    for s_name in data['active_selectors'].keys():
+        new_keyboard.add(InlineKeyboardButton(s_name, callback_data='selector_'+s_name + '_' + data['active_selectors'][s_name]))
+    new_keyboard.add(InlineKeyboardButton('Продолжить', callback_data='continue'))
+    await bot.edit_message_reply_markup(call.message.chat.id, message_id=call.message.message_id, reply_markup=new_keyboard)
+
+
+@dp.callback_query_handler(Text(startswith='continue'))
+async def add_values(call: aio.types.CallbackQuery, state: FSMContext):
+    await call.message.delete()
+    async with state.proxy() as data:
+        for selector in data.keys():
+            if selector.startswith('values'):
+                values_keyboard = InlineKeyboardMarkup()
+                for key in data[selector]:
+                    values_keyboard.add(InlineKeyboardButton(key, callback_data='add_' + selector.split('_')[1] + '_' + data[selector][key]))
+                await bot.send_message(call.message.chat.id, 'Выберите значение селектора ' + selector.split('_')[1] + ':', reply_markup=values_keyboard)
+
+
+@dp.callback_query_handler(Text(startswith='add_'))
+async def final_filters(call: aio.types.CallbackQuery, state: FSMContext):
+    await call.message.delete()
+    selector_id = call.data.split('_')[1]
+    value_id = call.data.split('_')[2]
+    async with state.proxy() as data:
+        data['final'].update({data['all_selectors'][selector_id]: value_id})
+    print(data['final'])
+
 
 
 

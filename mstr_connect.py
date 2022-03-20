@@ -4,8 +4,7 @@ from mstrio.project_objects import list_reports, Report, list_documents
 
 from mstrio.types import ObjectTypes
 from mstrio.object_management import list_objects, list_folders, get_predefined_folder_contents, PredefinedFolders
-url = 'http://f5a7-213-135-80-34.ngrok.io/MicroStrategyLibrary/api/'
-
+url = 'http://d1bd-213-135-80-34.ngrok.io/MicroStrategyLibrary/api/'
 mstr_username = 'administrator'
 mstr_password = ''
 project_name = 'New Project'
