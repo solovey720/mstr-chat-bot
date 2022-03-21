@@ -45,6 +45,7 @@ async def start_message(message: aio.types.Message):
 async def help_info(message: aio.types.Message):
     await bot.send_message(message.from_user.id, f'Список доступных команд:\n /search - поиск отчета')
 
+
 @dp.message_handler(state=get_info.find_name)
 async def search_report(message: aio.types.Message, state: FSMContext):
     all_reports = InlineKeyboardMarkup()
