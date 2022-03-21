@@ -66,7 +66,7 @@ async def screenshot(options = dict()):
     await browser.close()
 
 
-async def screenshot_html(options=dict()):
+async def screenshot_html(options=dict(), selectors=''):
     timeout_long = 60000
     timeout_short = 3000
     path = 'https://d1bd-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb'
@@ -96,6 +96,8 @@ async def screenshot_html(options=dict()):
                                      project) + '&Port=0&share=1&'
     path += 'uid=' + options.get('login', login) + '&' + 'pwd=' + options.get('password', password)
     path += '&hiddensections=path,dockTop,dockLeft,footer'
+
+    path += selectors
     ##############
     #path += '&evt=' + '1024001' + '&src=mstrWeb.' + 'oivm.rwb.1024001'
     #path += '&events=-2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.WC5D6239510A84DC09D38527793A12086*.elemList*.h1;264614C648E9C743C4283B8137C8D9BA*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.W5121A375615A451CA272FD10697EA8EA*.elemList*.h1;77ECA0D9445F155A4B08DFAC49FC9624*.elemList*.h23;77ECA0D9445F155A4B08DFAC49FC9624*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048014*.mstrWeb***.oivm***.rwb***.2048014_'
@@ -156,7 +158,7 @@ def get_selectors(HTML):
         name = HTML[:HTML.find('\"')]
         HTML = HTML[HTML.find('\"ckey\":\"') + 8:]
         ckey = HTML[:HTML.find('\"')]
-        select[name] = ckey
+        select[name[0:6]] = ckey
         find_111 = HTML.find('\"t\":111') + 1
     return select
 
