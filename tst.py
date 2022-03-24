@@ -122,11 +122,12 @@ async def screenshot_html(options = dict()):
     print(r)'''
 
     
-    
+    ##################  Задаем на нужной странице в нужном селекторе нужные значения (значения перечисляются через \\u001e)
     await request_set_selector(page)
     await request_set_selector(page,{'ctlKey':selectors['Актер'],'elemList':tst['9:JOE']+'\\u001e'+tst['10:CHRISTIAN']}) 
+    #################   тригерим обновления селекторов
     await trigger_selectors(page)
-
+    ################
 
     await page.waitFor(3000000)
     return HTML
@@ -169,6 +170,8 @@ async def request_set_selector(page, options = dict()):
     ctlKey=options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     keyContext=await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
     elemList=options.get('elemList', 'h30;77ECA0D9445F155A4B08DFAC49FC9624')
+    
+    ################## отправляем запрос
     await page.evaluate(f'''
     url = {url}
     fetch(url, {{
