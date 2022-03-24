@@ -163,14 +163,14 @@ def get_values(HTML, ckey):
 
 async def request_set_selector(page, options = dict()):
     taskid=options.get('taskid', 'mojoRWManipulation')
+    url = options.get('url', 'http://localhost:8080/MicroStrategy/servlet/taskProc') #url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     rwb = await page.evaluate('mstrApp.docModel.bs')
     messageID = await page.evaluate('mstrApp.docModel.mid')
     ctlKey=options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     keyContext=await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
     elemList=options.get('elemList', 'h30;77ECA0D9445F155A4B08DFAC49FC9624')
     await page.evaluate(f'''
-    url = 'http://localhost:8080/MicroStrategy/servlet/taskProc'
-   
+    url = {url}
     fetch(url, {{
     method: 'POST',
         headers: {{
@@ -180,9 +180,12 @@ async def request_set_selector(page, options = dict()):
     }})   
     ''')
 
-async def trigger_selectors(page, sel_name='Selector3e8'):
-    await page.click('#mstrHamburger')   
-    await page.evaluate('document.querySelector(\'a[class="item rerun"]\').click()')
+async def trigger_selectors(page):
+    
+    await page.evaluate('mstrApp.docModel.controller.refresh()')
+
+    #await page.click('#mstrHamburger')   
+    #await page.evaluate('document.querySelector(\'a[class="item rerun"]\').click()')
 
     # await page.evaluate(f"document.querySelector('div[nm=\"{sel_name}\"]').querySelector('div[aria-label=\"OK\"]').click()")
     
