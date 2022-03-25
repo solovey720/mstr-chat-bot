@@ -126,7 +126,7 @@ async def screenshot_html(options = dict()):
     await request_set_selector(page,{'ctlKey':selectors['Актер'],'elemList':tst['9:JOE']+'\\u001e'+tst['10:CHRISTIAN']}) 
     #################   тригерим обновления селекторов
     await trigger_selectors(page)
-    ################
+    #################
 
     await page.waitFor(3000000)
     return HTML
@@ -184,7 +184,7 @@ async def request_set_selector(page, options = dict()):
     
 
 async def trigger_selectors(page):
-    
+     
     await page.evaluate('mstrApp.docModel.controller.refresh()')
 
     #await page.click('#mstrHamburger')   
