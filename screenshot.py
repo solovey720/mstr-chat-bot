@@ -69,13 +69,13 @@ async def screenshot(options = dict()):
 async def screenshot_html(options=dict(), selectors=''):
     timeout_long = 60000
     timeout_short = 3000
-    path = 'https://d1bd-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb'
+    path = 'https://d1bd-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb' # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = 'C4DB9BA7BF457B5B6D345090FF2BA99F'
     docType = 'document'
-    server = 'DESKTOP-2RSMLJR'
-    project = 'New+Project'
+    server = 'DESKTOP-2RSMLJR' # 10.191.2.88
+    project = 'New+Project' # Дашборды+оперсовета
     login = 'administrator'
-    password = ''
+    password = '' # Ceo143566
     screen_width = 1920
     screen_height = 1080
     screen_name = 'test.png'
@@ -106,7 +106,7 @@ async def screenshot_html(options=dict(), selectors=''):
     print(path)
     ####################################################
     browser = await launch(
-        {'headless': options.get('headless', False), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True),
+        {'headless': options.get('headless', True), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True),
          'defaultViewport': options.get('defaultViewport', {'width': screen_width, 'height': screen_height})})
     page = await browser.newPage()
     await page.goto(path, {'timeout': timeout_long})
@@ -123,10 +123,14 @@ async def screenshot_html(options=dict(), selectors=''):
         '#divWaitBox' if options.get('docType', docType) == 'report' else 'ERROR')
 
     try:
-        await page.waitForSelector(selector_1, {'timeout': timeout_long,
-                                                'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
-        await page.waitForSelector(selector_2,
-                                   {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+        #await page.waitForSelector(selector_1, {'timeout': timeout_long,
+        #                                        'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        #await page.waitForSelector(selector_2,
+        #                           {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+
+        await page.waitFor(7000)
+
+
         for i in range(
                 5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
             try:
@@ -135,6 +139,7 @@ async def screenshot_html(options=dict(), selectors=''):
             except:
                 await page.screenshot({'path': options.get('path_screenshot', screen_name)})
                 HTML = await page.evaluate('document.body.innerHTML')
+                print(HTML)
                 break
             await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:

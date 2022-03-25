@@ -30,8 +30,9 @@ class get_info(StatesGroup):
 @dp.message_handler(commands=['start'])
 async def start_message(message: aio.types.Message):
     await bot.send_message(message.from_user.id, 'Введите /search для поиска отчета,\n/help для списка доступных команд')
-    #keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Нужная кнопка', callback_data='s_Продолжительно_W0C72608BDBF54B33AD173402A0F0F7DC'))
+    #keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Нужная кнопка', callback_data='document_233DB69981444C2B38E266AF39289366'))
     #await bot.send_message(message.from_user.id, 'нажми', reply_markup=keyboard)
+    #await get_info.file_data.set()
 
 
 
@@ -81,7 +82,7 @@ async def get_screenshot(call: aio.types.CallbackQuery, state: FSMContext):
     await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile('test.png'))
     if file_type == 'document':
         yes_no_keyboard = InlineKeyboardMarkup().add(InlineKeyboardButton('Да', callback_data=f'addFilter'),
-                                                     InlineKeyboardButton('No', callback_data='NoFilter'))
+                                                     InlineKeyboardButton('Нет', callback_data='NoFilter'))
         await bot.send_message(call.message.chat.id, 'Хотите добавить фильтр на отчет?', reply_markup=yes_no_keyboard)
     else:
         await bot.send_message(call.message.chat.id, 'Введите /search для поиска отчетов')
@@ -108,21 +109,21 @@ async def get_filters(call: aio.types.CallbackQuery, state: FSMContext):
         selectors_keyboard = InlineKeyboardMarkup()
         for selector_name in data['active_selectors'].keys():
             print('selector_'+selector_name + '_' + data['active_selectors'][selector_name])
-            selectors_keyboard.add(InlineKeyboardButton(selector_name, callback_data='sel_'+selector_name + '_' + data['active_selectors'][selector_name]))
+            selectors_keyboard.add(InlineKeyboardButton(selector_name, callback_data='sel,'+selector_name + ',' + data['active_selectors'][selector_name]))
         selectors_keyboard.add(InlineKeyboardButton('Продолжить', callback_data='continue'))
         await bot.send_message(call.message.chat.id, 'Выберите селекторы на которые хотите добавить фильтр', reply_markup=selectors_keyboard)
 
 
-@dp.callback_query_handler(Text(startswith='sel_'), state=get_info.file_data)
+@dp.callback_query_handler(Text(startswith='sel,'), state=get_info.file_data)
 async def add_selector(call: aio.types.CallbackQuery, state: FSMContext):
-    selector_name = call.data.split('_')[1]
-    ckey = call.data.split('_')[2]
+    selector_name = call.data.split(',')[1]
+    ckey = call.data.split(',')[2]
     new_keyboard = InlineKeyboardMarkup()
     async with state.proxy() as data:
-        data[f'values_{selector_name}_{ckey}'] = screenshot.get_values(data['html'], ckey)
+        data[f'values,{selector_name},{ckey}'] = screenshot.get_values(data['html'], ckey)
         data['active_selectors'].pop(selector_name)
     for s_name in data['active_selectors'].keys():
-        new_keyboard.add(InlineKeyboardButton(s_name, callback_data='sel_'+s_name + '_' + data['active_selectors'][s_name]))
+        new_keyboard.add(InlineKeyboardButton(s_name, callback_data='sel,'+s_name + ',' + data['active_selectors'][s_name]))
     new_keyboard.add(InlineKeyboardButton('Продолжить', callback_data='continue'))
     await bot.edit_message_reply_markup(call.message.chat.id, message_id=call.message.message_id, reply_markup=new_keyboard)
 
@@ -134,21 +135,23 @@ async def add_values(call: aio.types.CallbackQuery, state: FSMContext):
         for selector in data.keys():
             if selector.startswith('values'):
                 values_keyboard = InlineKeyboardMarkup(row_width=2)
-                c=0
+                print(data[selector].keys())
+                c = 0
                 for key in data[selector]:
-                    if c<=50:
-                        values_keyboard.insert(InlineKeyboardButton(key, callback_data='add_' + selector.split('_')[1] + '_' + data[selector][key]))
+                    if c <= 50:
+                        values_keyboard.insert(InlineKeyboardButton(key, callback_data='add,' + selector.split(',')[1] + ',' + data[selector][key]))
                     else:
                         break
                     c += 1
-                await bot.send_message(call.message.chat.id, 'Выберите значение селектора ' + selector.split('_')[1] + ':', reply_markup=values_keyboard)
+                await bot.send_message(call.message.chat.id, 'Выберите значение селектора ' + selector.split(',')[1] + ':', reply_markup=values_keyboard)
     await bot.send_message(call.message.chat.id, 'После выбора нужных селекторов нажмите \'Продолжить\':', reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton('Продолжить', callback_data='continue2')))
 
-@dp.callback_query_handler(Text(startswith='add_'), state=get_info.file_data)
+
+@dp.callback_query_handler(Text(startswith='add,'), state=get_info.file_data)
 async def final_filters(call: aio.types.CallbackQuery, state: FSMContext):
     await call.message.delete()
-    selector_id = call.data.split('_')[1]
-    value_id = call.data.split('_')[2]
+    selector_id = call.data.split(',')[1]
+    value_id = call.data.split(',')[2]
     async with state.proxy() as data:
         data['final'].update({data['all_selectors'][selector_id]: value_id})
     print(data['final'])
