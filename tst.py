@@ -129,7 +129,7 @@ async def screenshot_html(options = dict()):
     #################
 
     await page.waitFor(3000000)
-    return HTML
+    return page
 
 def get_selectors(HTML):
 
@@ -162,17 +162,20 @@ def get_values(HTML, ckey):
     return val
 
 async def request_set_selector(page, options = dict()):
+    url = options.get('url', 'http://localhost:8080/MicroStrategy/servlet/taskProc') #url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    ctlKey=options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
+    elemList=options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
+
     taskid=options.get('taskid', 'mojoRWManipulation')
-    url = options.get('url', '\'http://localhost:8080/MicroStrategy/servlet/taskProc\'') #url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     rwb = await page.evaluate('mstrApp.docModel.bs')
     messageID = await page.evaluate('mstrApp.docModel.mid')
-    ctlKey=options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
-    keyContext=await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
     mstr_now = await page.evaluate('mstrmojo.now()')
-    elemList=options.get('elemList', 'h30;77ECA0D9445F155A4B08DFAC49FC9624')
     servlet= await page.evaluate('mstrApp.servletState')
+    keyContext=await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
+    
+
     await page.evaluate(f'''
-    url = {url}
+    url = \'{url}\'
     fetch(url, {{
     method: 'POST',
         headers: {{
