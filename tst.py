@@ -101,7 +101,6 @@ async def screenshot_html(options = dict()):
         print('error')
     
     
-    
     selectors = get_selectors(HTML)
     #print(selectors)
     tst= get_values(HTML, selectors['Актер'])
@@ -164,14 +163,14 @@ def get_values(HTML, ckey):
 
 async def request_set_selector(page, options = dict()):
     taskid=options.get('taskid', 'mojoRWManipulation')
-    url = options.get('url', 'http://localhost:8080/MicroStrategy/servlet/taskProc') #url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', '\'http://localhost:8080/MicroStrategy/servlet/taskProc\'') #url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     rwb = await page.evaluate('mstrApp.docModel.bs')
     messageID = await page.evaluate('mstrApp.docModel.mid')
     ctlKey=options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     keyContext=await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
+    mstr_now = await page.evaluate('mstrmojo.now()')
     elemList=options.get('elemList', 'h30;77ECA0D9445F155A4B08DFAC49FC9624')
-    
-    ################## отправляем запрос
+    servlet= await page.evaluate('mstrApp.servletState')
     await page.evaluate(f'''
     url = {url}
     fetch(url, {{
@@ -179,9 +178,10 @@ async def request_set_selector(page, options = dict()):
         headers: {{
         'Content-type': 'application/x-www-form-urlencoded',
         }},
-    body:"taskId={taskid}&rwb={rwb}&messageID={messageID}&stateID=-1&params=%7B%22actions%22%3A%5B%7B%22act%22%3A%22setSelectorElements%22%2C%22keyContext%22%3A%22{keyContext}%22%2C%22ctlKey%22%3A%22{ctlKey}%22%2C%22elemList%22%3A%22{elemList}%22%2C%22isVisualization%22%3Afalse%2C%22include%22%3Atrue%2C%22tks%22%3A%22W12390BF5EDEF41D8A507193CEF784240%22%7D%5D%2C%22partialUpdate%22%3A%7B%22selectors%22%3A%5B%22W5121A375615A451CA272FD10697EA8EA%22%5D%7D%2C%22style%22%3A%7B%22params%22%3A%7B%22treesToRender%22%3A3%7D%2C%22name%22%3A%22RWDocumentMojoStyle%22%7D%7D&zoomFactor=1&styleName=RWDocumentMojoStyle&taskContentType=json&taskEnv=xhr&xts="+ mstrmojo.now() +"&mstrWeb="+mstrApp.servletState
+    body:"taskId={taskid}&rwb={rwb}&messageID={messageID}&stateID=-1&params=%7B%22actions%22%3A%5B%7B%22act%22%3A%22setSelectorElements%22%2C%22keyContext%22%3A%22{keyContext}%22%2C%22ctlKey%22%3A%22{ctlKey}%22%2C%22elemList%22%3A%22{elemList}%22%2C%22isVisualization%22%3Afalse%2C%22include%22%3Atrue%2C%22tks%22%3A%22W12390BF5EDEF41D8A507193CEF784240%22%7D%5D%2C%22partialUpdate%22%3A%7B%22selectors%22%3A%5B%22W5121A375615A451CA272FD10697EA8EA%22%5D%7D%2C%22style%22%3A%7B%22params%22%3A%7B%22treesToRender%22%3A3%7D%2C%22name%22%3A%22RWDocumentMojoStyle%22%7D%7D&zoomFactor=1&styleName=RWDocumentMojoStyle&taskContentType=json&taskEnv=xhr&xts={mstr_now}&mstrWeb={servlet}"
     }})   
     ''')
+    
 
 async def trigger_selectors(page):
     
