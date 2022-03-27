@@ -37,7 +37,7 @@ def check(url):
     line_count = 0
     z=get_(url)
 
-    for i in range(10):
+    for i in range(len(z)):
         
         a=z[i]
         print(a)
