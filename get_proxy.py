@@ -13,11 +13,23 @@ now = datetime.date.today()+datetime.timedelta(days=-1)
 
 #чтение по ссылке
 
-url1=f'https://webanetlabs.net/proxylist2022/spisok_proksi_na_{now.strftime("%d.%m.%Y")}.html'
+
+def get_url():
+    for i in range(30):
+        now = datetime.date.today()+datetime.timedelta(days=-i)
+        z=f'https://webanetlabs.net/proxylist2022/spisok_proksi_na_{now.strftime("%d.%m.%Y")}.html'
+        get = requests.get(z)
+        a=get.status_code
+        if a == 200:
+            return z
+
+url1=get_url()
 url2='https://advanced.name/freeproxy/6240642a03e73'
 url_list = [url1, url2]
 #print(type(url_list[1]))
 good_p=[]
+
+
 
 def get_(url):
     get = requests.get(url)
