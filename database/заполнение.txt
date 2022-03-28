@@ -1,0 +1,13 @@
+CREATE TABLE users
+               (ID INTEGER PRIMARY KEY,
+               security TEXT)
+
+CREATE TABLE subscription
+               (ID INTEGER PRIMARY KEY,
+               indicator_change TEXT,
+               company_events TEXT,
+               time_events TEXT)
+
+CREATE TABLE favorite
+               (ID INTEGER PRIMARY KEY,
+               favorite TEXT)
