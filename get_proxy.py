@@ -65,7 +65,7 @@ def check(url):
         }
         line_count +=1
         try:           
-            r =  requests.post(url, params=dat, proxies=proxies, timeout=5)
+            r =  requests.post(url, params=dat, proxies=proxies, timeout=3)
             if (r.status_code == 200):
                 print('--------------------------------------------------------')
                 print(f'\t\t\t\t\t{a}')
