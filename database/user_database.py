@@ -207,6 +207,10 @@ class DB:
         
 
 
+
+
+
+"""
 import random
 import time
 def test():
@@ -245,3 +249,5 @@ print(a.get_security(1723464345))
 print(a.get_subscription(1723464345))
 print(time.time()-start)
 '''
+
+"""
