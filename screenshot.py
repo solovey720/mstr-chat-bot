@@ -69,13 +69,13 @@ async def screenshot(options = dict()):
 async def screenshot_html(options=dict(), selectors=''):
     timeout_long = 60000
     timeout_short = 3000
-    path = 'https://d1bd-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb' # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = 'https://bcf9-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb' # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = 'C4DB9BA7BF457B5B6D345090FF2BA99F'
     docType = 'document'
-    server = 'DESKTOP-2RSMLJR' # 10.191.2.88
-    project = 'New+Project' # Дашборды+оперсовета
+    server = 'DESKTOP-2RSMLJR'
+    project = 'New+Project'
     login = 'administrator'
-    password = '' # Ceo143566
+    password = ''
     screen_width = 1920
     screen_height = 1080
     screen_name = 'test.png'
@@ -163,7 +163,7 @@ def get_selectors(HTML):
         name = HTML[:HTML.find('\"')]
         HTML = HTML[HTML.find('\"ckey\":\"') + 8:]
         ckey = HTML[:HTML.find('\"')]
-        select[name[0:6]] = ckey
+        select[name[0:10]] = ckey
         find_111 = HTML.find('\"t\":111') + 1
     return select
 
@@ -262,3 +262,28 @@ async def get_screen(path, options=dict()):
         print('errorrrrrrrr')
 
     await browser.close()
+
+
+async def request_set_selector(page, options=dict()):
+    url = options.get('url',
+                      'http://localhost:8080/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
+    elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
+
+    taskid = options.get('taskid', 'mojoRWManipulation')
+    rwb = await page.evaluate('mstrApp.docModel.bs')
+    messageID = await page.evaluate('mstrApp.docModel.mid')
+    mstr_now = await page.evaluate('mstrmojo.now()')
+    servlet = await page.evaluate('mstrApp.servletState')
+    keyContext = await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
+
+    await page.evaluate(f'''
+    url = \'{url}\'
+    fetch(url, {{
+    method: 'POST',
+        headers: {{
+        'Content-type': 'application/x-www-form-urlencoded',
+        }},
+    body:"taskId={taskid}&rwb={rwb}&messageID={messageID}&stateID=-1&params=%7B%22actions%22%3A%5B%7B%22act%22%3A%22setSelectorElements%22%2C%22keyContext%22%3A%22{keyContext}%22%2C%22ctlKey%22%3A%22{ctlKey}%22%2C%22elemList%22%3A%22{elemList}%22%2C%22isVisualization%22%3Afalse%2C%22include%22%3Atrue%2C%22tks%22%3A%22W12390BF5EDEF41D8A507193CEF784240%22%7D%5D%2C%22partialUpdate%22%3A%7B%22selectors%22%3A%5B%22W5121A375615A451CA272FD10697EA8EA%22%5D%7D%2C%22style%22%3A%7B%22params%22%3A%7B%22treesToRender%22%3A3%7D%2C%22name%22%3A%22RWDocumentMojoStyle%22%7D%7D&zoomFactor=1&styleName=RWDocumentMojoStyle&taskContentType=json&taskEnv=xhr&xts={mstr_now}&mstrWeb={servlet}"
+    }})   
+    ''')

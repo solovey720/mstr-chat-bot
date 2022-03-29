@@ -155,3 +155,4 @@ test/
 screenshots/
 demo/
 *.png
+test.py
