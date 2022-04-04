@@ -19,10 +19,7 @@ asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
 #asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
 asyncio.get_event_loop().run_until_complete(get_filter_screen(1, {'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'], 'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h1;264614C648E9C743C4283B8137C8D9BA','h10;264614C648E9C743C4283B8137C8D9BA']}}))
 #asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-
-
 """
-#https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=10.191.2.88&P
 
 async def create_page(user_id, options=dict()):
 
@@ -53,8 +50,7 @@ async def create_page(user_id, options=dict()):
     path += 'uid=' + login + '&' + 'pwd=' + password
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
-    print(path)
-    ####################################################
+    
     page = await browser.newPage()
     page.user_id = user_id
 
@@ -71,12 +67,8 @@ async def create_page(user_id, options=dict()):
         '#divWaitBox' if docType == 'report' else 'ERROR')
 
     try:
-        await page.waitForSelector(selector_1, {'timeout': timeout_long,
-                                                'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
-        await page.waitForSelector(selector_2,
-                                   {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
-
-
+        await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
         for i in range(5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
             try:
                 await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
@@ -123,17 +115,15 @@ async def get_filter_screen(user_id, options=dict()):
         '#UniqueReportID' if docType == 'report' else 'ERROR')
     selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
         '#divWaitBox' if docType == 'report' else 'ERROR')
+    
     await apply_selectors(user_id)
  
     try:
-        await page.waitForSelector(selector_1, {'timeout': timeout_long,
-                                                'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
-        await page.waitForSelector(selector_2,
-                                   {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+        await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
         for i in range(5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
             try:
                 await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
-
             except:
                 await page.screenshot({'path': screen_name})
                 return 
@@ -210,7 +200,7 @@ async def apply_selectors(user_id):
 
 async def on_startup(_): 
     global browser
-    browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False})
+    browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
 
 async def get_page_by_id(user_id: int):
     for i in (await browser.pages()):
