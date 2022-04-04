@@ -210,7 +210,7 @@ async def get_page_by_id(user_id: int):
 async def close_page(user_id: int):
     for i in (await browser.pages()):
         if i.user_id == user_id:
-            i.close()
+            await i.close()
 
 def list_to_str(val: list) -> str:
     str=val.pop()
