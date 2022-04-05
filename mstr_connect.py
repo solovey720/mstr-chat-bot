@@ -9,7 +9,7 @@ import os
 
 dotenv.load_dotenv('keys.env')
 
-url = os.environ.get('SERVER')+'/MicroStrategyLibrary/api/'
+url = os.environ.get('SERVER') + '/MicroStrategyLibrary/api/'
 mstr_username = os.environ.get('LOGIN')
 mstr_password = os.environ.get('PASSWORD')
 project_name = os.environ.get('PROJECT')
@@ -22,12 +22,13 @@ def get_connection():
 
 
 def search_report(connection, report_name):
-    rep = list_reports(connection, name_begins=report_name)
-    return rep
+    reports = list_reports(connection, name_begins=report_name)
+    return reports
+
 
 def search_document(connection, doc_name):
-    doc = list_documents(connection, doc_name)
-    return doc
+    documents = list_documents(connection, doc_name)
+    return documents
 
 
 def get_report(connection, report_id):

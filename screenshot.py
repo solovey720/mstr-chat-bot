@@ -24,6 +24,7 @@ async def create_page(user_id, options=dict()):
     path = options.get('path', os.environ.get('SERVER')+'/MicroStrategy/servlet/mstrWeb')
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
+    # TODO: как назвать server, если server двумя строчками выше?
     server = options.get('Server', 'DESKTOP-2RSMLJR') #КАК НАЗВАТЬ???????????????????????
     project = options.get('Project', os.environ.get('PROJECT'))
     login = options.get('login', os.environ.get('LOGIN'))
@@ -105,8 +106,7 @@ async def get_filter_screen(user_id, options=dict()):
     if filters_sel:
         for i in filters_sel.keys():
             print(i)
-            # await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])})
-            await request_set_selector(user_id, {'ctlKey': i, 'elemList': filters_sel[i]})
+            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])})
 
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
                 docType == 'dossier') else (
@@ -140,7 +140,8 @@ async def get_filter_screen(user_id, options=dict()):
 async def get_selectors(user_id):
     page = await get_page_by_id(user_id)
     HTML = await page.evaluate('document.body.innerHTML')
-    select = dict()
+    select_multi = dict()
+    select_wo_multi = dict()
     find_111 = HTML.find('\"t\":111') + 1
     while find_111 != 0:
         HTML = HTML[find_111:]
@@ -148,9 +149,14 @@ async def get_selectors(user_id):
         name = HTML[:HTML.find('\"')]
         HTML = HTML[HTML.find('\"ckey\":\"') + 8:]
         ckey = HTML[:HTML.find('\"')]
-        select[name[0:10]] = ckey
+
+        HTML = HTML[HTML.find('\"multi\":') + 8:]
+        if HTML[0] == 't':
+            select_multi[name] = ckey
+        else:
+            select_wo_multi[name] = ckey
         find_111 = HTML.find('\"t\":111') + 1
-    return select
+    return select_multi, select_wo_multi
 
 
 async def get_values(user_id, ckey):
@@ -173,7 +179,7 @@ async def get_values(user_id, ckey):
 
 async def request_set_selector(user_id, options=dict()):
     page = await get_page_by_id(user_id)
-    url = options.get('url',os.environ.get('SERVER')+'/MicroStrategy/servlet/taskProc')
+    url = options.get('url', os.environ.get('SERVER')+'/MicroStrategy/servlet/taskProc')
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -204,7 +210,7 @@ async def apply_selectors(user_id):
 
 async def on_startup(_):
     global browser
-    browser = await launch({'headless': False, 'ignoreHTTPSErrors': True, 'autoClose': False,
+    browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose': False,
                             'defaultViewport': {'width': 1920, 'height': 1080}})
 
 
@@ -221,8 +227,7 @@ async def close_page(user_id: int):
 
 
 def list_to_str(val: list) -> str:
-    #в параметрах указан лист, а приходит строчка. pop принимает один параметр. намудрил...
-    # str = val.pop()
+    str = val.pop()
     str = ''
     for i in val:
         str += '\\u001e' + i
