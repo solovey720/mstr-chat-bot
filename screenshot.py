@@ -1,6 +1,4 @@
-from matplotlib.style import use
 from pyppeteer import launch
-import asyncio
 import logging
 #http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=MSTR-IS01.CORP.MVIDEO.RU&Project=%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0&Port=0&share=1&uid=administrator&pwd=Ceo143566!@
 #LP 520F150011EB25866E6D0080EF154E9B
@@ -25,15 +23,13 @@ async def create_page(user_id, options=dict()):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', 'http://f178-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = options.get('path', 'http://4a99-93-157-144-71.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
     server = options.get('Server', 'DESKTOP-2RSMLJR')
     project = options.get('Project', 'New+Project')
     login = options.get('login', 'administrator')
     password = options.get('password', '')
-    screen_width = 1920
-    screen_height = 1080
     
 
     evt_temp = '2048001' if docType == 'document' else (
@@ -138,7 +134,8 @@ async def get_filter_screen(user_id, options=dict()):
 async def get_selectors(user_id):
     page = await get_page_by_id(user_id)
     HTML = await page.evaluate('document.body.innerHTML')
-    select = dict()
+    select_multi = dict()
+    select_wo_multi = dict()
     find_111 = HTML.find('\"t\":111') + 1
     while find_111 != 0:
         HTML = HTML[find_111:]
@@ -146,9 +143,14 @@ async def get_selectors(user_id):
         name = HTML[:HTML.find('\"')]
         HTML = HTML[HTML.find('\"ckey\":\"') + 8:]
         ckey = HTML[:HTML.find('\"')]
-        select[name[0:10]] = ckey
+        
+        HTML = HTML[HTML.find('\"multi\":') + 8:]
+        if HTML[0]=='t':
+            select_multi[name] = ckey
+        else:
+            select_wo_multi[name] = ckey
         find_111 = HTML.find('\"t\":111') + 1
-    return select
+    return select_multi, select_wo_multi 
 
 
 async def get_values(user_id, ckey):
@@ -170,7 +172,7 @@ async def get_values(user_id, ckey):
 
 async def request_set_selector(user_id, options=dict()):
     page = await get_page_by_id(user_id)
-    url = options.get('url', 'http://f178-213-135-80-34.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', 'http://4a99-93-157-144-71.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
