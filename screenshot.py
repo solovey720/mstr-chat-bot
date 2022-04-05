@@ -1,160 +1,145 @@
+from matplotlib.style import use
 from pyppeteer import launch
 import asyncio
 import logging
-#http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=MSTR-IS01.CORP.MVIDEO.RU&Project=%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0&Port=0&share=1&uid=administrator&pwd=Ceo143566!@
-#LP 520F150011EB25866E6D0080EF154E9B
-#log 84293CF411EB296FDA820080EFF566F0
-#gfk 4E44AA6711EB13AC585C0080EFA5DBEF
-#sales 52969EFC11EA3C7B42930080EF857558
-#obs 0105984311EA440357CD0080EF354C4B
+import dotenv
+import os
 
+global browser
+dotenv.load_dotenv('keys.env')
+"""
+asyncio.get_event_loop().run_until_complete(create_page(1,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}) )
 
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
+asyncio.get_event_loop().run_until_complete(create_page(2,{'docID': '8CD564B54D2ED4AFD358F3853610D647'}) )
+asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
+asyncio.get_event_loop().run_until_complete(get_filter_screen(1, {'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'], 'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h1;264614C648E9C743C4283B8137C8D9BA','h10;264614C648E9C743C4283B8137C8D9BA']}}))
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
+"""
 
-#https://dashboard-temp.corp.mvideo.ru:443/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=10.191.2.88&P
-async def screenshot(options = dict()):
-    timeout_long = 60000
-    timeout_short = 3000
-    path = 'https://dashboard-temp/MicroStrategy/servlet/mstrWeb'
-    docID = 'C4DB9BA7BF457B5B6D345090FF2BA99F'
-    docType = 'document'
-    server = '10.191.2.88'
-    project = 'Дашборды+оперсовета'
-    login = 'administrator'
-    password = 'Ceo143566'
+async def create_page(user_id, options=dict()):
+    timeout_long = options.get('timeout_long', 60000)
+    timeout_short = options.get('timeout_short', 3000)
+    path = options.get('path', os.environ.get('SERVER')+'/MicroStrategy/servlet/mstrWeb')
+    docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
+    docType = options.get('docType', 'document')
+    server = options.get('Server', 'DESKTOP-2RSMLJR') #КАК НАЗВАТЬ???????????????????????
+    project = options.get('Project', os.environ.get('PROJECT'))
+    login = options.get('login', os.environ.get('LOGIN'))
+    password = options.get('password', os.environ.get('PASSWORD'))
     screen_width = 1920
     screen_height = 1080
-    screen_name = 'test.png'
 
-    evt_temp = '2048001' if options.get('docType', docType) == 'document' else ('4001' if options.get('docType', docType) == 'report' else ('3140' if options.get('docType', docType) == 'dossier' else 'error'))
+    evt_temp = '2048001' if docType == 'document' else (
+        '4001' if docType == 'report' else (
+            '3140' if docType == 'dossier' else 'error'))
     evt = options.get('evt', evt_temp)
-    timeout_long = options.get('timeout_long', timeout_long)
-    timeout_short = options.get('timeout_short', timeout_short)
 
-    path=options.get('path', path)
-    path+='?evt=' + evt + '&src=mstrWeb.' + options.get('evt', '2048001')
-    path+='&' + ('document' if options.get('docType', docType) == 'dossier' else options.get('docType', docType)) + 'ID=' + options.get('docID', docID) + '&currentViewMedia=1&visMode=0&'
-    path+= 'Server=' + options.get('Server', server) + '&'
-    path+= 'Project=' + options.get('Project', project) + '&Port=0&share=1&'
-    path+= 'uid=' + options.get('login', login) + '&' + 'pwd=' + options.get('password', password)
-    path+='&hiddensections=path,dockTop,dockLeft,footer'
-    print (path)
-
-    browser = await launch({'headless': options.get('headless', False), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True), 'defaultViewport': options.get('defaultViewport', {'width': screen_width, 'height': screen_height})})
-    page = await browser.newPage()
-    await page.goto(path, {'timeout':timeout_long})
-
-    # нажимаем на 'continue
-    #await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
-    #await page.click('#\\33 054')
-
-    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType', 'document') == 'document') or (options.get('docType', 'document') == 'dossier') else ( '#UniqueReportID' if options.get('docType', 'document') == 'report' else 'ERROR')
-    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType', 'document') == 'document') or (options.get('docType', 'document') == 'dossier') else ( '#divWaitBox' if options.get('docType', 'document') == 'report' else 'ERROR')
-    try:
-        await page.waitForSelector(selector_1, {'timeout':timeout_long, 'visible': True} ) #ждем ухода самой загрузки документа и появления загрузки данных борда
-        await page.waitForSelector(selector_2, {'timeout':timeout_long, 'hidden': True} ) # ждем пока пропадет окно загрузки данных
-        for i in range(5): # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
-            try :
-                await page.waitForSelector(selector_2, {'timeout':timeout_short, 'visible': True} )
-            except:
-                await page.screenshot({'path': options.get('path_screenshot', screen_name)})
-                break
-            await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
-    except Exception as e:
-        logging.exception(e)
-        print('error')
-
-    await browser.close()
-
-
-async def screenshot_html(options=dict(), selectors=''):
-    timeout_long = 60000
-    timeout_short = 3000
-    path = 'https://bcf9-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb' # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
-    docID = 'C4DB9BA7BF457B5B6D345090FF2BA99F'
-    docType = 'document'
-    server = 'DESKTOP-2RSMLJR'
-    project = 'New+Project'
-    login = 'administrator'
-    password = ''
-    screen_width = 1920
-    screen_height = 1080
-    screen_name = 'test.png'
-
-    evt_temp = '2048001' if options.get('docType', docType) == 'document' else (
-        '4001' if options.get('docType', docType) == 'report' else (
-            '3140' if options.get('docType', docType) == 'dossier' else 'error'))
-    evt = options.get('evt', evt_temp)
-    timeout_long = options.get('timeout_long', timeout_long)
-    timeout_short = options.get('timeout_short', timeout_short)
-
-    path = options.get('path', path)
     path += '?evt=' + evt + '&src=mstrWeb.' + evt
-    path += '&' + ('document' if options.get('docType', docType) == 'dossier' else options.get('docType', docType)) + 'ID=' + options.get(
-        'docID', docID) + '&currentViewMedia=1&visMode=0&'
-    path += 'Server=' + options.get('Server', server) + '&'
-    path += 'Project=' + options.get('Project',
-                                     project) + '&Port=0&share=1&'
-    path += 'uid=' + options.get('login', login) + '&' + 'pwd=' + options.get('password', password)
+    path += '&' + ('document' if docType == 'dossier' else docType) + 'ID=' + docID + '&currentViewMedia=1&visMode=0&'
+    path += 'Server=' + server + '&'
+    path += 'Project=' + project + '&Port=0&share=1&'
+    path += 'uid=' + login + '&' + 'pwd=' + password
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
-    path += selectors
-    ##############
-    #path += '&evt=' + '1024001' + '&src=mstrWeb.' + 'oivm.rwb.1024001'
-    #path += '&events=-2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.WC5D6239510A84DC09D38527793A12086*.elemList*.h1;264614C648E9C743C4283B8137C8D9BA*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.W5121A375615A451CA272FD10697EA8EA*.elemList*.h1;77ECA0D9445F155A4B08DFAC49FC9624*.elemList*.h23;77ECA0D9445F155A4B08DFAC49FC9624*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048014*.mstrWeb***.oivm***.rwb***.2048014_'
-    #path += '&evtorder=2048001%2c1024001&2048001=1&1024001=1'
-    ##############
-    print(path)
-    ####################################################
-    browser = await launch(
-        {'headless': options.get('headless', True), 'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True),
-         'defaultViewport': options.get('defaultViewport', {'width': screen_width, 'height': screen_height})})
     page = await browser.newPage()
+    page.user_id = user_id
+
     await page.goto(path, {'timeout': timeout_long})
 
     ############################ press 'continue'
-    await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
+    await page.waitForSelector('#\\33 054', {'timeout': timeout_long, 'visible': True})
     await page.click('#\\33 054')
     ############################
-    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType', docType) == 'document') or (options.get('docType', docType) == 'dossier') else (
-        '#UniqueReportID' if options.get('docType', 'document') == 'report' else 'ERROR')
-    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (options.get('docType',
-                                                                                    docType) == 'document') or (
-                                                                                   options.get('docType', docType) == 'dossier') else (
-        '#divWaitBox' if options.get('docType', docType) == 'report' else 'ERROR')
+
+    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
+                docType == 'dossier') else (
+        '#UniqueReportID' if docType == 'report' else 'ERROR')
+    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
+                docType == 'dossier') else (
+        '#divWaitBox' if docType == 'report' else 'ERROR')
 
     try:
-        #await page.waitForSelector(selector_1, {'timeout': timeout_long,
-        #                                        'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
-        #await page.waitForSelector(selector_2,
-        #                           {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
-
-        await page.waitFor(7000)
-
-
+        await page.waitForSelector(selector_1, {'timeout': timeout_long,
+                                                'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2,
+                                   {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
         for i in range(
                 5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
             try:
                 await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
-
             except:
-                await page.screenshot({'path': options.get('path_screenshot', screen_name)})
-                HTML = await page.evaluate('document.body.innerHTML')
-                print(HTML)
-                break
+                return
             await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:
         logging.exception(e)
         print('error')
 
-    # selectors = get_selectors(HTML)
-    # tst= get_values(HTML, selectors['Актер'])
-    # print(tst)
 
-    await browser.close()
-    return HTML
+async def get_filter_screen(user_id, options=dict()):
+    page = await get_page_by_id(user_id)
+
+    timeout_long = options.get('timeout_long', 60000)
+    timeout_short = options.get('timeout_short', 3000)
+    docType = options.get('docType', 'document')
+    screen_name = options.get('path_screenshot', f'{user_id}.png')
+
+    security_sel = 'S_security'
+    security_val = options.get('security', [])
+
+    filters_sel = options.get('filters', {})
+
+    if not (security_val or filters_sel):
+        await page.screenshot({'path': screen_name})
+        return
+
+    if security_val:
+        ctlkey = (await get_selectors(user_id))[security_sel]
+        tmp = await get_values(user_id, ctlkey)
+        security_ctl_val = []
+        for i in security_val:
+            security_ctl_val.append(tmp[i])
+        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)})
+
+    if filters_sel:
+        for i in filters_sel.keys():
+            print(i)
+            # await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])})
+            await request_set_selector(user_id, {'ctlKey': i, 'elemList': filters_sel[i]})
+
+    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
+                docType == 'dossier') else (
+        '#UniqueReportID' if docType == 'report' else 'ERROR')
+    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
+                docType == 'dossier') else (
+        '#divWaitBox' if docType == 'report' else 'ERROR')
+
+    await apply_selectors(user_id)
+
+    try:
+        await page.waitForSelector(selector_1, {'timeout': timeout_long,
+                                                'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2,
+                                   {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+        for i in range(
+                5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
+            try:
+                await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
+            except:
+                await page.screenshot({'path': screen_name})
+                return
+            await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
+    except Exception as e:
+        logging.exception(e)
+        print('error')
+
+    return
 
 
-def get_selectors(HTML):
+async def get_selectors(user_id):
+    page = await get_page_by_id(user_id)
+    HTML = await page.evaluate('document.body.innerHTML')
     select = dict()
     find_111 = HTML.find('\"t\":111') + 1
     while find_111 != 0:
@@ -168,7 +153,9 @@ def get_selectors(HTML):
     return select
 
 
-def get_values(HTML, ckey):
+async def get_values(user_id, ckey):
+    page = await get_page_by_id(user_id)
+    HTML = await page.evaluate('document.body.innerHTML')
     val = dict()
     HTML = HTML[HTML.find('\"k\":\"' + ckey + '\"'):]
     begin = HTML.find('\"elms\":[') + 9
@@ -184,89 +171,9 @@ def get_values(HTML, ckey):
     return val
 
 
-def get_path(options=dict()):
-    timeout_long = 60000
-    timeout_short = 3000
-    path = 'https://dashboard-temp/MicroStrategy/servlet/mstrWeb'
-    docID = 'C4DB9BA7BF457B5B6D345090FF2BA99F'
-    docType = 'document'
-    server = '10.191.2.88'
-    project = 'Дашборды+оперсовета'
-    login = 'administrator'
-    password = 'Ceo143566'
-    screen_width = 1920
-    screen_height = 1080
-    screen_name = 'test.png'
-
-    evt_temp = '2048001' if options.get('docType', docType) == 'document' else (
-        '4001' if options.get('docType', docType) == 'report' else (
-            '3140' if options.get('docType', docType) == 'dossier' else 'error'))
-    evt = options.get('evt', evt_temp)
-    timeout_long = options.get('timeout_long', timeout_long)
-    timeout_short = options.get('timeout_short', timeout_short)
-
-    path = options.get('path', path)
-    path += '?evt=' + evt + '&src=mstrWeb.' + evt
-    path += '&' + ('document' if options.get('docType', docType) == 'dossier' else options.get('docType', docType)) + 'ID=' + options.get(
-        'docID', docID) + '&currentViewMedia=1&visMode=0&'
-    path += 'Server=' + options.get('Server', server) + '&'
-    path += 'Project=' + options.get('Project',
-                                     project) + '&Port=0&share=1&'
-    path += 'uid=' + options.get('login', login) + '&' + 'pwd=' + options.get('password', password)
-    path += '&hiddensections=path,dockTop,dockLeft,footer'
-    ##############
-    #path += '&evt=' + '1024001' + '&src=mstrWeb.' + 'oivm.rwb.1024001'
-    #path += '&events=-2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.WC5D6239510A84DC09D38527793A12086*.elemList*.h1;264614C648E9C743C4283B8137C8D9BA*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048084*.mstrWeb***.oivm***.rwb***.2048084*.ctlKey*.W5121A375615A451CA272FD10697EA8EA*.elemList*.h1;77ECA0D9445F155A4B08DFAC49FC9624*.elemList*.h23;77ECA0D9445F155A4B08DFAC49FC9624*.usePartDisplay*.1*.currentIncludeState*.true*.applyNow*.0*.targetType*.0.2048014*.mstrWeb***.oivm***.rwb***.2048014_'
-    #path += '&evtorder=2048001%2c1024001&2048001=1&1024001=1'
-    ##############
-    print(path)
-
-
-async def get_screen(path, options=dict()):
-    print(path)
-    browser = await launch({'headless': options.get('headless', False),
-                            'ignoreHTTPSErrors': options.get('ignoreHTTPSErrors', True),
-                            'defaultViewport': options.get('defaultViewport', {'width': options.get('screen_width', 1920), 'height': options.get('screen_height', 1080)})
-                            })
-    page = await browser.newPage()
-    await page.goto(path, {'timeout': options.get('timeout_long', 60000)})
-
-    ############################ press 'continue'
-    #await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
-    #await page.click('#\\33 054')
-    ############################
-
-    if (options.get('docType') == 'document') or (options.get('docType') == 'dossier'):
-        selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal'
-        selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal'
-    elif options.get('docType') == 'report':
-        selector_1 = '#UniqueReportID'
-        selector_2 = '#divWaitBox'
-    else:
-        selector_1 = 'ERROR'
-        selector_2 = 'ERROR'
-
-    try:
-        await page.waitForSelector(selector_1, {'timeout': options.get('timeout_long', 60000), 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
-        await page.waitForSelector(selector_2, {'timeout': options.get('timeout_long', 60000), 'hidden': True})  # ждем пока пропадет окно загрузки данных
-        for i in range(5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
-            try:
-                await page.waitForSelector(selector_2, {'timeout': options.get('timeout_short', 3000), 'visible': True})
-
-            except:
-                await page.screenshot({'path': options.get('path_screenshot', 'example.png')})
-                break
-            await page.waitForSelector(selector_2, {'timeout': options.get('timeout_long', 60000), 'hidden': True})
-    except Exception as e:
-        logging.exception(e)
-        print('errorrrrrrrr')
-
-    await browser.close()
-
-
-async def request_set_selector(page, options=dict()):
-    url = options.get('url',
-                      'http://localhost:8080/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+async def request_set_selector(user_id, options=dict()):
+    page = await get_page_by_id(user_id)
+    url = options.get('url',os.environ.get('SERVER')+'/MicroStrategy/servlet/taskProc')
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -287,3 +194,36 @@ async def request_set_selector(page, options=dict()):
     body:"taskId={taskid}&rwb={rwb}&messageID={messageID}&stateID=-1&params=%7B%22actions%22%3A%5B%7B%22act%22%3A%22setSelectorElements%22%2C%22keyContext%22%3A%22{keyContext}%22%2C%22ctlKey%22%3A%22{ctlKey}%22%2C%22elemList%22%3A%22{elemList}%22%2C%22isVisualization%22%3Afalse%2C%22include%22%3Atrue%2C%22tks%22%3A%22W12390BF5EDEF41D8A507193CEF784240%22%7D%5D%2C%22partialUpdate%22%3A%7B%22selectors%22%3A%5B%22W5121A375615A451CA272FD10697EA8EA%22%5D%7D%2C%22style%22%3A%7B%22params%22%3A%7B%22treesToRender%22%3A3%7D%2C%22name%22%3A%22RWDocumentMojoStyle%22%7D%7D&zoomFactor=1&styleName=RWDocumentMojoStyle&taskContentType=json&taskEnv=xhr&xts={mstr_now}&mstrWeb={servlet}"
     }})   
     ''')
+
+# зачем выносить это в отдельную функцию?
+async def apply_selectors(user_id):
+    page = await get_page_by_id(user_id)
+    await page.evaluate('mstrApp.docModel.controller.refresh()')
+
+
+
+async def on_startup(_):
+    global browser
+    browser = await launch({'headless': False, 'ignoreHTTPSErrors': True, 'autoClose': False,
+                            'defaultViewport': {'width': 1920, 'height': 1080}})
+
+
+async def get_page_by_id(user_id: int):
+    for i in (await browser.pages()):
+        if i.user_id == user_id:
+            return i
+
+
+async def close_page(user_id: int):
+    for i in (await browser.pages()):
+        if i.user_id == user_id:
+            i.close()
+
+
+def list_to_str(val: list) -> str:
+    #в параметрах указан лист, а приходит строчка. pop принимает один параметр. намудрил...
+    # str = val.pop()
+    str = ''
+    for i in val:
+        str += '\\u001e' + i
+    return str

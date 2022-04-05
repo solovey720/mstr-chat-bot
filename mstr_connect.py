@@ -4,10 +4,15 @@ from mstrio.project_objects import list_reports, Report, list_documents
 
 from mstrio.types import ObjectTypes
 from mstrio.object_management import list_objects, list_folders, get_predefined_folder_contents, PredefinedFolders
-url = 'http://bcf9-213-135-80-34.ngrok.io/MicroStrategyLibrary/api/'
-mstr_username = 'administrator'
-mstr_password = ''
-project_name = 'New Project'
+import dotenv
+import os
+
+dotenv.load_dotenv('keys.env')
+
+url = os.environ.get('SERVER')+'/MicroStrategyLibrary/api/'
+mstr_username = os.environ.get('LOGIN')
+mstr_password = os.environ.get('PASSWORD')
+project_name = os.environ.get('PROJECT')
 
 
 def get_connection():

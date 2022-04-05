@@ -151,8 +151,10 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+test.py
 test/
 screenshots/
 demo/
 *.png
-test.py
+*.env
+*.bak
