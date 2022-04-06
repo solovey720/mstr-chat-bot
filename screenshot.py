@@ -1,4 +1,5 @@
 from pyppeteer import launch
+import asyncio
 import logging
 #http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=MSTR-IS01.CORP.MVIDEO.RU&Project=%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0&Port=0&share=1&uid=administrator&pwd=Ceo143566!@
 #LP 520F150011EB25866E6D0080EF154E9B
@@ -8,22 +9,14 @@ import logging
 #obs 0105984311EA440357CD0080EF354C4B
 
 
-"""
-asyncio.get_event_loop().run_until_complete(create_page(1,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}) )
 
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
-asyncio.get_event_loop().run_until_complete(create_page(2,{'docID': '8CD564B54D2ED4AFD358F3853610D647'}) )
-asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
-asyncio.get_event_loop().run_until_complete(get_filter_screen(1, {'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'], 'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h1;264614C648E9C743C4283B8137C8D9BA','h10;264614C648E9C743C4283B8137C8D9BA']}}))
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-"""
+
 
 async def create_page(user_id, options=dict()):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', 'http://4a99-93-157-144-71.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = options.get('path', 'http://09eb-93-157-144-71.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
     server = options.get('Server', 'DESKTOP-2RSMLJR')
@@ -172,7 +165,7 @@ async def get_values(user_id, ckey):
 
 async def request_set_selector(user_id, options=dict()):
     page = await get_page_by_id(user_id)
-    url = options.get('url', 'http://4a99-93-157-144-71.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', 'http://09eb-93-157-144-71.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -202,7 +195,7 @@ async def apply_selectors(user_id):
 
 async def on_startup(_): 
     global browser
-    browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
+    browser = await launch({'headless': False, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
 
 async def get_page_by_id(user_id: int):
     for i in (await browser.pages()):
@@ -219,3 +212,14 @@ def list_to_str(val: list) -> str:
     for i in val:
         str+='\\u001e'+i
     return str
+
+asyncio.get_event_loop().run_until_complete(on_startup("") )
+    
+asyncio.get_event_loop().run_until_complete(create_page(1,{'docID': 'D4F24BCA4D33D5B4723F209EC81B2106'}) )
+
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
+#asyncio.get_event_loop().run_until_complete(create_page(2,{'docID': '8CD564B54D2ED4AFD358F3853610D647'}) )
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(1)) #'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],
+asyncio.get_event_loop().run_until_complete(get_filter_screen(1, { 'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}))
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
