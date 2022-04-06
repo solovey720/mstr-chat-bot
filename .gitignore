@@ -52,8 +52,7 @@ coverage.xml
 cover/
 
 # Translations
-*.mo
-*.pot
+
 
 # Django stuff:
 *.log
@@ -153,3 +152,4 @@ cython_debug/
 
 test/
 screenshots/
+*.env
