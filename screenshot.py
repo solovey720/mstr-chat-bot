@@ -1,5 +1,5 @@
 from matplotlib.style import use
-from pyppeteer import launch
+from pyppeteer import launch, errors
 import asyncio
 import logging
 import dotenv
@@ -21,11 +21,10 @@ asyncio.get_event_loop().run_until_complete(get_filter_screen(1, {'security': ['
 async def create_page(user_id, options=dict()):
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', os.environ.get('SERVER')+'/MicroStrategy/servlet/mstrWeb')
+    path = options.get('path', os.environ.get('SERVER_LINK')+'/MicroStrategy/servlet/mstrWeb')
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
-    # TODO: как назвать server, если server двумя строчками выше?
-    server = options.get('Server', 'DESKTOP-2RSMLJR') #КАК НАЗВАТЬ???????????????????????
+    server = options.get('Server', os.environ.get('SERVER'))
     project = options.get('Project', os.environ.get('PROJECT'))
     login = options.get('login', os.environ.get('LOGIN'))
     password = options.get('password', os.environ.get('PASSWORD'))
@@ -105,7 +104,6 @@ async def get_filter_screen(user_id, options=dict()):
 
     if filters_sel:
         for i in filters_sel.keys():
-            print(i)
             await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])})
 
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
@@ -132,7 +130,7 @@ async def get_filter_screen(user_id, options=dict()):
             await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:
         logging.exception(e)
-        print('error')
+        raise e
 
     return
 
@@ -179,7 +177,7 @@ async def get_values(user_id, ckey):
 
 async def request_set_selector(user_id, options=dict()):
     page = await get_page_by_id(user_id)
-    url = options.get('url', os.environ.get('SERVER')+'/MicroStrategy/servlet/taskProc')
+    url = options.get('url', os.environ.get('SERVER_LINK') + '/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -201,7 +199,6 @@ async def request_set_selector(user_id, options=dict()):
     }})   
     ''')
 
-# зачем выносить это в отдельную функцию?
 async def apply_selectors(user_id):
     page = await get_page_by_id(user_id)
     await page.evaluate('mstrApp.docModel.controller.refresh()')
@@ -223,12 +220,11 @@ async def get_page_by_id(user_id: int):
 async def close_page(user_id: int):
     for i in (await browser.pages()):
         if i.user_id == user_id:
-            i.close()
+            await i.close()
 
 
 def list_to_str(val: list) -> str:
-    str = val.pop()
-    str = ''
-    for i in val:
-        str += '\\u001e' + i
-    return str
+    str_ = str(val[0])
+    for i in val[1:]:
+        str_ += '\\u001e' + i
+    return str_

@@ -9,7 +9,7 @@ import os
 
 dotenv.load_dotenv('keys.env')
 
-url = os.environ.get('SERVER') + '/MicroStrategyLibrary/api/'
+url = os.environ.get('SERVER_LINK') + '/MicroStrategyLibrary/api/'
 mstr_username = os.environ.get('LOGIN')
 mstr_password = os.environ.get('PASSWORD')
 project_name = os.environ.get('PROJECT')
