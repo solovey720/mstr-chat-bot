@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2022-04-06 12:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+msgid "begin"
+msgstr "Введите /search для поиска отчета,\n/help для списка доступных команд"
+
+msgid "command_list"
+msgstr "Список доступных команд:\n /search - поиск отчета \n /language - сменить язык"
+
+msgid "file_name"
+msgstr "Введи имя отчета:"
+
+msgid "report_list"
+msgstr "Список доступных репортов:"
+
+msgid "document_list"
+msgstr "Список доступных документов:"
+
+msgid "send_report"
+msgstr "Отправляем скриншот отчета..."
+
+msgid "type_search"
+msgstr "Введите /search для поиска отчетов"
+
+msgid "add_filter"
+msgstr "Хотите добавить фильтр на отчет?"
+
+msgid "yes"
+msgstr "Да"
+
+msgid "no"
+msgstr "Нет"
+
+msgid "mult_selectors"
+msgstr "Селекторы с мультивыбором:"
+
+msgid "wo_mult_selectors"
+msgstr "Селекторы без мультивыбора:"
+
+msgid "get_screen"
+msgstr "Прислать скрин"
+
+msgid "more_selectors"
+msgstr "Выбрать еще селектор"
+
+msgid "set_sel_val"
+msgstr "Установите значение селектора"
+
+msgid "no_data"
+msgstr "Выбранные фильтры исключают все данные"
+
+msgid "find_another"
+msgstr "Найти другой отчет"
+
+msgid "sel_val_mult"
+msgstr "Выберите одно или несколько значений для селектора \'{0}\':"
+
+msgid "sel_val_wo_mult"
+msgstr "Выберите одно значение для селектора \'{0}\':"
+
+msgid "wtd"
+msgstr "Что дальше делать?"
+
+msgid "selector_set"
+msgstr "Селектор установлен в {0}"

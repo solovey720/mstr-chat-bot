@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2022-04-06 12:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+msgid "begin"
+msgstr "Enter /search to find report,\n/help for list of available commands"
+
+msgid "command_list"
+msgstr "List of available commands:\n /search - find report \n /language - change language"
+
+msgid "file_name"
+msgstr "Enter report name:"
+
+msgid "report_list"
+msgstr "List of available reports:"
+
+msgid "document_list"
+msgstr "List of available documents:"
+
+msgid "send_report"
+msgstr "Loading screenshot of report..."
+
+msgid "type_search"
+msgstr "Enter /search to find report"
+
+msgid "add_filter"
+msgstr "Add report filter?"
+
+msgid "yes"
+msgstr "Yes"
+
+msgid "no"
+msgstr "No"
+
+msgid "mult_selectors"
+msgstr "Multi select filters:"
+
+msgid "wo_mult_selectors"
+msgstr "Single select filters:"
+
+msgid "get_screen"
+msgstr "Get screenshot"
+
+msgid "more_selectors"
+msgstr "Choose another selector"
+
+msgid "set_sel_val"
+msgstr "Set selector's value"
+
+msgid "no_data"
+msgstr "Выбранные фильтры исключают все данные (только на англ)"
+
+msgid "find_another"
+msgstr "Search for another report"
+
+msgid "sel_val_mult"
+msgstr "Choose one or more selector's \'{0}\' value:"
+
+msgid "sel_val_wo_mult"
+msgstr "Choose one selector's \'{0}\' value: :"
+
+msgid "wtd"
+msgstr "What are you going to do bro?"
+
+msgid "selector_set"
+msgstr "Selector set in {0}"
