@@ -1,5 +1,4 @@
 import random
-from scheduler import scheduler, get_user_jobs
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -9,7 +8,11 @@ from mstrio.types import ObjectTypes, ObjectSubTypes
 import mstr_connect
 
 from pyppeteer import launch
-import screenshot
+###################
+#from webdriver.page_interaction import on_startup
+from webdriver.screenshot import *
+from webdriver.scheduler import scheduler, scheduler_dashboard
+##########################
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from init_bot import bot
 import json
@@ -17,7 +20,6 @@ from translate import _
 import dotenv
 import os
 import aiogram as aio
-import scheduler_bot
 
 dotenv.load_dotenv('keys.env')
 
@@ -40,9 +42,11 @@ async def start_command(message: aio.types.Message):
     print('s')
     
     user_id = aio.types.User.get_current().id
+    
     #scheduler.add_job(screenshot.click_all_pages,  "interval", seconds=1, replace_existing=True, id=f'{user_id}_click', name='click')
-    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[1, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
-    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[5, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr2', name='sec_withsec_withfiltr2')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+    #scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name='sec_withsec_withfiltr')
+    '''scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[5, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr2', name='sec_withsec_withfiltr2')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[6, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr3', name='sec_withsec_withfiltr3')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[7, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr4', name='sec_withsec_withfiltr4')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[8, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr5', name='sec_withsec_withfiltr5')
@@ -54,7 +58,7 @@ async def start_command(message: aio.types.Message):
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[3, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER']}],id=f'{user_id}_sec_withsec', name='sec_withsec')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[4],id=f'{user_id}_sec', name='sec')
     print(get_user_jobs(str(user_id)))
-    print('f')
+    print('f')'''
     #scheduler.add_job(screenshot.create_page,  "interval", seconds=3, replace_existing=True, args=[aio.types.User.get_current().id,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}],id='2')
     #print('sched')
     #await screenshot.create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
@@ -62,23 +66,24 @@ async def start_command(message: aio.types.Message):
     #await bot.send_photo(chat_id=aio.types.User.get_current().id, photo=InputFile(str(aio.types.User.get_current().id) + '.png'))
 
 async def send_sched_photo(user_id: int, options=dict()): 
-    await screenshot.scheduler_dashboard(user_id, options)
-    #await bot.send_photo(chat_id=user_id, photo=InputFile(str((-1) * user_id) + '.png'))
-    #os.remove(str((-1) * user_id) + '.png')
+    screen_name = options.get('path_screenshot', f'{user_id}.png')
+    await scheduler_dashboard(user_id, options)
+    await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+    os.remove(screen_name)
 
 
 
 @dp.message_handler(commands=['help'], state=None)
 async def help_command(message: aio.types.Message):
     print('hs')
-    await screenshot.create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
-    await screenshot.get_filter_screen(aio.types.User.get_current().id)
+    await create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
+    await get_filter_screen(aio.types.User.get_current().id)
     await bot.send_photo(chat_id=aio.types.User.get_current().id, photo=InputFile(str(aio.types.User.get_current().id) + '.png'))
     os.remove(str(aio.types.User.get_current().id) + '.png')
     print('hf')
 
 
-aio.executor.start_polling(dp, on_startup=screenshot.on_startup)
+aio.executor.start_polling(dp)#, on_startup=on_startup)
 exit()
 @dp.message_handler(commands=['search'], state=None)
 async def search_command(message: aio.types.Message):
@@ -127,8 +132,11 @@ async def send_screenshot(call: aio.types.CallbackQuery, state: FSMContext):
     # TODO: подумать как лучше: сообщение в чате или answer
     # await bot.edit_message_text('Отправляем скриншот отчета...', chat_id=call.message.chat.id, message_id=call.message.message_id)
     await call.answer(text='Отправляем скриншот отчета...', show_alert=True)
-    await screenshot.create_page(aio.types.User.get_current().id, {'docID': file_id})
-    await screenshot.get_filter_screen(aio.types.User.get_current().id)
+    #await scheduler.create_page(aio.types.User.get_current().id, {'docID': file_id})
+    #await scheduler.get_filter_screen(aio.types.User.get_current().id)
+    await create_page(aio.types.User.get_current().id, {'docID': file_id})
+    await get_filter_screen(aio.types.User.get_current().id)
+
     await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile(str(aio.types.User.get_current().id) + '.png'))
 
     if file_type == 'report':
@@ -155,7 +163,8 @@ async def get_filters(call: aio.types.CallbackQuery, state: FSMContext):
 
     await call.message.delete()
 
-    selectors_multi, selectors_wo_multi = await screenshot.get_selectors(aio.types.User.get_current().id)
+    #selectors_multi, selectors_wo_multi = await scheduler.get_selectors(aio.types.User.get_current().id)
+    selectors_multi, selectors_wo_multi = await get_selectors(aio.types.User.get_current().id)
 
     # отправляем селекторы с мультивыбором
     if selectors_multi:
@@ -198,7 +207,8 @@ async def get_values(call: aio.types.CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             selector_ctl = data['selectors_wo_multi'][selector_name]
 
-    selector_values = await screenshot.get_values(aio.types.User.get_current().id, selector_ctl)
+    #selector_values = await scheduler.get_values(aio.types.User.get_current().id, selector_ctl)
+    selector_values = await get_values(aio.types.User.get_current().id, selector_ctl)
 
     if selector_values:
         selector_values_keyboard = InlineKeyboardMarkup()
@@ -273,7 +283,9 @@ async def screen_with_filters(call: aio.types.CallbackQuery, state: FSMContext):
         for ctlKey in data['final'].keys():
             filters[ctlKey] = data['final'][ctlKey]
 
-    await screenshot.get_filter_screen(aio.types.User.get_current().id,
+    #await scheduler.get_filter_screen(aio.types.User.get_current().id,
+    #                                   {'docType': data['file_type'], 'filters': filters})
+    await get_filter_screen(aio.types.User.get_current().id,
                                        {'docType': data['file_type'], 'filters': filters})
 
     await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile(str(aio.types.User.get_current().id) + '.png'),
@@ -282,4 +294,4 @@ async def screen_with_filters(call: aio.types.CallbackQuery, state: FSMContext):
     await state.finish()
 
 
-aio.executor.start_polling(dp, on_startup=screenshot.on_startup)
+aio.executor.start_polling(dp, on_startup=on_startup)
