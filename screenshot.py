@@ -1,4 +1,6 @@
+import os
 from pyppeteer import launch
+from aiogram.types import InputFile
 import asyncio
 import logging
 #http://dashboards.corp.mvideo.ru/MicroStrategy/servlet/mstrWeb?evt=2048001&src=mstrWeb.2048001&documentID=520F150011EB25866E6D0080EF154E9B&currentViewMedia=1&visMode=0&Server=MSTR-IS01.CORP.MVIDEO.RU&Project=%D0%94%D0%B0%D1%88%D0%B1%D0%BE%D1%80%D0%B4%D1%8B%20%D0%BE%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%B0&Port=0&share=1&uid=administrator&pwd=Ceo143566!@
@@ -12,18 +14,17 @@ import logging
 
 
 
-async def create_page(user_id, options=dict()):
+async def create_page(user_id, options=dict(), new_browser = None):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', 'http://09eb-93-157-144-71.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = options.get('path', 'http://41b7-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
     server = options.get('Server', 'DESKTOP-2RSMLJR')
     project = options.get('Project', 'New+Project')
     login = options.get('login', 'administrator')
     password = options.get('password', '')
-    
 
     evt_temp = '2048001' if docType == 'document' else (
         '4001' if docType == 'report' else (
@@ -39,15 +40,20 @@ async def create_page(user_id, options=dict()):
     path += 'uid=' + login + '&' + 'pwd=' + password
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
-    
-    page = await browser.newPage()
+    if not new_browser:
+        #global browser
+        page = await browser.newPage()
+    else: 
+        page = await new_browser.newPage()
+
     page.user_id = user_id
 
     await page.goto(path, {'timeout': timeout_long})
-
+    #await create_audio (user_id)
     ############################ press 'continue'
     await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
     await page.click('#\\33 054')
+    #await create_audio (user_id)
     ############################
     
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
@@ -70,9 +76,11 @@ async def create_page(user_id, options=dict()):
     
 
 
-async def get_filter_screen(user_id, options=dict()):
-    page = await get_page_by_id(user_id)
-    
+async def get_filter_screen(user_id, options=dict(), new_browser = None):
+    if not new_browser:
+        page = await get_page_by_id(user_id)
+    else: 
+        page = (await new_browser.pages())[1]
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
     docType = options.get('docType', 'document')
@@ -88,16 +96,18 @@ async def get_filter_screen(user_id, options=dict()):
         return
 
     if security_val:
-        ctlkey = (await get_selectors(user_id))[security_sel]
-        tmp = await get_values(user_id, ctlkey)
+        a, b = await get_selectors(user_id, new_browser=new_browser)
+        all_selectors = a | b
+        ctlkey = (all_selectors)[security_sel]
+        tmp = await get_values(user_id, ctlkey, new_browser=new_browser)
         security_ctl_val=[]
         for i in security_val:
             security_ctl_val.append(tmp[i])
-        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)})
+        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=new_browser)
     
     if filters_sel: 
         for i in filters_sel.keys():
-            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])})
+            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=new_browser)
     
     
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
@@ -105,7 +115,7 @@ async def get_filter_screen(user_id, options=dict()):
     selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
         '#divWaitBox' if docType == 'report' else 'ERROR')
     
-    await apply_selectors(user_id)
+    await apply_selectors(user_id, new_browser=new_browser)
  
     try:
         await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
@@ -124,8 +134,11 @@ async def get_filter_screen(user_id, options=dict()):
     return 
 
 
-async def get_selectors(user_id):
-    page = await get_page_by_id(user_id)
+async def get_selectors(user_id, new_browser = None):
+    if not new_browser:
+        page = await get_page_by_id(user_id)
+    else: 
+        page = (await new_browser.pages())[1]
     HTML = await page.evaluate('document.body.innerHTML')
     select_multi = dict()
     select_wo_multi = dict()
@@ -146,8 +159,12 @@ async def get_selectors(user_id):
     return select_multi, select_wo_multi 
 
 
-async def get_values(user_id, ckey):
-    page = await get_page_by_id(user_id)
+async def get_values(user_id, ckey, new_browser = None):
+    
+    if not new_browser:
+        page = await get_page_by_id(user_id)
+    else: 
+        page = (await new_browser.pages())[1]
     HTML = await page.evaluate('document.body.innerHTML')
     val = dict()
     HTML = HTML[HTML.find('\"k\":\"' + ckey + '\"'):]
@@ -163,9 +180,12 @@ async def get_values(user_id, ckey):
         val[name] = value
     return val
 
-async def request_set_selector(user_id, options=dict()):
-    page = await get_page_by_id(user_id)
-    url = options.get('url', 'http://09eb-93-157-144-71.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+async def request_set_selector(user_id, options=dict(), new_browser = None):
+    if not new_browser:
+        page = await get_page_by_id(user_id)
+    else: 
+        page = (await new_browser.pages())[1]
+    url = options.get('url', 'http://41b7-213-135-80-34.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -175,7 +195,7 @@ async def request_set_selector(user_id, options=dict()):
     mstr_now = await page.evaluate('mstrmojo.now()')
     servlet = await page.evaluate('mstrApp.servletState')
     keyContext = await page.evaluate(f'mstrApp.docModel.getNodeDataByKey("{ctlKey}").defn.ck')
-
+    
     await page.evaluate(f'''
     url = \'{url}\'
     fetch(url, {{
@@ -188,14 +208,35 @@ async def request_set_selector(user_id, options=dict()):
     ''')
 
 
-async def apply_selectors(user_id):
-    page = await get_page_by_id(user_id)
+async def apply_selectors(user_id, new_browser = None):
+    if not new_browser:
+        page = await get_page_by_id(user_id)
+    else: 
+        page = (await new_browser.pages())[1]
     await page.evaluate('mstrApp.docModel.controller.refresh()')
+
+async def create_audio(user_id):
+    page = await get_page_by_id(user_id)
+    await page.evaluate(
+        '''
+        let a = document.createElement("audio");
+        a.src = "https://radio-holding.ru:9433/marusya_default";
+        a.loop = true;
+        a.autoplay = "autoplay";
+        a.volume = 1;
+        document.body.appendChild(a);
+        '''
+    )
+
+async def click_all_pages():
+    for i in (await browser.pages()):
+        await i.bringToFront()
+        await i.waitFor(3000)
 
 
 async def on_startup(_): 
     global browser
-    browser = await launch({'headless': False, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
+    browser = await launch({'ignoreDefaultArgs': ['--force-fieldtrials=AutomaticTabDiscarding/Disabled'], 'headless': False, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
 
 async def get_page_by_id(user_id: int):
     for i in (await browser.pages()):
@@ -213,13 +254,50 @@ def list_to_str(val: list) -> str:
         str+='\\u001e'+i
     return str
 
-asyncio.get_event_loop().run_until_complete(on_startup("") )
+
+#scheduler
+
+async def scheduler_dashboard(user_id: int, options=dict()): 
+    #{ 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}
+    #{ 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}
+    #scheduler.add_job(screenshot.create_page,  "interval", seconds=3, replace_existing=True, args=[aio.types.User.get_current().id,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}],id='2')
+    sch_user_id = (-1) * user_id
+    new_browser = await launch({ 'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
+    #'args': ['--incognito']
+    await create_page(sch_user_id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'}, new_browser = new_browser)
     
+    
+    filters_sel = options.get('filters', {})
+    new_filters_sel = dict()
+    a, b = await get_selectors(sch_user_id, new_browser = new_browser)
+    all_selectors = a | b
+    for i in filters_sel.keys():
+        ctlkey = all_selectors[i]
+        all_values = await get_values(sch_user_id, ctlkey, new_browser = new_browser)
+        sel_values = []
+        for j in filters_sel[i]:
+            sel_values.append(all_values[j])
+        new_filters_sel[ctlkey] = sel_values
+
+    await get_filter_screen(sch_user_id, {'security': options.get('security', None),'filters':new_filters_sel}, new_browser = new_browser)
+    await new_browser.close()
+    #await close_page(sch_user_id)
+    
+
+
+
+#asyncio.get_event_loop().run_until_complete(on_startup('') )
+#asyncio.get_event_loop().run_until_complete(scheduler_dashboard(1,{'filters': {'Актер':['PENELOPE','BOB']}}))
+
+"""
 asyncio.get_event_loop().run_until_complete(create_page(1,{'docID': 'D4F24BCA4D33D5B4723F209EC81B2106'}) )
 
 #asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
 #asyncio.get_event_loop().run_until_complete(create_page(2,{'docID': '8CD564B54D2ED4AFD358F3853610D647'}) )
 #asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(1)) #'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],
-asyncio.get_event_loop().run_until_complete(get_filter_screen(1, { 'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}))
+#asyncio.get_event_loop().run_until_complete(get_filter_screen(1)) #
+asyncio.get_event_loop().run_until_complete(get_filter_screen(1, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}))
 #asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
+
+
+"""

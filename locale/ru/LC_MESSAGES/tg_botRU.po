@@ -15,41 +15,65 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-msgid "Введите /search для поиска отчета,\n/help для списка доступных команд"
-msgstr ""
+msgid "begin"
+msgstr "Введите /search для поиска отчета,\n/help для списка доступных команд"
 
-msgid "Список доступных команд:\n /search - поиск отчета"
-msgstr ""
+msgid "command_list"
+msgstr "Список доступных команд:\n /search - поиск отчета \n /language - сменить язык"
 
-msgid "Введи имя отчета:"
-msgstr ""
+msgid "file_name"
+msgstr "Введи имя отчета:"
 
-msgid "Список доступных репортов:"
-msgstr ""
+msgid "report_list"
+msgstr "Список доступных репортов:"
 
-msgid "Список доступных документов:"
-msgstr ""
+msgid "document_list"
+msgstr "Список доступных документов:"
 
-msgid "Отправляем скриншот отчета..."
-msgstr ""
+msgid "send_report"
+msgstr "Отправляем скриншот отчета..."
 
-msgid "Введите /search для поиска отчетов"
-msgstr ""
+msgid "type_search"
+msgstr "Введите /search для поиска отчетов"
 
-msgid "Хотите добавить фильтр на отчет?"
-msgstr ""
+msgid "add_filter"
+msgstr "Хотите добавить фильтр на отчет?"
 
-msgid "Да"
-msgstr "ес"
+msgid "yes"
+msgstr "Да"
 
-msgid "Нет"
-msgstr ""
+msgid "no"
+msgstr "Нет"
 
-msgid "Селекторы с мультивыбором:"
-msgstr ""
+msgid "mult_selectors"
+msgstr "Селекторы с мультивыбором:"
 
-msgid "Селекторы без мультивыбора:"
-msgstr ""
+msgid "wo_mult_selectors"
+msgstr "Селекторы без мультивыбора:"
 
-msgid "Выберите значения для %s селектора \'%s\':"
-msgstr ""
+msgid "get_screen"
+msgstr "Прислать скрин"
+
+msgid "more_selectors"
+msgstr "Выбрать еще селектор"
+
+msgid "set_sel_val"
+msgstr "Установите значение селектора"
+
+msgid "no_data"
+msgstr "Выбранные фильтры исключают все данные"
+
+msgid "find_another"
+msgstr "Найти другой отчет"
+
+msgid "sel_val_mult"
+msgstr "Выберите одно или несколько значений для селектора \'{0}\':"
+
+msgid "sel_val_wo_mult"
+msgstr "Выберите одно значение для селектора \'{0}\':"
+
+msgid "wtd"
+msgstr "Что дальше делать?"
+
+msgid "selector_set"
+msgstr "Селектор установлен в {0}"

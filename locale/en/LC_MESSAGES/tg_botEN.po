@@ -15,42 +15,65 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-msgid "1"
+msgid "begin"
 msgstr "Enter /search to find report,\n/help for list of available commands"
 
-msgid "Список доступных команд:\n /search - поиск отчета"
-msgstr "List of available commands:\n /search - find report"
+msgid "command_list"
+msgstr "List of available commands:\n /search - find report \n /language - change language"
 
-msgid "Введи имя отчета:"
+msgid "file_name"
 msgstr "Enter report name:"
 
-msgid "Список доступных репортов:"
-msgstr "List of available reports"
+msgid "report_list"
+msgstr "List of available reports:"
 
-msgid "Список доступных документов:"
-msgstr "List of available documents"
+msgid "document_list"
+msgstr "List of available documents:"
 
-msgid "Отправляем скриншот отчета..."
+msgid "send_report"
 msgstr "Loading screenshot of report..."
 
-msgid "Введите /search для поиска отчетов"
+msgid "type_search"
 msgstr "Enter /search to find report"
 
-msgid "Хотите добавить фильтр на отчет?"
+msgid "add_filter"
 msgstr "Add report filter?"
 
-msgid "Да"
+msgid "yes"
 msgstr "Yes"
 
-msgid "Нет"
+msgid "no"
 msgstr "No"
 
-msgid "Селекторы с мультивыбором:"
+msgid "mult_selectors"
 msgstr "Multi select filters:"
 
-msgid "Селекторы без мультивыбора:"
+msgid "wo_mult_selectors"
 msgstr "Single select filters:"
 
-msgid "Выберите значения для %s селектора \'%s\':"
-msgstr "Choose elements of %s selector \'%s\':"
+msgid "get_screen"
+msgstr "Get screenshot"
 
+msgid "more_selectors"
+msgstr "Choose another selector"
+
+msgid "set_sel_val"
+msgstr "Set selector's value"
+
+msgid "no_data"
+msgstr "Выбранные фильтры исключают все данные (только на англ)"
+
+msgid "find_another"
+msgstr "Search for another report"
+
+msgid "sel_val_mult"
+msgstr "Choose one or more selector's \'{0}\' value:"
+
+msgid "sel_val_wo_mult"
+msgstr "Choose one selector's \'{0}\' value: :"
+
+msgid "wtd"
+msgstr "What are you going to do bro?"
+
+msgid "selector_set"
+msgstr "Selector set in {0}"
