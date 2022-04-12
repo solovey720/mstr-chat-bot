@@ -13,7 +13,7 @@ from pyppeteer import launch
 from webdriver.scheduler import *
 ##########################
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from init_bot import bot
+
 import json
 from translate import _
 import dotenv
@@ -43,7 +43,7 @@ async def start_command(message: aio.types.Message):
     user_id = aio.types.User.get_current().id
     
     #scheduler.add_job(screenshot.click_all_pages,  "interval", seconds=1, replace_existing=True, id=f'{user_id}_click', name='click')
-    scheduler.add_job(scheduler_dashboard,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+    scheduler.add_job(scheduler_dashboard,  "interval", seconds=60*5, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr21.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr21', name='sec_withsec_withfiltr12')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr31.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr31', name='sec_withsec_withfiltr13')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr41.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr41', name='sec_withsec_withfiltr14')
