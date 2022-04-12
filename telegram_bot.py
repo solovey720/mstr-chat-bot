@@ -9,9 +9,8 @@ import mstr_connect
 
 from pyppeteer import launch
 ###################
-#from webdriver.page_interaction import on_startup
-from webdriver.screenshot import *
-from webdriver.scheduler import scheduler, scheduler_dashboard
+#from webdriver.screenshot import *
+from webdriver.scheduler import *
 ##########################
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from init_bot import bot
@@ -45,8 +44,14 @@ async def start_command(message: aio.types.Message):
     
     #scheduler.add_job(screenshot.click_all_pages,  "interval", seconds=1, replace_existing=True, id=f'{user_id}_click', name='click')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr21.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr21', name='sec_withsec_withfiltr12')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr31.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr31', name='sec_withsec_withfiltr13')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr41.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr41', name='sec_withsec_withfiltr14')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr51.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr51', name='sec_withsec_withfiltr15')
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr61.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr61', name='sec_withsec_withfiltr16')
     #scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name='sec_withsec_withfiltr')
-    '''scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[5, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr2', name='sec_withsec_withfiltr2')
+    '''
+    scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[5, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr2', name='sec_withsec_withfiltr2')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[6, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr3', name='sec_withsec_withfiltr3')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[7, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr4', name='sec_withsec_withfiltr4')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[8, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr5', name='sec_withsec_withfiltr5')
@@ -58,7 +63,8 @@ async def start_command(message: aio.types.Message):
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[3, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER']}],id=f'{user_id}_sec_withsec', name='sec_withsec')
     scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[4],id=f'{user_id}_sec', name='sec')
     print(get_user_jobs(str(user_id)))
-    print('f')'''
+    print('f')
+    '''
     #scheduler.add_job(screenshot.create_page,  "interval", seconds=3, replace_existing=True, args=[aio.types.User.get_current().id,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}],id='2')
     #print('sched')
     #await screenshot.create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
@@ -76,7 +82,7 @@ async def send_sched_photo(user_id: int, options=dict()):
 @dp.message_handler(commands=['help'], state=None)
 async def help_command(message: aio.types.Message):
     print('hs')
-    await create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
+    await create_page()  (aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
     await get_filter_screen(aio.types.User.get_current().id)
     await bot.send_photo(chat_id=aio.types.User.get_current().id, photo=InputFile(str(aio.types.User.get_current().id) + '.png'))
     os.remove(str(aio.types.User.get_current().id) + '.png')

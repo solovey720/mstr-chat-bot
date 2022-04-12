@@ -1,6 +1,4 @@
 from webdriver.screenshot import *
-
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
@@ -12,20 +10,7 @@ scheduler = AsyncIOScheduler(jobstores=jobstores)
 scheduler.start()
 ################################
 scheduler.remove_all_jobs()
-
-def get_user_jobs(user_id: str):
-    job_list=[]
-    for job in scheduler.get_jobs():
-        if job.id.startswith(user_id):
-            job_list.append(job)
-    return job_list
-
-def get_jobs_name(jobs):
-    job_name=[]
-    for job in jobs:
-        job_name.append(job.name)
-    return job_name
-
+################################
 
 async def scheduler_dashboard(user_id: int, options=dict()): 
     #{ 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}
@@ -55,7 +40,18 @@ async def scheduler_dashboard(user_id: int, options=dict()):
     await new_browser.close()
     #await close_page(sch_user_id)
     
+def get_user_jobs(user_id: str):
+    job_list=[]
+    for job in scheduler.get_jobs():
+        if job.id.startswith(user_id):
+            job_list.append(job)
+    return job_list
 
+def get_jobs_name(jobs):
+    job_name=[]
+    for job in jobs:
+        job_name.append(job.name)
+    return job_name
 
 
 #asyncio.get_event_loop().run_until_complete(on_startup('') )
