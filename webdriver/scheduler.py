@@ -12,15 +12,12 @@ scheduler.start()
 scheduler.remove_all_jobs()
 ################################
 
+#scheduler.add_job(scheduler_dashboard,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+
 async def scheduler_dashboard(user_id: int, options=dict()): 
-    #{ 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}
-    #{ 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}
-    #scheduler.add_job(screenshot.create_page,  "interval", seconds=3, replace_existing=True, args=[aio.types.User.get_current().id,{'docID': 'EA706ACB43C4530927380DB3B07E0889'}],id='2')
-    #sch_user_id = (-1) * user_id
     new_browser = await launch({ 'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await new_browser.pages())[0]
 
-    #'args': ['--incognito']
     await create_page(user_id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'}, new_browser = page)
     
     
@@ -36,9 +33,8 @@ async def scheduler_dashboard(user_id: int, options=dict()):
             sel_values.append(all_values[j])
         new_filters_sel[ctlkey] = sel_values
 
-    await get_filter_screen(user_id, {'path_screenshot': options.get('path_screenshot', f'{user_id}.png'),'security': options.get('security', None),'filters':new_filters_sel}, new_browser = page)
+    await send_filter_screen(user_id, {'path_screenshot': options.get('path_screenshot', f'{user_id}.png'),'security': options.get('security', None),'filters':new_filters_sel}, new_browser = page)
     await new_browser.close()
-    #await close_page(sch_user_id)
     
 def get_user_jobs(user_id: str):
     job_list=[]
@@ -52,20 +48,3 @@ def get_jobs_name(jobs):
     for job in jobs:
         job_name.append(job.name)
     return job_name
-
-
-#asyncio.get_event_loop().run_until_complete(on_startup('') )
-#asyncio.get_event_loop().run_until_complete(scheduler_dashboard(1,{'filters': {'Актер':['PENELOPE','BOB']}}))
-
-"""
-asyncio.get_event_loop().run_until_complete(create_page(1,{'docID': 'D4F24BCA4D33D5B4723F209EC81B2106'}) )
-
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(1))
-#asyncio.get_event_loop().run_until_complete(create_page(2,{'docID': '8CD564B54D2ED4AFD358F3853610D647'}) )
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(1)) #
-asyncio.get_event_loop().run_until_complete(get_filter_screen(1, { 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'IGK719A420311EA16852B700080EF55FCB9':['h141;264614C648E9C743C4283B8137C8D9BA','h157;264614C648E9C743C4283B8137C8D9BA','h137;264614C648E9C743C4283B8137C8D9BA']}}))
-#asyncio.get_event_loop().run_until_complete(get_filter_screen(2))
-
-
-"""

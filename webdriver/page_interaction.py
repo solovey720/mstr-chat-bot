@@ -1,9 +1,11 @@
 from pyppeteer import launch
+from pyppeteer.page import Page
+from create_bot_and_conn import server_link
 #from webdriver.start_browser import *
 
 _browsers_list = dict()
 
-async def create_browser(user_id: int, headless = True):
+async def create_browser(user_id: int, headless = True) -> Page:
     _browsers_list[user_id] = await launch({ 'headless': headless, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await _browsers_list[user_id].pages())[0]
     return page 
@@ -12,7 +14,7 @@ async def close_browser(user_id: int):
     _browsers_list[user_id].close()
     _browsers_list.pop(user_id)
    
-async def get_browsers_page(user_id: int):
+async def get_browsers_page(user_id: int) -> Page:
     page = (await _browsers_list[user_id].pages())[0]
     return page
    
@@ -72,7 +74,7 @@ async def request_set_selector(user_id, options=dict(), new_browser = None):
     else: 
         page = new_browser
 
-    url = options.get('url', 'http://e6d9-213-135-80-34.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', f'{server_link}/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 

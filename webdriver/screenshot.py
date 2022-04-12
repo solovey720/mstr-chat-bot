@@ -1,12 +1,17 @@
-from  webdriver.page_interaction import *
+import os
+from webdriver.page_interaction import *
+from create_bot_and_conn import bot, server_link
+from aiogram.types import InputFile
+
 import logging
+
 
 
 async def create_page(user_id, options=dict(), new_browser = None):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', 'http://e6d9-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = options.get('path', f'{server_link}/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
     server = options.get('Server', 'DESKTOP-2RSMLJR')
@@ -62,7 +67,7 @@ async def create_page(user_id, options=dict(), new_browser = None):
     
 
 
-async def get_filter_screen(user_id, options=dict(), new_browser = None):
+async def send_filter_screen(user_id, options=dict(), new_browser = None):
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -80,6 +85,8 @@ async def get_filter_screen(user_id, options=dict(), new_browser = None):
 
     if not (security_val or filters_sel):
         await page.screenshot({'path': screen_name})
+        await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+        os.remove(screen_name)
         return
 
     if security_val:
@@ -112,6 +119,8 @@ async def get_filter_screen(user_id, options=dict(), new_browser = None):
                 await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
             except:
                 await page.screenshot({'path': screen_name})
+                await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+                os.remove(screen_name)
                 return 
             await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:
