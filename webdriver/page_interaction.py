@@ -1,11 +1,29 @@
-#from pyppeteer import launch
-from webdriver.start_browser import *
+from pyppeteer import launch
+#from webdriver.start_browser import *
+
+_browsers_list = dict()
+
+async def create_browser(user_id: int, headless = True):
+    _browsers_list[user_id] = await launch({ 'headless': headless, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
+    page = (await _browsers_list[user_id].pages())[0]
+    return page 
+
+async def close_browser(user_id: int):
+    _browsers_list[user_id].close()
+    _browsers_list.pop(user_id)
+   
+async def get_browsers_page(user_id: int):
+    page = (await _browsers_list[user_id].pages())[0]
+    return page
+   
+
+
 
 async def get_selectors(user_id, new_browser = None):
     if not new_browser:
-        page = await get_page_by_id(user_id)
+        page = await get_browsers_page(user_id)
     else: 
-        page = (await new_browser.pages())[1]
+        page = new_browser
 
     HTML = await page.evaluate('document.body.innerHTML')
     select_multi = dict()
@@ -29,9 +47,9 @@ async def get_selectors(user_id, new_browser = None):
 
 async def get_values(user_id, ckey, new_browser = None):
     if not new_browser:
-        page = await get_page_by_id(user_id)
+        page = await get_browsers_page(user_id)
     else: 
-        page = (await new_browser.pages())[1]
+        page = new_browser
 
     HTML = await page.evaluate('document.body.innerHTML')
     val = dict()
@@ -50,11 +68,11 @@ async def get_values(user_id, ckey, new_browser = None):
 
 async def request_set_selector(user_id, options=dict(), new_browser = None):
     if not new_browser:
-        page = await get_page_by_id(user_id)
+        page = await get_browsers_page(user_id)
     else: 
-        page = (await new_browser.pages())[1]
+        page = new_browser
 
-    url = options.get('url', 'http://41b7-213-135-80-34.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', 'http://e6d9-213-135-80-34.ngrok.io/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -79,12 +97,20 @@ async def request_set_selector(user_id, options=dict(), new_browser = None):
 
 async def apply_selectors(user_id, new_browser = None):
     if not new_browser:
-        page = await get_page_by_id(user_id)
+        page = await get_browsers_page(user_id)
     else: 
-        page = (await new_browser.pages())[1]
+        page = new_browser
 
     await page.evaluate('mstrApp.docModel.controller.refresh()')
 
+
+def list_to_str(val: list) -> str:
+    str=val.pop()
+    for i in val:
+        str+='\\u001e'+i
+    return str
+
+"""
 async def get_page_by_id(user_id: int):
     for i in (await browser.pages()):
         if i.user_id == user_id:
@@ -94,10 +120,4 @@ async def close_page(user_id: int):
     for i in (await browser.pages()):
         if i.user_id == user_id:
             await i.close()
-
-def list_to_str(val: list) -> str:
-    str=val.pop()
-    for i in val:
-        str+='\\u001e'+i
-    return str
-
+"""

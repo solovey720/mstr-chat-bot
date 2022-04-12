@@ -1,13 +1,12 @@
 from  webdriver.page_interaction import *
 import logging
 
-#from  webdriver.page_interaction import browser
 
 async def create_page(user_id, options=dict(), new_browser = None):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
-    path = options.get('path', 'http://41b7-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
+    path = options.get('path', 'http://e6d9-213-135-80-34.ngrok.io/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
     docID = options.get('docID', 'C4DB9BA7BF457B5B6D345090FF2BA99F')
     docType = options.get('docType', 'document')
     server = options.get('Server', 'DESKTOP-2RSMLJR')
@@ -30,9 +29,10 @@ async def create_page(user_id, options=dict(), new_browser = None):
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
     if not new_browser:
-        page = await browser.newPage()
+        page = await create_browser(user_id, headless = True)
     else: 
-        page = await new_browser.newPage()
+        page = new_browser
+    
 
     page.user_id = user_id
 
@@ -64,9 +64,9 @@ async def create_page(user_id, options=dict(), new_browser = None):
 
 async def get_filter_screen(user_id, options=dict(), new_browser = None):
     if not new_browser:
-        page = await get_page_by_id(user_id)
+        page = await get_browsers_page(user_id)
     else: 
-        page = (await new_browser.pages())[1]
+        page = new_browser
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
@@ -83,18 +83,18 @@ async def get_filter_screen(user_id, options=dict(), new_browser = None):
         return
 
     if security_val:
-        a, b = await get_selectors(user_id, new_browser=new_browser)
+        a, b = await get_selectors(user_id, new_browser=page)
         all_selectors = a | b
         ctlkey = (all_selectors)[security_sel]
-        tmp = await get_values(user_id, ctlkey, new_browser=new_browser)
+        tmp = await get_values(user_id, ctlkey, new_browser=page)
         security_ctl_val=[]
         for i in security_val:
             security_ctl_val.append(tmp[i])
-        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=new_browser)
+        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=page)
     
     if filters_sel: 
         for i in filters_sel.keys():
-            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=new_browser)
+            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=page)
     
     
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
@@ -102,7 +102,7 @@ async def get_filter_screen(user_id, options=dict(), new_browser = None):
     selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
         '#divWaitBox' if docType == 'report' else 'ERROR')
     
-    await apply_selectors(user_id, new_browser=new_browser)
+    await apply_selectors(user_id, new_browser=page)
  
     try:
         await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
