@@ -19,7 +19,7 @@ from translate import _
 import dotenv
 import os
 import aiogram as aio
-
+import asyncio
 # dotenv.load_dotenv('keys.env')
 
 
@@ -34,7 +34,7 @@ import aiogram as aio
 #     set_filters = State()
 #     final = State()
 
-
+#sem = asyncio.Semaphore(1)
 
 @dp.message_handler(commands=['start'], state=None)
 async def start_command(message: aio.types.Message):
@@ -43,7 +43,13 @@ async def start_command(message: aio.types.Message):
     user_id = aio.types.User.get_current().id
     
     #scheduler.add_job(screenshot.click_all_pages,  "interval", seconds=1, replace_existing=True, id=f'{user_id}_click', name='click')
-    scheduler.add_job(scheduler_dashboard,  "interval", seconds=60*5, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+    #scheduler.add_job(scheduler_dashboard,  "interval", seconds=60, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+    
+    #for i in range (15):
+        #scheduler.add_job(semaphore_sched,  "cron",max_instances=1, day_of_week='mon-sun', hour=14, minute=51, misfire_grace_time = None, replace_existing=True, args=[sem, user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr{i}.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr{i}', name=f'sec_withsec_withfiltr{i}')
+    scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=15, minute=44, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
+    print('create')
+    #scheduler.add_job(scheduler_dashboard,  "cron", day_of_week='mon-sun', hour=12, minute=40, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr21.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr21', name='sec_withsec_withfiltr12')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr31.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr31', name='sec_withsec_withfiltr13')
     # scheduler.add_job(send_sched_photo,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr41.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr41', name='sec_withsec_withfiltr14')

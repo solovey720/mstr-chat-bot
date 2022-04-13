@@ -6,20 +6,21 @@ jobstores = {
     'default': SQLAlchemyJobStore(url='sqlite:///database/jobs.sqlite')
         }
 
-scheduler = AsyncIOScheduler(jobstores=jobstores)
+scheduler = AsyncIOScheduler(jobstores=jobstores, timezone="Europe/Moscow")
 scheduler.start()
 ################################
 scheduler.remove_all_jobs()
 ################################
-
+#######################################################################Примеры запусков 
 #scheduler.add_job(scheduler_dashboard,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
+#scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=15, minute=44, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
 
 async def scheduler_dashboard(user_id: int, options=dict()): 
     new_browser = await launch({ 'headless': True, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await new_browser.pages())[0]
+    sched_options = options.copy()
 
-    await create_page(user_id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'}, new_browser = page)
-    
+    await create_page(user_id, options = sched_options, new_browser = page)
     
     filters_sel = options.get('filters', {})
     new_filters_sel = dict()
@@ -33,7 +34,8 @@ async def scheduler_dashboard(user_id: int, options=dict()):
             sel_values.append(all_values[j])
         new_filters_sel[ctlkey] = sel_values
 
-    await send_filter_screen(user_id, {'path_screenshot': options.get('path_screenshot', f'{user_id}.png'),'security': options.get('security', None),'filters':new_filters_sel}, new_browser = page)
+    sched_options['filters'] = new_filters_sel
+    await send_filter_screen(user_id, options = sched_options, new_browser = page)
     await new_browser.close()
     
 def get_user_jobs(user_id: str):
@@ -42,6 +44,9 @@ def get_user_jobs(user_id: str):
         if job.id.startswith(user_id):
             job_list.append(job)
     return job_list
+
+def delete_job (job_id):
+    scheduler.remove_job(job_id)
 
 def get_jobs_name(jobs):
     job_name=[]
