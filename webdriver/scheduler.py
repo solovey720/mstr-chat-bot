@@ -11,6 +11,7 @@ scheduler = AsyncIOScheduler(jobstores=jobstores, timezone="Europe/Moscow")
 scheduler.start()
 ################################
 scheduler.remove_all_jobs()
+
 ################################
 #######################################################################Примеры запусков
 #scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=17, minute=46, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfilt{i}r.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfil{i}tr', name=f'sec_withsec_wi{i}thfiltr')

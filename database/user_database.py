@@ -1,5 +1,6 @@
 
 import sqlite3 
+import json
 class DB: 
 
     """
@@ -11,6 +12,16 @@ class DB:
         )   
     print(a.cursor.fetchall())
     """
+    '''a={
+            'Idотчета1':{
+                        'selector1':['значениеселектора', 'значениеселектора'],
+                        'selector2':['значениеселектора']
+                        },
+            'id_отчета2':{
+                        'sel4': ['знач1'],
+                        'sel5': ['знач2', 'знач5', 'знач6']
+                        }
+    }'''
 
     def __init__(self, path: str):
         self.connect = sqlite3.connect(path)
@@ -65,8 +76,9 @@ class DB:
         else: 
             self.connect.commit()
 
-    def insert_favorite (self, user_id: int, favorite: str):
+    def insert_favorite (self, user_id: int, favorite: dict):
         try:
+            favorite = json.dumps(favorite)
             self.cursor.execute(
                 '''
                 UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
@@ -85,7 +97,7 @@ class DB:
                 select * from subscription LIMIT 1
                 '''
             )   
-            z=a.cursor.fetchone()
+            z=self.cursor.fetchone()
             for i in z.keys()[1:]:
                 self.cursor.execute(
                     f'''
@@ -107,19 +119,23 @@ class DB:
                 {"user_id": user_id}
             )   
             tmp = self.cursor.fetchall()[0][0]
+            if (tmp==None):
+                tmp = security
+            else:
+                tmp = f'{tmp};{security}'
 
             self.cursor.execute(
                 '''
                 UPDATE users SET security = :security WHERE ID = :user_id
                 ''', 
-                {"user_id": user_id, "security": f"{tmp};{security}"}
+                {"user_id": user_id, "security": f"{tmp}"}
             )   
         except sqlite3.DatabaseError as err:       
             print("Error: ", err)
         else: 
             self.connect.commit()
     
-    def concat_favorite (self, user_id: int, favorite: str):
+    def concat_favorite (self, user_id: int, favorite: dict):
         try:
             self.cursor.execute(
                 '''
@@ -128,12 +144,19 @@ class DB:
                 {"user_id": user_id}
             )   
             tmp = self.cursor.fetchall()[0][0]
+            if (tmp==None):
+                tmp = favorite
+            else:
+                cur_favorite = json.loads(tmp)
+                tmp = cur_favorite | favorite
+
+            tmp = json.dumps(tmp)
 
             self.cursor.execute(
                 '''
                 UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
                 ''', 
-                {"user_id": user_id, "favorite": f"{tmp};{favorite}"}
+                {"user_id": user_id, "favorite": f"{tmp}"}
             )   
         except sqlite3.DatabaseError as err:       
             print("Error: ", err)
@@ -191,7 +214,8 @@ class DB:
         except sqlite3.DatabaseError as err:       
             print("Error: ", err)
         else: 
-            return self.cursor.fetchone()
+            tmp = self.cursor.fetchone()[0]
+            return json.loads(tmp)
 
     def get_subscription (self, user_id: int):
         try:
@@ -205,6 +229,30 @@ class DB:
             print("Error: ", err)
         else: 
             return self.cursor.fetchone()
+
+    def delete_favorite (self, user_id: int, documentID: str):
+        try:
+            self.cursor.execute(
+                '''
+                select favorite from favorite WHERE ID = :user_id
+                ''', 
+                {"user_id": user_id}
+            )   
+            tmp = self.cursor.fetchall()[0][0]
+            cur_favorite = json.loads(tmp)
+            cur_favorite.pop(documentID)
+            tmp = json.dumps(cur_favorite)
+
+            self.cursor.execute(
+                '''
+                UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
+                ''', 
+                {"user_id": user_id, "favorite": f"{tmp}"}
+            )   
+        except sqlite3.DatabaseError as err:       
+            print("Error: ", err)
+        else: 
+            self.connect.commit()
 
     """
     def get_all (self):
@@ -291,15 +339,20 @@ class DB:
         self.cursor.close()
         self.connect.close()
         
-"""
+
 a = DB('database/bot_database.sqlite')
 
 a.drop_all_users()
 a.insert_new_user(1)
-a.insert_favorite(1," sdf")
-print(a.get_favorite(1)[0])
-a.show_all()
-"""
+a.concat_favorite(1,{'a':'s'})
+a.concat_favorite(1,{'z':{'s':[1,2]}})
+z=a.get_favorite(1)
+print(z['a'])
+a.delete_favorite(1, 'a')
+print(a.get_favorite(1))
+
+#a.show_all()
+
 """
 import random
 import time

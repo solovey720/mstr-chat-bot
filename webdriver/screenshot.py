@@ -97,17 +97,20 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None):
         await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return
+        
+    try:
+        if security_val:
+            a, b = await get_selectors(user_id, new_browser=page)
+            all_selectors = a | b
+            ctlkey = (all_selectors)[security_sel]
+            tmp = await get_values(user_id, ctlkey, new_browser=page)
+            security_ctl_val=[]
+            for i in security_val:
+                security_ctl_val.append(tmp[i])
+            await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=page)
+    except:
+        return
 
-    if security_val:
-        a, b = await get_selectors(user_id, new_browser=page)
-        all_selectors = a | b
-        ctlkey = (all_selectors)[security_sel]
-        tmp = await get_values(user_id, ctlkey, new_browser=page)
-        security_ctl_val=[]
-        for i in security_val:
-            security_ctl_val.append(tmp[i])
-        await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=page)
-    
     if filters_sel: 
         for i in filters_sel.keys():
             await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=page)
