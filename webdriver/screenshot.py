@@ -1,13 +1,18 @@
-import os
 from webdriver.page_interaction import *
 from create_bot_and_conn import bot, server_link
 from aiogram.types import InputFile
-
 import logging
+import os
+
+import asyncio
+
+run_limit = 10
+
+sem = asyncio.Semaphore(run_limit)
 
 
 
-async def create_page(user_id, options=dict(), new_browser = None):
+async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
@@ -34,7 +39,7 @@ async def create_page(user_id, options=dict(), new_browser = None):
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
     if not new_browser:
-        page = await create_browser(user_id, headless = True)
+        page = await create_browser(user_id, headless = False)
     else: 
         page = new_browser
     
@@ -65,9 +70,13 @@ async def create_page(user_id, options=dict(), new_browser = None):
         logging.exception(e)
         print('error')
     
+async def create_page(user_id, options=dict(), new_browser = None):  
+    async with sem:
+        #print('start create')
+        await _sem_create_page(user_id, options, new_browser)
 
 
-async def send_filter_screen(user_id, options=dict(), new_browser = None):
+async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None):
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -129,3 +138,7 @@ async def send_filter_screen(user_id, options=dict(), new_browser = None):
     
     return 
 
+async def send_filter_screen(user_id, options=dict(), new_browser = None):  
+    async with sem:
+        #print('start send')
+        await _sem_send_filter_screen(user_id, options, new_browser)
