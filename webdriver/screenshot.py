@@ -14,6 +14,7 @@ sem = asyncio.Semaphore(run_limit)
 
 async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
+
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
     path = options.get('path', f'{server_link}/MicroStrategy/servlet/mstrWeb') # https://dashboard-temp/MicroStrategy/servlet/mstrWeb
@@ -70,7 +71,25 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
         logging.exception(e)
         print('error')
     
-async def create_page(user_id, options=dict(), new_browser = None):  
+async def create_page(user_id, options=dict(), new_browser = None): 
+    """Create new browser.
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``timeout_long`` (int): Maximum navigation time in milliseconds
+    * ``timeout_short`` (int): Maximum download time in milliseconds
+    * ``path`` (str): path to the MstrWeb
+    * ``docID`` (str): id of the opening document
+    * ``docType`` (str): type of the document
+    * ``server`` (str): Mstr server name
+    * ``project`` (str): Mstr project name
+    * ``login`` (str): Mstr login
+    * ``password`` (str): Mstr password
+    * ``evt`` (str): Mstr event (use default to document, report, dossier)
+
+    await create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
+    """ 
     async with sem:
         #print('start create')
         await _sem_create_page(user_id, options, new_browser)
@@ -97,7 +116,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None):
         await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return
-        
+
     try:
         if security_val:
             a, b = await get_selectors(user_id, new_browser=page)
@@ -142,6 +161,20 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None):
     return 
 
 async def send_filter_screen(user_id, options=dict(), new_browser = None):  
+    """Send screenshot of the document with filters
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``timeout_long`` (int): Maximum navigation time in milliseconds
+    * ``timeout_short`` (int): Maximum download time in milliseconds
+    * ``path_screenshot`` (str): path to save screenshot
+    * ``security`` (list): values to apply of security selector 
+    * ``filters`` (dict): dict of ``selector``(str): ``values id``(list) to apply  
+    * ``docType`` (str): type of the document
+
+    await send_filter_screen(aio.types.User.get_current().id)
+    """ 
     async with sem:
         #print('start send')
         await _sem_send_filter_screen(user_id, options, new_browser)

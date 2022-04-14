@@ -1,7 +1,6 @@
 from pyppeteer import launch
 from pyppeteer.page import Page
 from create_bot_and_conn import server_link
-#from webdriver.start_browser import *
 
 _browsers_list = dict()
 
@@ -22,6 +21,12 @@ async def get_browsers_page(user_id: int) -> Page:
 
 
 async def get_selectors(user_id, new_browser = None):
+    """Get all dashboard's selector
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -48,6 +53,13 @@ async def get_selectors(user_id, new_browser = None):
 
 
 async def get_values(user_id, ckey, new_browser = None):
+    """Get all values from dashboard's selector
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``ckey`` (str): selector's ctlkey
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -69,6 +81,15 @@ async def get_values(user_id, ckey, new_browser = None):
     return val
 
 async def request_set_selector(user_id, options=dict(), new_browser = None):
+    """Send request to change selector's value
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``url`` (str): url to taskProc
+    * ``ctlKey`` (str): selector's ctlKey
+    * ``elemList`` (str): list of values (concat throught \\u001e)
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -98,6 +119,12 @@ async def request_set_selector(user_id, options=dict(), new_browser = None):
 
 
 async def apply_selectors(user_id, new_browser = None):
+    """Apply selector changes 
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
