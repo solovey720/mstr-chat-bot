@@ -46,7 +46,7 @@ async def start_command(message: aio.types.Message):
     #scheduler.add_job(scheduler_dashboard,  "interval", seconds=60, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
     
     for i in range (77):
-        scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=10, minute=12, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfilt{i}r.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfil{i}tr', name=f'sec_withsec_wi{i}thfiltr')
+        scheduler.add_job() (scheduler_dashboard, "cron", day_of_week='mon-sun', hour=10, minute=12, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfilt{i}r.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfil{i}tr', name=f'sec_withsec_wi{i}thfiltr')
         #scheduler.add_job(semaphore_sched,  "cron",max_instances=1, day_of_week='mon-sun', hour=14, minute=51, misfire_grace_time = None, replace_existing=True, args=[sem, user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr{i}.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr{i}', name=f'sec_withsec_withfiltr{i}')
     #scheduler.add_job(sem_scheduler_dashboard, "cron", day_of_week='mon-sun', hour=15, minute=44, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
     print('create')
@@ -83,8 +83,11 @@ async def start_command(message: aio.types.Message):
 @dp.message_handler(commands=['help'], state=None)
 async def help_command(message: aio.types.Message):
     print('hs')
-    await create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
-    await send_filter_screen(aio.types.User.get_current().id)
+    #scheduler.add_job() (scheduler_dashboard, "cron", day_of_week='mon-sun', hour=10, minute=12, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', }],id=f'{user_id}_sec_withsec_withfil{i}tr', name=f'sec_withsec_wi{i}thfiltr')
+
+    await create_page(aio.types.User.get_current().id, {'headless': True, 'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3'},)
+    await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png','filters': {'Актер':['PENELOPE','BOB'], 'Год':['2006']}}, is_ctlkey=False)
+    #await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png','filters': {'IGK719A420311EA16852B700080EF55FCB9':['h4;264614C648E9C743C4283B8137C8D9BA','h5;264614C648E9C743C4283B8137C8D9BA'], 'IGK719A442911EA16852B700080EF55FCB9':['h2006;F65860F746DE5329EC4065B6F888ED7D']}})
     print('hf')
 
 

@@ -1,4 +1,3 @@
-from sqlalchemy import true
 from webdriver.page_interaction import *
 from create_bot_and_conn import bot, server_link
 from aiogram.types import InputFile
@@ -25,6 +24,7 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
     project = options.get('Project', 'New+Project')
     login = options.get('login', 'administrator')
     password = options.get('password', '')
+    headless = options.get('headless', True)
 
     evt_temp = '2048001' if docType == 'document' else (
                 '4001' if docType == 'report' else (
@@ -41,7 +41,7 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
     path += '&hiddensections=path,dockTop,dockLeft,footer'
 
     if not new_browser:
-        page = await create_browser(user_id, headless = False)
+        page = await create_browser(user_id, headless = headless)
     else: 
         page = new_browser
     
@@ -118,10 +118,11 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
         os.remove(screen_name)
         return
 
+    a, b = await get_selectors(user_id, new_browser=page)
+    all_selectors = a | b
+
     try:
         if security_val:
-            a, b = await get_selectors(user_id, new_browser=page)
-            all_selectors = a | b
             ctlkey = (all_selectors)[security_sel]
             tmp = await get_values(user_id, ctlkey, new_browser=page)
             security_ctl_val=[]
@@ -131,11 +132,23 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     except:
         return
 
-    if filters_sel: 
-        for i in filters_sel.keys():
-            await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=page)
-    
-    
+    try:
+        if filters_sel: 
+            if is_ctlkey:    
+                for i in filters_sel.keys():
+                    await request_set_selector(user_id, {'ctlKey': i, 'elemList': list_to_str(filters_sel[i])}, new_browser=page)
+            else:
+                for i in filters_sel.keys():
+                    ctlkey = (all_selectors)[i]
+                    tmp = await get_values(user_id, ctlkey, new_browser=page)
+                    ctl_val=[]
+                    for j in filters_sel[i]:
+                        ctl_val.append(tmp[j])
+                    await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(ctl_val)}, new_browser=page)
+    except:
+        print('filter error')
+
+        
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
         '#UniqueReportID' if docType == 'report' else 'ERROR')
     selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
@@ -161,7 +174,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     
     return 
 
-async def send_filter_screen(user_id, options=dict(), new_browser = None):  
+async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):  
     """Send screenshot of the document with filters
 
     Available options are:
@@ -175,7 +188,10 @@ async def send_filter_screen(user_id, options=dict(), new_browser = None):
     * ``docType`` (str): type of the document
 
     await send_filter_screen(aio.types.User.get_current().id)
+    await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png','filters': {'Актер':['PENELOPE','BOB'], 'Год':['2006']}}, is_ctlkey=False)
+    await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB'], 'Год':['2006']}}, is_ctlkey=False)
+    await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png','filters': {'IGK719A420311EA16852B700080EF55FCB9':['h4;264614C648E9C743C4283B8137C8D9BA','h5;264614C648E9C743C4283B8137C8D9BA'], 'IGK719A442911EA16852B700080EF55FCB9':['h2006;F65860F746DE5329EC4065B6F888ED7D']}})
     """ 
     async with sem:
         #print('start send')
-        await _sem_send_filter_screen(user_id, options, new_browser)
+        await _sem_send_filter_screen(user_id, options, new_browser = new_browser, is_ctlkey = is_ctlkey)

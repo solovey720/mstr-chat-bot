@@ -133,7 +133,8 @@ async def apply_selectors(user_id, new_browser = None):
     await page.evaluate('mstrApp.docModel.controller.refresh()')
 
 
-def list_to_str(val: list) -> str:
+def list_to_str(value: list) -> str:
+    val = value.copy()
     str=val.pop()
     for i in val:
         str+='\\u001e'+i
