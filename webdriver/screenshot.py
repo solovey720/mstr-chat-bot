@@ -1,3 +1,4 @@
+from sqlalchemy import true
 from webdriver.page_interaction import *
 from create_bot_and_conn import bot, server_link
 from aiogram.types import InputFile
@@ -95,7 +96,7 @@ async def create_page(user_id, options=dict(), new_browser = None):
         await _sem_create_page(user_id, options, new_browser)
 
 
-async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None):
+async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
