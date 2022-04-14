@@ -1,8 +1,9 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, User
 from aiogram.dispatcher import FSMContext
 from aiogram import Dispatcher
-from create_bot_and_conn import bot, GetInfo
+from create_bot_and_conn import bot, GetInfo, db
 from translate import _
+from create_bot_and_conn import db
 
 
 # @dp.message_handler(commands=['language'], state=None)
@@ -19,6 +20,8 @@ async def language_command(message: Message):
 
 # @dp.message_handler(commands=['start'], state=None)
 async def start_command(message: Message):
+    db.insert_new_user(User.get_current().id)
+
     language_keyboard = InlineKeyboardMarkup()
     rus_lang_button = InlineKeyboardButton('rus', callback_data='lang:ru')
     eng_lang_button = InlineKeyboardButton('eng', callback_data='lang:en')
@@ -29,6 +32,7 @@ async def start_command(message: Message):
     await GetInfo.set_language.set()
 
     print(User.get_current())
+    db.show_all()
 
 
 # @dp.message_handler(commands=['help'], state=None)
@@ -45,6 +49,10 @@ async def search_command(message: Message, state: FSMContext):
     await bot.send_message(message.from_user.id, _(language)('file_name'))
     await GetInfo.find_file.set()
     print(User.get_current())
+
+
+async def favorite_command(message: Message, state: FSMContext):
+    db.get_favorite(User.get_current().id)
 
 
 def register_handlers_commands(dp: Dispatcher):

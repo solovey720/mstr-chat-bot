@@ -50,12 +50,16 @@ async def search_file(message: Message, state: FSMContext):
 
 # @dp.callback_query_handler(Text(startswith=['report:', 'document:']), state=GetInfo.get_screen)
 async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
+
+    file_type = call.data.split(':')[0]
+    file_id = call.data.split(':')[1]
+
     language = ''
     async with state.proxy() as data:
         language = data['language']
+        data['file_id'] = file_id
     # TODO: продумать удаление/изменение inline клавиатуры
-    file_type = call.data.split(':')[0]
-    file_id = call.data.split(':')[1]
+
 
     # создаем страницу в браузере, отправляем скриншот <id пользователя>.png
     await bot.edit_message_text(_(language)('send_report'), chat_id=call.message.chat.id,
@@ -73,7 +77,8 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
         yes_no_keyboard = InlineKeyboardMarkup()
         yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
         no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')
-        yes_no_keyboard.add(yes_button, no_button)
+        add_to_favorite = InlineKeyboardButton('Добавить отчет в избранное', callback_data='add_favorite')
+        yes_no_keyboard.add(yes_button, no_button, add_to_favorite)
         await bot.send_message(call.message.chat.id, _(language)('add_filter'), reply_markup=yes_no_keyboard)
         await GetInfo.set_filters.set()
 

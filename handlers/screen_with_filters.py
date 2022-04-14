@@ -43,5 +43,6 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
     choice_keyboard.add(change_selectors_button, find_another_button)
     await bot.send_message(chat_id=call.message.chat.id, text=_(language)('wtd'), reply_markup=choice_keyboard)
 
+
 def register_handlers_screen_with_filters(dp: Dispatcher):
     dp.register_callback_query_handler(get_screen, Text(equals='getScreen'), state=GetInfo.set_filters)
