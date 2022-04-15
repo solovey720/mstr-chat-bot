@@ -50,8 +50,8 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
     await page.goto(path, {'timeout': timeout_long})
     ############################ press 'continue'
-    await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
-    await page.click('#\\33 054')
+    #await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
+    #await page.click('#\\33 054')
     ############################
     
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
