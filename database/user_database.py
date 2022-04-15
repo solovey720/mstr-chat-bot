@@ -1,16 +1,27 @@
+import sqlite3
+import json
 
-import sqlite3 
-class DB: 
 
+class DB:
     """
     # Можно выполнять кастомные запросы через cursor.execute
     a.cursor.execute(
             '''
             select * from users
             '''
-        )   
+        )
     print(a.cursor.fetchall())
     """
+    '''a={
+            'Idотчета1':{
+                        'selector1':['значениеселектора', 'значениеселектора'],
+                        'selector2':['значениеселектора']
+                        },
+            'id_отчета2':{
+                        'sel4': ['знач1'],
+                        'sel5': ['знач2', 'знач5', 'знач6']
+                        }
+    }'''
 
     def __init__(self, path: str):
         self.connect = sqlite3.connect(path)
@@ -19,193 +30,229 @@ class DB:
 
     def insert_new_user(self, user_id: int):
         users = self.get_users()
-        if (user_id,) in users: 
+        if (user_id,) in users:
             return
         self.cursor.execute(
-                '''
-                SELECT name from sqlite_master where type= "table"
-                '''
-            ) 
-        tables=self.cursor.fetchall()
+            '''
+            SELECT name from sqlite_master where type= "table"
+            '''
+        )
+        tables = self.cursor.fetchall()
         try:
             for i in tables:
                 self.cursor.execute(
                     f'''
                     insert into {i['name']} (ID) values (:user_id);
-                    ''', 
+                    ''',
                     {"user_id": user_id}
-                )   
-        except sqlite3.DatabaseError as err:       
+                )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
         else:
             self.connect.commit()
-        
+
     def get_users(self):
         try:
             self.cursor.execute(
                 '''
                 select ID from users
                 '''
-            )   
-        except sqlite3.DatabaseError as err:       
+            )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             return self.cursor.fetchall()
 
-    def insert_security (self, user_id: int, security: str):
+    def insert_security(self, user_id: int, security: str):
         try:
             self.cursor.execute(
                 '''
                 UPDATE users SET security = :security WHERE ID = :user_id
-                ''', 
+                ''',
                 {"user_id": user_id, "security": security}
-            )   
-        except sqlite3.DatabaseError as err:       
+            )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             self.connect.commit()
-    # TODO: почему есть insert и concat? Можно же сразу добавлять с разделителем в конце
-    def insert_favorite (self, user_id: int, favorite: str):
+
+    def insert_favorite(self, user_id: int, favorite: dict):
         try:
+            favorite = json.dumps(favorite)
             self.cursor.execute(
                 '''
                 UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
-                ''', 
+                ''',
                 {"user_id": user_id, "favorite": favorite}
-            )   
-        except sqlite3.DatabaseError as err:       
+            )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             self.connect.commit()
 
-    def insert_subscription (self, user_id: int, subscription: dict):
-        try:
-            self.cursor.execute(
-                '''
-                select * from subscription LIMIT 1
-                '''
-            )   
-            z=a.cursor.fetchone()
-            for i in z.keys()[1:]:
-                self.cursor.execute(
-                    f'''
-                    UPDATE subscription SET {i} = :subs WHERE ID = :user_id;
-                    ''', 
-                    {"user_id": user_id, "subs": subscription.get(i, None)}
-                )  
-        except sqlite3.DatabaseError as err:       
-            print("Error: ", err)
-        else: 
-            self.connect.commit()
-        
-    def concat_security (self, user_id: int, security: str):
-        try:
-            self.cursor.execute(
-                '''
-                select security from users WHERE ID = :user_id
-                ''', 
-                {"user_id": user_id}
-            )   
-            tmp = self.cursor.fetchall()[0][0]
-
-            self.cursor.execute(
-                '''
-                UPDATE users SET security = :security WHERE ID = :user_id
-                ''', 
-                {"user_id": user_id, "security": f"{tmp};{security}"}
-            )   
-        except sqlite3.DatabaseError as err:       
-            print("Error: ", err)
-        else: 
-            self.connect.commit()
-    
-    def concat_favorite (self, user_id: int, favorite: str):
-        try:
-            self.cursor.execute(
-                '''
-                select favorite from favorite WHERE ID = :user_id
-                ''', 
-                {"user_id": user_id}
-            )   
-            tmp = self.cursor.fetchall()[0][0]
-
-            self.cursor.execute(
-                '''
-                UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
-                ''', 
-                {"user_id": user_id, "favorite": f"{tmp};{favorite}"}
-            )   
-        except sqlite3.DatabaseError as err:       
-            print("Error: ", err)
-        else: 
-            self.connect.commit()
-
-    def concat_subscription (self, user_id: int, subscription: dict):
+    def insert_subscription(self, user_id: int, subscription: dict):
         try:
             self.cursor.execute(
                 '''
                 select * from subscription LIMIT 1
                 '''
             )
-            # было z=a.cursor.fetchone()
-            z=self.cursor.fetchone()
+            z = self.cursor.fetchone()
             for i in z.keys()[1:]:
                 self.cursor.execute(
                     f'''
-                    select {i} from subscription WHERE ID = :user_id
-                    ''', 
-                    {"user_id": user_id}
-                )   
-                tmp = self.cursor.fetchone()[0]
-                self.cursor.execute(
-                    f'''
                     UPDATE subscription SET {i} = :subs WHERE ID = :user_id;
-                    ''', 
-                    {"user_id": user_id, "subs": f'{tmp};{subscription.get(i, None)}'}
-                )  
-        except sqlite3.DatabaseError as err:       
+                    ''',
+                    {"user_id": user_id, "subs": subscription.get(i, None)}
+                )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             self.connect.commit()
 
-    def get_security (self, user_id: int):
+    def concat_security(self, user_id: int, security: str):
         try:
             self.cursor.execute(
                 '''
                 select security from users WHERE ID = :user_id
-                ''', 
+                ''',
                 {"user_id": user_id}
-            )   
-        except sqlite3.DatabaseError as err:       
-            print("Error: ", err)
-        else: 
-            return self.cursor.fetchone()
+            )
+            tmp = self.cursor.fetchall()[0][0]
+            if (tmp == None):
+                tmp = security
+            else:
+                tmp = f'{tmp};{security}'
 
-    def get_favorite (self, user_id: int):
+            self.cursor.execute(
+                '''
+                UPDATE users SET security = :security WHERE ID = :user_id
+                ''',
+                {"user_id": user_id, "security": f"{tmp}"}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            self.connect.commit()
+
+    def concat_favorite(self, user_id: int, favorite: dict):
         try:
             self.cursor.execute(
                 '''
                 select favorite from favorite WHERE ID = :user_id
-                ''', 
+                ''',
                 {"user_id": user_id}
-            )   
-        except sqlite3.DatabaseError as err:       
+            )
+            tmp = self.cursor.fetchall()[0][0]
+            if (tmp == None):
+                tmp = favorite
+            else:
+                cur_favorite = json.loads(tmp)
+                tmp = cur_favorite | favorite
+
+            tmp = json.dumps(tmp)
+
+            self.cursor.execute(
+                '''
+                UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
+                ''',
+                {"user_id": user_id, "favorite": f"{tmp}"}
+            )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
+            self.connect.commit()
+
+    def concat_subscription(self, user_id: int, subscription: dict):
+        try:
+            self.cursor.execute(
+                '''
+                select * from subscription LIMIT 1
+                '''
+            )
+            z = a.cursor.fetchone()
+            for i in z.keys()[1:]:
+                self.cursor.execute(
+                    f'''
+                    select {i} from subscription WHERE ID = :user_id
+                    ''',
+                    {"user_id": user_id}
+                )
+                tmp = self.cursor.fetchone()[0]
+                self.cursor.execute(
+                    f'''
+                    UPDATE subscription SET {i} = :subs WHERE ID = :user_id;
+                    ''',
+                    {"user_id": user_id, "subs": f'{tmp};{subscription.get(i, None)}'}
+                )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            self.connect.commit()
+
+    def get_security(self, user_id: int):
+        try:
+            self.cursor.execute(
+                '''
+                select security from users WHERE ID = :user_id
+                ''',
+                {"user_id": user_id}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
             return self.cursor.fetchone()
+
+    def get_favorite(self, user_id: int):
+        try:
+            self.cursor.execute(
+                '''
+                select favorite from favorite WHERE ID = :user_id
+                ''',
+                {"user_id": user_id}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            tmp = self.cursor.fetchone()[0]
+            return json.loads(tmp)
 
     def get_subscription(self, user_id: int):
         try:
             self.cursor.execute(
                 '''
                 select indicator_change, company_events, time_events from subscription WHERE ID = :user_id;
-                ''', 
+                ''',
                 {"user_id": user_id}
-            )   
+            )
         except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             return self.cursor.fetchone()
+
+    def delete_favorite(self, user_id: int, documentID: str):
+        try:
+            self.cursor.execute(
+                '''
+                select favorite from favorite WHERE ID = :user_id
+                ''',
+                {"user_id": user_id}
+            )
+            tmp = self.cursor.fetchall()[0][0]
+            cur_favorite = json.loads(tmp)
+            cur_favorite.pop(documentID)
+            tmp = json.dumps(cur_favorite)
+
+            self.cursor.execute(
+                '''
+                UPDATE favorite SET favorite = :favorite WHERE ID = :user_id
+                ''',
+                {"user_id": user_id, "favorite": f"{tmp}"}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            self.connect.commit()
 
     """
     def get_all (self):
@@ -223,91 +270,96 @@ class DB:
             return self.cursor.fetchall()
     """
 
-    def drop_user (self, user_id: int):
+    def drop_user(self, user_id: int):
         users = self.get_users()
-        if (user_id,) not in users: 
+        if (user_id,) not in users:
             return
         self.cursor.execute(
-                '''
-                SELECT name from sqlite_master where type= "table"
-                '''
-            ) 
-        tables=self.cursor.fetchall()
+            '''
+            SELECT name from sqlite_master where type= "table"
+            '''
+        )
+        tables = self.cursor.fetchall()
         try:
             for i in tables:
                 self.cursor.execute(
                     f'''
                     delete from {i} where ID = :user_id;
-                    ''', 
+                    ''',
                     {"user_id": user_id}
-                )   
-        except sqlite3.DatabaseError as err:       
+                )
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
         else:
             self.connect.commit()
-    
+
     def drop_all_users(self):
         self.cursor.execute(
             '''
             SELECT name from sqlite_master where type= "table"
             '''
-        ) 
-        tables=self.cursor.fetchall()
+        )
+        tables = self.cursor.fetchall()
         try:
             for i in tables:
                 self.cursor.execute(
                     f'''
                     delete from {i['name']};
                     '''
-                )   
+                )
         except sqlite3.DatabaseError as err:
             print("Error: ", err)
-        else: 
+        else:
             self.connect.commit()
 
     def show_all(self):
         self.cursor.execute(
-                '''
-                SELECT name from sqlite_master where type= "table"
-                '''
-            ) 
-        tables=self.cursor.fetchall()
+            '''
+            SELECT name from sqlite_master where type= "table"
+            '''
+        )
+        tables = self.cursor.fetchall()
         try:
             for i in tables:
                 print(i['name'])
                 SQL = f'''
                     select * from {i['name']}
                     '''
-                self.cursor.execute(SQL)   
+                self.cursor.execute(SQL)
                 tmp = self.cursor.fetchall()
                 for i in tmp:
                     for j in i:
-                        print (j, end='\t')
-                    print()        
+                        print(j, end='\t')
+                    print()
                 print('\n')
-        except sqlite3.DatabaseError as err:       
+        except sqlite3.DatabaseError as err:
             print("Error: ", err)
 
     def __del__(self):
         self.cursor.close()
         self.connect.close()
-        
-"""
+
+
 a = DB('database/bot_database.sqlite')
 
 a.drop_all_users()
 a.insert_new_user(1)
-a.insert_favorite(1," sdf")
-print(a.get_favorite(1)[0])
-a.show_all()
-"""
+a.concat_favorite(1, {'a': 's'})
+a.concat_favorite(1, {'z': {'s': [1, 2]}})
+z = a.get_favorite(1)
+print(z['a'])
+a.delete_favorite(1, 'a')
+print(a.get_favorite(1))
+
+# a.show_all()
+
 """
 import random
 import time
 def test():
     a.drop_all_users()
     print('drop_all_user')
-    
+
 
     for i in range(100):
         b=random.randint(1,1111111111)

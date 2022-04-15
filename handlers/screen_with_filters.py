@@ -18,6 +18,7 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
 
     filters = {}
     async with state.proxy() as data:
+        print(data)
         for sel_ctl in data['filters']:
             sel_list = []
             print(sel_ctl + '---------sel_ctl')
@@ -25,7 +26,7 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
                 print(dic)
                 sel_list.append(list(dic.keys())[0])
             if sel_list:
-                filters[sel_ctl] = sel_list
+                filters[sel_ctl.split(';')[0]] = sel_list
 
     await bot.send_message(call.message.chat.id, _(language)('send_report'))
     try:
@@ -37,10 +38,11 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
         await bot.send_message(call.message.chat.id, _(language)('no_data'))
 
     # TODO: подумать над текстом кнопок и сообщений
-    choice_keyboard = InlineKeyboardMarkup()
+    choice_keyboard = InlineKeyboardMarkup(row_width=2)
     change_selectors_button = InlineKeyboardButton(_(language)('more_selectors'), callback_data='yesFilter')
     find_another_button = InlineKeyboardButton(_(language)('find_another'), callback_data='findAnother')
-    choice_keyboard.add(change_selectors_button, find_another_button)
+    add_to_favorite = InlineKeyboardButton('Добавить в избранное', callback_data='add_favorite')
+    choice_keyboard.add(change_selectors_button, find_another_button, add_to_favorite)
     await bot.send_message(chat_id=call.message.chat.id, text=_(language)('wtd'), reply_markup=choice_keyboard)
 
 

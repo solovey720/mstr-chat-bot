@@ -59,20 +59,20 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
 
     selector_name = call.data.split(':')[2]
     selector_type = call.data.split(':')[1]
-    selector_ctl = ''
+    selector_ctl_name = ''
     if selector_type == 'mult':
         async with state.proxy() as data:
-            selector_ctl = data['selectors_multi'][selector_name]
+            selector_ctl_name = data['selectors_multi'][selector_name] + f';{selector_name}'
     else:
         async with state.proxy() as data:
-            selector_ctl = data['selectors_wo_multi'][selector_name]
+            selector_ctl_name = data['selectors_wo_multi'][selector_name] + f';{selector_name}'
 
     # добавляем ctl селектора в словарь filters
     async with state.proxy() as data:
-        data['active_selector'] = selector_ctl
-        data['filters'].update({selector_ctl: []})
+        data['active_selector'] = selector_ctl_name
+        data['filters'].update({selector_ctl_name: []})
 
-    selector_values = await get_values(User.get_current().id, selector_ctl)
+    selector_values = await get_values(User.get_current().id, selector_ctl_name.split(';')[0])
     async with state.proxy() as data:
         data['selector_values'] = selector_values
 
@@ -132,6 +132,7 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
     selected_values = []
 
     async with state.proxy() as data:
+        print(data)
         selector_value = data['selector_values'][selector_value_name]
         selector_ctl = data['active_selector']
         if selector_type == 'mult':

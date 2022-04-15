@@ -22,4 +22,4 @@ bot = Bot(token)
 dp = Dispatcher(bot, storage=MemoryStorage())
 conn = get_connection()
 db = DB('database/bot_database.sqlite')
-
+server_link = os.environ.get('SERVER_LINK')

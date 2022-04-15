@@ -74,7 +74,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
         await state.finish()
     else:
-        yes_no_keyboard = InlineKeyboardMarkup()
+        yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
         yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
         no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')
         add_to_favorite = InlineKeyboardButton('Добавить отчет в избранное', callback_data='add_favorite')

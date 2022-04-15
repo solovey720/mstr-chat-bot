@@ -49,8 +49,8 @@ async def create_page(user_id, options=dict()):
     await page.goto(path, {'timeout': timeout_long})
 
     ############################ press 'continue'
-    await page.waitForSelector('#\\33 054', {'timeout': timeout_long, 'visible': True})
-    await page.click('#\\33 054')
+    #await page.waitForSelector('#\\33 054', {'timeout': timeout_long, 'visible': True})
+    #await page.click('#\\33 054')
     ############################
 
     selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (
@@ -207,7 +207,7 @@ async def apply_selectors(user_id):
 
 async def on_startup(_):
     global browser
-    browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose': False,
+    browser = await launch({'headless': False, 'ignoreHTTPSErrors': True, 'autoClose': False,
                             'defaultViewport': {'width': 1920, 'height': 1080}})
 
 

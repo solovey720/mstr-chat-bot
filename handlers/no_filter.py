@@ -13,7 +13,7 @@ async def no_filter(call: CallbackQuery, state: FSMContext):
         language = data['language']
         await call.message.delete()
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
-    await state.finish()
+    await state.reset_state(with_data=False)
     await close_page(User.get_current().id)
 
 
