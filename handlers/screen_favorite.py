@@ -19,7 +19,15 @@ async def get_screen_favorite(call: CallbackQuery, state: FSMContext):
     all_favorites = db.get_favorite(User.get_current().id)
     file_id = call.data.split(':')[1]
     await create_page(User.get_current().id, {'docID': file_id})
-    await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id]}, is_ctlkey=False)
+    await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id], 'security': db.get_security(User.get_current().id)}, is_ctlkey=False)
+    try:
+            await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id], 'security': db.get_security(User.get_current().id)}, is_ctlkey=False)
+    except KeyError as e:
+        if e.args[0] == 'S_security':
+            await bot.send_message(call.message.chat.id, _(language)('security_key_error'))
+            await bot.send_message(call.message.chat.id, _(language)('file_name'))
+            await GetInfo.find_file.set()
+            return
     yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
     yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
     no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')

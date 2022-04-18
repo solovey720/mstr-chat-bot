@@ -173,7 +173,7 @@ class DB:
                 select * from subscription LIMIT 1
                 '''
             )
-            z = a.cursor.fetchone()
+            z = self.cursor.fetchone()
             for i in z.keys()[1:]:
                 self.cursor.execute(
                     f'''
@@ -204,7 +204,12 @@ class DB:
         except sqlite3.DatabaseError as err:
             print("Error: ", err)
         else:
-            return self.cursor.fetchone()
+            
+            z = self.cursor.fetchone()[0]
+            if z:
+                return z.split(';')
+            else:
+                return z
 
     def get_favorite(self, user_id: int):
         try:
@@ -343,16 +348,19 @@ class DB:
         self.connect.close()
 
 
-'''a = DB('database/bot_database.sqlite')
+a = DB('database/bot_database.sqlite')
 
-a.drop_all_users()
-a.insert_new_user(1)
-a.concat_favorite(1, {'a': 's'})
-a.concat_favorite(1, {'z': {'s': [1, 2]}})
-z = a.get_favorite(1)
-print(z['a'])
-a.delete_favorite(1, 'a')
-print(a.get_favorite(1))'''
+# a.drop_all_users()
+# a.insert_new_user(1)
+# a.concat_security(1, 'q')
+# a.concat_security(1, 'w')
+# a.concat_security(1, 'e')
+# z = a.get_security(1)
+# print(z)
+#a.insert_security(1723464345, None)
+#a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
+# print(a.get_security(1723464345))
+# a.show_all()
 
 # a.show_all()
 

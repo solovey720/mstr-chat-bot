@@ -1,5 +1,5 @@
 from webdriver.page_interaction import *
-from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER
+from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE
 from aiogram.types import InputFile
 import logging
 import os
@@ -9,6 +9,7 @@ import asyncio
 run_limit = 10
 
 sem = asyncio.Semaphore(run_limit)
+
 
 
 
@@ -129,8 +130,9 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
             for i in security_val:
                 security_ctl_val.append(tmp[i])
             await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=page)
-    except:
-        return
+    except Exception as e:
+        if HARD_SECURITY_MODE:
+            raise e
 
     try:
         if filters_sel: 

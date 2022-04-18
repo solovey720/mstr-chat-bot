@@ -40,3 +40,6 @@ LOGIN = os.environ.get('LOGIN')
 PASSWORD = os.environ.get('PASSWORD')
 
 #TODO: установить дефолтное значение language
+
+#Отправлять ли отчеты без секьюрности 
+HARD_SECURITY_MODE = True

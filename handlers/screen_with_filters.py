@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, User, InlineKeyboardMarkup, InlineKeybo
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from create_bot_and_conn import GetInfo, bot
+from create_bot_and_conn import GetInfo, bot, db
 
 from translate import _
 
@@ -29,10 +29,15 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
 
     await bot.send_message(call.message.chat.id, _(language)('send_report'))
     try:
-        await send_filter_screen(User.get_current().id, {'filters': filters})
-
-    except errors.TimeoutError as e:
+        await send_filter_screen(User.get_current().id, {'filters': filters, 'security': db.get_security(User.get_current().id)})
+    except errors.TimeoutError:
         await bot.send_message(call.message.chat.id, _(language)('no_data'))
+    except KeyError as e:
+        if e.args[0] == 'S_security':
+            await bot.send_message(call.message.chat.id, _(language)('security_key_error'))
+            await bot.send_message(call.message.chat.id, _(language)('file_name'))
+            await GetInfo.find_file.set()
+            return
 
     # TODO: подумать над текстом кнопок и сообщений
     choice_keyboard = InlineKeyboardMarkup(row_width=2)

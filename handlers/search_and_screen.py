@@ -3,7 +3,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, C
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from create_bot_and_conn import GetInfo, conn, bot
+from create_bot_and_conn import GetInfo, conn, bot, db
 
 from mstr_connect import search_report, search_document
 
@@ -64,7 +64,14 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
                                 message_id=call.message.message_id)
     # await call.answer('Отправляем скриншот отчета...', show_alert=True)
     await create_page(User.get_current().id, {'docID': file_id})
-    await send_filter_screen(User.get_current().id)
+    try:
+        await send_filter_screen(User.get_current().id, {'security': db.get_security(User.get_current().id)})
+    except KeyError as e:
+        if e.args[0] == 'S_security':
+            await bot.send_message(call.message.chat.id, _(language)('security_key_error'))
+            await bot.send_message(call.message.chat.id, _(language)('file_name'))
+            await GetInfo.find_file.set()
+            return
 
     if file_type == 'report':
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
