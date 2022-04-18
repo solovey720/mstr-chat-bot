@@ -1,17 +1,17 @@
+
+from aiogram import Dispatcher
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, User
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from create_bot_and_conn import GetInfo, bot
 
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from webdriver.scheduler import get_selectors, get_values
 
-from screenshot import get_selectors, get_values
-from aiogram.types import User
 from translate import _
-from aiogram import Dispatcher
 
 
-# @dp.callback_query_handler(Text(startswith='yesFilter'), state=GetInfo.set_filters)
+# Выводим список всех селекторов
 async def get_all_selectors(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
@@ -44,14 +44,13 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
         await bot.send_message(call.message.chat.id, _(language)('wo_mult_selectors'),
                                reply_markup=selectors_wo_multi_keyboard)
 
-    # TODO: подумать над текстом
     send_screen_keyboard = InlineKeyboardMarkup()
     send_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
     send_screen_keyboard.add(send_screen_button)
     await bot.send_message(call.message.chat.id, _(language)('get_screen'), reply_markup=send_screen_keyboard)
 
 
-# @dp.callback_query_handler(Text(startswith='sel:'), state=GetInfo.set_filters)
+# Выводим список всех значений выбранного селектора
 async def get_selector_values(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
@@ -83,10 +82,6 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
             selector_values_keyboard.add(selector_values_button)
 
         if selector_type == 'mult':
-            # await bot.send_message(call.message.chat.id,
-            #                       f'Выберите одно или несколько значений для селектора \'{selector_name}\':',
-            #                       reply_markup=selector_values_keyboard)
-            # TODO: вот тут как
             await bot.edit_message_text(text=_(language)('sel_val_mult').format(selector_name),
                                         chat_id=call.message.chat.id,
                                         message_id=call.message.message_id,
@@ -97,9 +92,6 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
             except Exception as e:
                 await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
         else:
-            # await bot.send_message(call.message.chat.id,
-            #                       f'Выберите одно значение для селектора \'{selector_name}\':',
-            #                       reply_markup=selector_values_keyboard)
             await bot.edit_message_text(text=_(language)('sel_val_wo_mult').format(selector_name),
                                         chat_id=call.message.chat.id,
                                         message_id=call.message.message_id,
@@ -110,7 +102,6 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
                 if data['selectors_multi']:
                     await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
 
-        # TODO: подумать над текстом кнопок и сообщения
         choice_keyboard = InlineKeyboardMarkup()
         choose_selector_button = InlineKeyboardButton(_(language)('more_selectors'), callback_data='yesFilter')
         choose_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
@@ -120,19 +111,17 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
                                reply_markup=choice_keyboard)
 
 
-# @dp.callback_query_handler(Text(startswith='val'), state=GetInfo.set_filters)
+# Запоминаем выбранное значение(-я) у селектора
 async def set_selector_value(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
         language = data['language']
 
     selector_type = call.data.split(':')[1]
-    selector_value = ''
     selector_value_name = call.data.split(':')[2]
     selected_values = []
 
     async with state.proxy() as data:
-        print(data)
         selector_value = data['selector_values'][selector_value_name]
         selector_ctl = data['active_selector']
         if selector_type == 'mult':

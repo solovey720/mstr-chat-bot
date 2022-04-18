@@ -1,20 +1,23 @@
-from create_bot_and_conn import bot, GetInfo
-from aiogram.dispatcher.filters import Text
+
+from aiogram import Dispatcher
 from aiogram.types import CallbackQuery, User
 from aiogram.dispatcher import FSMContext
-from screenshot import close_page
+from aiogram.dispatcher.filters import Text
+
+from create_bot_and_conn import bot, GetInfo
+
+from webdriver.scheduler import close_browser
+
 from translate import _
-from aiogram import Dispatcher
 
 
-# @dp.callback_query_handler(Text(equals='findAnother'), state=GetInfo.set_filters)
+# Функция, срабатывающая при нажатии на кнопку "Найти другой отчет"
 async def find_another_report(call: CallbackQuery, state: FSMContext):
-    language = ''
     async with state.proxy() as data:
         language = data['language']
-    await close_page(User.get_current().id)
-    await state.reset_state(with_data=False)
-    await bot.send_message(call.message.chat.id, _(language)('type_search'))
+        await close_browser(User.get_current().id)
+        await state.reset_state(with_data=False)
+        await bot.send_message(call.message.chat.id, _(language)('type_search'))
 
 
 def register_handlers_find_another_report(dp: Dispatcher):

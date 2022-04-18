@@ -1,22 +1,21 @@
+from aiogram import Dispatcher
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, User
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+
 from create_bot_and_conn import GetInfo, conn, bot
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputFile, User
+
 from mstr_connect import search_report, search_document
-from screenshot import get_filter_screen, create_page
-import os
+
+from webdriver.scheduler import send_filter_screen, create_page
+
 from translate import _
-from aiogram import Dispatcher
 
 
-# @dp.message_handler(state=GetInfo.find_file)
+# Выводим список доступных отчетов
 async def search_file(message: Message, state: FSMContext):
     language = ''
     async with state.proxy() as data:
-        data['selectors_wo_multi'] = {}
-        data['selectors_multi'] = {}
-        data['filters'] = {}
-        data['messages_id'] = {}
         language = data['language']
 
     all_reports = search_report(conn, message.text)
@@ -48,9 +47,8 @@ async def search_file(message: Message, state: FSMContext):
     await GetInfo.get_screen.set()
 
 
-# @dp.callback_query_handler(Text(startswith=['report:', 'document:']), state=GetInfo.get_screen)
+# Отправляем скрин без фильтров
 async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
-
     file_type = call.data.split(':')[0]
     file_id = call.data.split(':')[1]
 
@@ -60,15 +58,12 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
         data['file_id'] = file_id
     # TODO: продумать удаление/изменение inline клавиатуры
 
-
     # создаем страницу в браузере, отправляем скриншот <id пользователя>.png
     await bot.edit_message_text(_(language)('send_report'), chat_id=call.message.chat.id,
                                 message_id=call.message.message_id)
     # await call.answer('Отправляем скриншот отчета...', show_alert=True)
     await create_page(User.get_current().id, {'docID': file_id})
-    await get_filter_screen(User.get_current().id)
-    await bot.send_photo(chat_id=call.message.chat.id, photo=InputFile(str(User.get_current().id) + '.png'))
-    os.remove(str(User.get_current().id) + '.png')
+    await send_filter_screen(User.get_current().id)
 
     if file_type == 'report':
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
@@ -77,7 +72,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
         yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
         yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
         no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')
-        add_to_favorite = InlineKeyboardButton('Добавить отчет в избранное', callback_data='add_favorite')
+        add_to_favorite = InlineKeyboardButton(_(language)('add_to_favorite'), callback_data='add_favorite')
         yes_no_keyboard.add(yes_button, no_button, add_to_favorite)
         await bot.send_message(call.message.chat.id, _(language)('add_filter'), reply_markup=yes_no_keyboard)
         await GetInfo.set_filters.set()
@@ -85,4 +80,5 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
 
 def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_message_handler(search_file, state=GetInfo.find_file)
-    dp.register_callback_query_handler(send_screenshot_wo_filters, Text(startswith=['report:', 'document:']), state=GetInfo.get_screen)
+    dp.register_callback_query_handler(send_screenshot_wo_filters, Text(startswith=['report:', 'document:']),
+                                       state=GetInfo.get_screen)

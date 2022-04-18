@@ -1,12 +1,15 @@
+
+from aiogram import Dispatcher
+from aiogram.types import CallbackQuery
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from create_bot_and_conn import GetInfo, bot
-from aiogram.types import CallbackQuery
-from aiogram import Dispatcher
+
 from translate import _
 
+from create_bot_and_conn import GetInfo, bot
 
-# @dp.callback_query_handler(Text(startswith='lang:'), state=GetInfo.set_language)
+
+# Запоминаем язык, выбранный пользователем
 async def change_language(call: CallbackQuery, state: FSMContext):
     await call.message.delete()
     language = call.data.split(':')[1]

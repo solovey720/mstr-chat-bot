@@ -77,3 +77,12 @@ msgstr "What are you going to do bro?"
 
 msgid "selector_set"
 msgstr "Selector set in {0}"
+
+msgid "favorites"
+msgstr "Your favorites reports"
+
+msgid "send_favorite"
+msgstr "Sending a favorite report..."
+
+msgid "add_to_favorite"
+msgstr "Add to favorites"

@@ -1,20 +1,24 @@
+
+from aiogram import Dispatcher
+from aiogram.types import CallbackQuery, User
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+
 from create_bot_and_conn import GetInfo, bot
-from aiogram.types import CallbackQuery, User
+
 from translate import _
-from screenshot import close_page
-from aiogram import Dispatcher
+
+from webdriver.scheduler import close_browser
 
 
-# @dp.callback_query_handler(Text(startswith='noFilter'), state=GetInfo.set_filters)
+# Функция, срабатывающая при отказе пользователя наложить фильтры на отчет
 async def no_filter(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         language = data['language']
         await call.message.delete()
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
     await state.reset_state(with_data=False)
-    await close_page(User.get_current().id)
+    await close_browser(User.get_current().id)
 
 
 def register_handlers_no_filters(dp: Dispatcher):

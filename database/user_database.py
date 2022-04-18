@@ -30,7 +30,7 @@ class DB:
 
     def insert_new_user(self, user_id: int):
         users = self.get_users()
-        if (user_id,) in users:
+        if user_id in users:
             return
         self.cursor.execute(
             '''
@@ -61,7 +61,10 @@ class DB:
         except sqlite3.DatabaseError as err:
             print("Error: ", err)
         else:
-            return self.cursor.fetchall()
+            users_list = []
+            for row in self.cursor.fetchall():
+                users_list.append(row[0])
+            return users_list
 
     def insert_security(self, user_id: int, security: str):
         try:
@@ -340,7 +343,7 @@ class DB:
         self.connect.close()
 
 
-a = DB('database/bot_database.sqlite')
+'''a = DB('database/bot_database.sqlite')
 
 a.drop_all_users()
 a.insert_new_user(1)
@@ -349,7 +352,7 @@ a.concat_favorite(1, {'z': {'s': [1, 2]}})
 z = a.get_favorite(1)
 print(z['a'])
 a.delete_favorite(1, 'a')
-print(a.get_favorite(1))
+print(a.get_favorite(1))'''
 
 # a.show_all()
 

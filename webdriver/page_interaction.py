@@ -1,26 +1,33 @@
-from pyppeteer import launch
+from pyppeteer import launch, errors
 from pyppeteer.page import Page
-from create_bot_and_conn import server_link
+from create_bot_and_conn import SERVER_LINK
 
 _browsers_list = dict()
+
 
 async def create_browser(user_id: int, headless = True) -> Page:
     _browsers_list[user_id] = await launch({ 'headless': headless, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await _browsers_list[user_id].pages())[0]
     return page 
 
+
 async def close_browser(user_id: int):
-    _browsers_list[user_id].close()
+    await _browsers_list[user_id].close()
     _browsers_list.pop(user_id)
-   
+
+
 async def get_browsers_page(user_id: int) -> Page:
     page = (await _browsers_list[user_id].pages())[0]
     return page
    
 
-
-
 async def get_selectors(user_id, new_browser = None):
+    """Get all dashboard's selector
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -47,6 +54,13 @@ async def get_selectors(user_id, new_browser = None):
 
 
 async def get_values(user_id, ckey, new_browser = None):
+    """Get all values from dashboard's selector
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``ckey`` (str): selector's ctlkey
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -67,13 +81,23 @@ async def get_values(user_id, ckey, new_browser = None):
         val[name] = value
     return val
 
-async def request_set_selector(user_id, options=dict(), new_browser = None):
+
+async def request_set_selector(user_id, options=dict(), new_browser=None):
+    """Send request to change selector's value
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    * ``url`` (str): url to taskProc
+    * ``ctlKey`` (str): selector's ctlKey
+    * ``elemList`` (str): list of values (concat throught \\u001e)
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
         page = new_browser
 
-    url = options.get('url', f'{server_link}/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
+    url = options.get('url', f'{SERVER_LINK}/MicroStrategy/servlet/taskProc')  # url до taskproc (можно посмотреть через ф12 при прожатии селектора)
     ctlKey = options.get('ctlKey', 'W5121A375615A451CA272FD10697EA8EA')
     elemList = options.get('elemList', 'h29;77ECA0D9445F155A4B08DFAC49FC9624')
 
@@ -97,6 +121,12 @@ async def request_set_selector(user_id, options=dict(), new_browser = None):
 
 
 async def apply_selectors(user_id, new_browser = None):
+    """Apply selector changes 
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    """ 
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -105,7 +135,8 @@ async def apply_selectors(user_id, new_browser = None):
     await page.evaluate('mstrApp.docModel.controller.refresh()')
 
 
-def list_to_str(val: list) -> str:
+def list_to_str(value: list) -> str:
+    val = value.copy()
     str=val.pop()
     for i in val:
         str+='\\u001e'+i

@@ -77,3 +77,12 @@ msgstr "Что дальше делать?"
 
 msgid "selector_set"
 msgstr "Селектор установлен в {0}"
+
+msgid "favorites"
+msgstr "Ваши любимчики:"
+
+msgid "send_favorite"
+msgstr "Отправляем отчет любимчика..."
+
+msgid "add_to_favorite"
+msgstr "Добавить в избранное"
