@@ -13,6 +13,7 @@ from translate import _
 
 # Выводим список всех селекторов
 async def get_all_selectors(call: CallbackQuery, state: FSMContext):
+    # TODO: сделать обнуление словарей selectors_multi, selectors_wo_multi
     language = ''
     async with state.proxy() as data:
         language = data['language']
@@ -136,7 +137,6 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
         choose_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
         choice_keyboard.add(choose_selector_button, choose_screen_button)
 
-        # TODO: вот тут отже как
         await bot.send_message(chat_id=call.message.chat.id, text=_(language)('selector_set').format(selected_values))
 
 

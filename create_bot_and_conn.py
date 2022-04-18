@@ -38,3 +38,5 @@ SERVER = os.environ.get('SERVER')
 PROJECT = os.environ.get('PROJECT')
 LOGIN = os.environ.get('LOGIN')
 PASSWORD = os.environ.get('PASSWORD')
+
+#TODO: установить дефолтное значение language

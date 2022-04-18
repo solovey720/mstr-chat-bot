@@ -49,6 +49,8 @@ async def search_file(message: Message, state: FSMContext):
 
 # Отправляем скрин без фильтров
 async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
+    #TODO: продумать логику для репорта
+
     file_type = call.data.split(':')[0]
     file_id = call.data.split(':')[1]
 
@@ -56,7 +58,6 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         language = data['language']
         data['file_id'] = file_id
-    # TODO: продумать удаление/изменение inline клавиатуры
 
     # создаем страницу в браузере, отправляем скриншот <id пользователя>.png
     await bot.edit_message_text(_(language)('send_report'), chat_id=call.message.chat.id,

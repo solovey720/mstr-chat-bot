@@ -29,7 +29,7 @@ def search_document(connection, doc_name):
     documents = list_documents(connection, doc_name)
     return documents
 
-
+'''
 def get_report(connection, report_id):
     my_report = Report(connection=connection, id=report_id, parallel=False)
     return my_report
@@ -47,4 +47,4 @@ def get_report_metrics(connection, report_id):
 
 def get_report_attr_elements(connection, report_id):
     attr_elements = Report(connection=connection, id=report_id, parallel=False).attr_elements
-    return attr_elements
+    return attr_elements'''

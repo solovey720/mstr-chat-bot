@@ -16,6 +16,7 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
         language = data['language']
+        print(data)
 
     filters = {}
     async with state.proxy() as data:

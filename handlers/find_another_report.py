@@ -16,6 +16,7 @@ async def find_another_report(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         language = data['language']
         await close_browser(User.get_current().id)
+        #TODO: оставить из глобального словаря только язык
         await state.reset_state(with_data=False)
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
 
