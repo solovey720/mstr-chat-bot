@@ -158,4 +158,5 @@ demo/
 *.png
 *.env
 *.bak
+*.mo
 TODO.txt
