@@ -77,7 +77,7 @@ async def scheduler_dashboard(user_id: int, options=dict()):
             any extra keyword arguments to this method are passed on to the trigger's constructor
     * ``replace_existing`` (bool): ``True`` to replace an existing job with the same ``id``
     
-    scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=17, minute=46, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
+    scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=17, minute=46, second=0, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
     '''   
     async with sem:
         #print('start sched')
