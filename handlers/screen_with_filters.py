@@ -39,11 +39,13 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
             return
 
     # TODO: подумать над текстом кнопок и сообщений
-    choice_keyboard = InlineKeyboardMarkup(row_width=2)
+    choice_keyboard = InlineKeyboardMarkup(row_width=1)
     change_selectors_button = InlineKeyboardButton(_(language)('more_selectors'), callback_data='yesFilter')
     find_another_button = InlineKeyboardButton(_(language)('find_another'), callback_data='findAnother')
     add_to_favorite = InlineKeyboardButton(_(language)('add_to_favorite'), callback_data='add_favorite')
-    choice_keyboard.add(change_selectors_button, find_another_button, add_to_favorite)
+    add_scheduler = InlineKeyboardButton(_(language)('add_scheduler'), callback_data='add_scheduler')
+    choice_keyboard.row(change_selectors_button, find_another_button)
+    choice_keyboard.add(change_selectors_button, find_another_button, add_to_favorite, add_scheduler)
     await bot.send_message(chat_id=call.message.chat.id, text=_(language)('wtd'), reply_markup=choice_keyboard)
 
 

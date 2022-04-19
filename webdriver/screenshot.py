@@ -1,14 +1,14 @@
 from webdriver.page_interaction import *
-from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE
+from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT
 from aiogram.types import InputFile
 import logging
 import os
 
 import asyncio
 
-run_limit = 10
 
-sem = asyncio.Semaphore(run_limit)
+
+sem = asyncio.Semaphore(RUN_LIMIT)
 
 
 

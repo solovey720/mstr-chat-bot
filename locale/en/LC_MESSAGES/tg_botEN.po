@@ -92,3 +92,9 @@ msgstr "This report is not adapted to security. Choose another report"
 
 msgid "added_to_favorite"
 msgstr "Document has been added to favorites"
+
+msgid "add_scheduler"
+msgstr "Add Subscription"
+
+msgid "nothing_found"
+msgstr "Nothing found, please try again"

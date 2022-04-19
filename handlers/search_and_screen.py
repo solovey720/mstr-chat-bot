@@ -21,6 +21,10 @@ async def search_file(message: Message, state: FSMContext):
     all_reports = search_report(conn, message.text)
     all_documents = search_document(conn, message.text)
 
+    if not(all_reports or all_documents):
+        await bot.send_message(message.from_user.id, _(language)('nothing_found'))
+        return
+
     # Отправляем все доступные репорты
     if all_reports:
         all_reports_keyboard = InlineKeyboardMarkup()
@@ -77,11 +81,13 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
         await bot.send_message(call.message.chat.id, _(language)('type_search'))
         await state.finish()
     else:
-        yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
+        yes_no_keyboard = InlineKeyboardMarkup(row_width=1)
         yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
         no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')
         add_to_favorite = InlineKeyboardButton(_(language)('add_to_favorite'), callback_data='add_favorite')
-        yes_no_keyboard.add(yes_button, no_button, add_to_favorite)
+        add_scheduler = InlineKeyboardButton(_(language)('add_scheduler'), callback_data='add_scheduler')
+        yes_no_keyboard.row(yes_button, no_button)
+        yes_no_keyboard.add(add_to_favorite, add_scheduler)
         await bot.send_message(call.message.chat.id, _(language)('add_filter'), reply_markup=yes_no_keyboard)
         await GetInfo.set_filters.set()
 

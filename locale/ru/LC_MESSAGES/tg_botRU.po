@@ -92,3 +92,9 @@ msgstr "Этот отчет не адаптирован к ролевой мод
 
 msgid "added_to_favorite"
 msgstr "Документ был добавлен в избранное"
+
+msgid "add_scheduler"
+msgstr "Добавить подписку"
+
+msgid "nothing_found"
+msgstr "Ничего не найдено, повторите ввод"

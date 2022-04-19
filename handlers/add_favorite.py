@@ -14,7 +14,7 @@ async def add_to_favorite(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         language = data.get('language','ru')
         file_id = data['file_id']
-        if data['filters']:
+        if data.get('filters', None):
             json_string = {file_id: {}}
             for selector in data['filters']:
                 val_list = []
