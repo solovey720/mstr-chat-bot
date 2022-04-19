@@ -15,8 +15,7 @@ from webdriver.scheduler import send_filter_screen, errors
 async def get_screen(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
-        language = data['language']
-        print(data)
+        language = data.get('language','ru')
 
     filters = {}
     async with state.proxy() as data:

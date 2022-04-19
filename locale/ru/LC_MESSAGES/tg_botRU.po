@@ -89,3 +89,6 @@ msgstr "Добавить в избранное"
 
 msgid "security_key_error"
 msgstr "Этот отчет не адаптирован к ролевой модели. Выберите другой отчет"
+
+msgid "added_to_favorite"
+msgstr "Документ был добавлен в избранное"

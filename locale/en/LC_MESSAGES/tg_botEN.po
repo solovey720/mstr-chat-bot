@@ -89,3 +89,6 @@ msgstr "Add to favorites"
 
 msgid "security_key_error"
 msgstr "This report is not adapted to security. Choose another report"
+
+msgid "added_to_favorite"
+msgstr "Document has been added to favorites"

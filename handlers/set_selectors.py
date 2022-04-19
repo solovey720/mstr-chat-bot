@@ -16,7 +16,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
     # TODO: сделать обнуление словарей selectors_multi, selectors_wo_multi
     language = ''
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
     await call.message.delete()
 
     selectors_multi, selectors_wo_multi = await get_selectors(User.get_current().id)
@@ -55,7 +55,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
 async def get_selector_values(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
 
     selector_name = call.data.split(':')[2]
     selector_type = call.data.split(':')[1]
@@ -116,7 +116,7 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
 async def set_selector_value(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
 
     selector_type = call.data.split(':')[1]
     selector_value_name = call.data.split(':')[2]
@@ -137,7 +137,7 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
         choose_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
         choice_keyboard.add(choose_selector_button, choose_screen_button)
 
-        await bot.send_message(chat_id=call.message.chat.id, text=_(language)('selector_set').format(selected_values))
+        await bot.send_message(chat_id=call.message.chat.id, text=_(language)('selector_set').format("; ".join(selected_values)))
 
 
 def register_handlers_set_selectors(dp: Dispatcher):

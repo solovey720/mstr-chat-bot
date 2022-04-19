@@ -16,7 +16,7 @@ from translate import _
 async def search_file(message: Message, state: FSMContext):
     language = ''
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
 
     all_reports = search_report(conn, message.text)
     all_documents = search_document(conn, message.text)
@@ -56,7 +56,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
 
     language = ''
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
         data['file_id'] = file_id
 
     # создаем страницу в браузере, отправляем скриншот <id пользователя>.png

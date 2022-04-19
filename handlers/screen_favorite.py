@@ -14,12 +14,11 @@ from translate import _
 # Функция отправки скриншота отчета из избранного
 async def get_screen_favorite(call: CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
         await bot.send_message(call.message.chat.id, _(language)('send_favorite'))
     all_favorites = db.get_favorite(User.get_current().id)
     file_id = call.data.split(':')[1]
     await create_page(User.get_current().id, {'docID': file_id})
-    await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id], 'security': db.get_security(User.get_current().id)}, is_ctlkey=False)
     try:
             await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id], 'security': db.get_security(User.get_current().id)}, is_ctlkey=False)
     except KeyError as e:

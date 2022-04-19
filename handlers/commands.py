@@ -41,14 +41,14 @@ async def start_command(message: Message, state: FSMContext):
 # Команда помощи
 async def help_command(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
         await bot.send_message(message.from_user.id, _(language)('command_list'))
 
 
 # Команда для поиска отчета
 async def search_command(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
     await bot.send_message(message.from_user.id, _(language)('file_name'))
     await GetInfo.find_file.set()
 
@@ -56,7 +56,7 @@ async def search_command(message: Message, state: FSMContext):
 # Команда для вывода всех избранных отчетов
 async def favorite_command(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        language = data['language']
+        language = data.get('language','ru')
     await state.reset_state(with_data=False)
     all_favorites = db.get_favorite(User.get_current().id)
     all_favorites_keyboard = InlineKeyboardMarkup()
