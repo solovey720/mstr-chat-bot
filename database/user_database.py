@@ -113,6 +113,19 @@ class DB:
         else:
             self.connect.commit()
 
+    def insert_language(self, user_id: int, language: str):
+        try:
+            self.cursor.execute(
+                '''
+                UPDATE users SET language = :language WHERE ID = :user_id
+                ''',
+                {"user_id": user_id, "language": language}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            self.connect.commit()
+
     def concat_security(self, user_id: int, security: str):
         try:
             self.cursor.execute(
@@ -238,6 +251,20 @@ class DB:
         else:
             return self.cursor.fetchone()
 
+    def get_language(self, user_id: int):
+        try:
+            self.cursor.execute(
+                '''
+                select language from users WHERE ID = :user_id
+                ''',
+                {"user_id": user_id}
+            )
+        except sqlite3.DatabaseError as err:
+            print("Error: ", err)
+        else:
+            z = self.cursor.fetchone()[0]
+            return z
+
     def delete_favorite(self, user_id: int, documentID: str):
         try:
             self.cursor.execute(
@@ -348,17 +375,33 @@ class DB:
         self.connect.close()
 
 
-a = DB('database/bot_database.sqlite')
+# a = DB('database/bot_database.sqlite')
 
-# a.drop_all_users()
-# a.insert_new_user(1)
+# a.cursor.executescript(
+#                 '''
+#                 ALTER TABLE users
+#                 ADD language VARCHAR(2) DEFAULT 'ru';
+#                 '''
+#             )   
+
+# a.show_all()
+
+#a.drop_all_users()
+#a.insert_new_user(1)
 # a.concat_security(1, 'q')
 # a.concat_security(1, 'w')
 # a.concat_security(1, 'e')
-# z = a.get_security(1)
+# import time
+
+# start = time.time()
+# for i in range(10000):
+#     z = a.get_users()
+
+# print(time.time()-start)
+
 # print(z)
-#a.insert_security(1723464345, None)
-#a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
+# a.insert_security(1723464345, None)
+# a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
 # print(a.get_security(1723464345))
 # a.show_all()
 

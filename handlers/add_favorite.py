@@ -12,7 +12,6 @@ from translate import _
 async def add_to_favorite(call: CallbackQuery, state: FSMContext):
     file_id = ''
     async with state.proxy() as data:
-        language = data.get('language','ru')
         file_id = data['file_id']
         if data.get('filters', None):
             json_string = {file_id: {}}
@@ -25,7 +24,7 @@ async def add_to_favorite(call: CallbackQuery, state: FSMContext):
         else:
             db.concat_favorite(User.get_current().id, {file_id: None})
 
-        await bot.send_message(User.get_current().id, _(language)('added_to_favorite'))
+        await bot.send_message(User.get_current().id, _(User.get_current().id)('added_to_favorite'))
     
 
 

@@ -13,10 +13,8 @@ from webdriver.scheduler import close_browser
 
 # Функция, срабатывающая при отказе пользователя наложить фильтры на отчет
 async def no_filter(call: CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-        await call.message.delete()
-        await bot.send_message(call.message.chat.id, _(language)('type_search'))
+    await call.message.delete()
+    await bot.send_message(call.message.chat.id, _(call.message.chat.id)('type_search'))
     await state.reset_state(with_data=False)
     await close_browser(User.get_current().id)
 

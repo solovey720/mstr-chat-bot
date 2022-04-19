@@ -19,7 +19,7 @@ msgid "begin"
 msgstr "Введите /search для поиска отчета,\n/help для списка доступных команд"
 
 msgid "command_list"
-msgstr "Список доступных команд:\n /search - поиск отчета \n /language - сменить язык"
+msgstr "Список доступных команд:\n /search - поиск отчета \n /language - сменить язык\n /favorite - избранное\n /subscription - подписки"
 
 msgid "file_name"
 msgstr "Введи имя отчета:"
@@ -104,3 +104,6 @@ msgstr "Ваша подписка:"
 
 msgid "added_to_scheduler"
 msgstr "Документ добавлен в подписки"
+
+msgid "language_changed"
+msgstr "Язык успешно изменен"

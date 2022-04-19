@@ -14,9 +14,7 @@ from translate import _
 # Выводим список всех селекторов
 async def get_all_selectors(call: CallbackQuery, state: FSMContext):
     # TODO: сделать обнуление словарей selectors_multi, selectors_wo_multi
-    language = ''
-    async with state.proxy() as data:
-        language = data.get('language','ru')
+    # async with state.proxy() as data:
         # data['selectors_wo_multi'] = {}
         # data['selectors_multi'] = {}
         # data['filters'] = {}
@@ -34,7 +32,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
                 selectors_multi_keyboard.add(selectors_multi_button)
                 async with state.proxy() as data:
                     data['selectors_multi'].update({selector: selectors_multi[selector]})
-        await bot.send_message(call.message.chat.id, _(language)('mult_selectors'),
+        await bot.send_message(call.message.chat.id, _(call.message.chat.id)('mult_selectors'),
                                reply_markup=selectors_multi_keyboard)
 
     # отправляем селекторы без мультивыбора
@@ -46,21 +44,17 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
                 selectors_wo_multi_keyboard.add(selectors_wo_multi_button)
                 async with state.proxy() as data:
                     data['selectors_wo_multi'].update({selector: selectors_wo_multi[selector]})
-        await bot.send_message(call.message.chat.id, _(language)('wo_mult_selectors'),
+        await bot.send_message(call.message.chat.id, _(call.message.chat.id)('wo_mult_selectors'),
                                reply_markup=selectors_wo_multi_keyboard)
 
     send_screen_keyboard = InlineKeyboardMarkup()
-    send_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
+    send_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
     send_screen_keyboard.add(send_screen_button)
-    await bot.send_message(call.message.chat.id, _(language)('get_screen'), reply_markup=send_screen_keyboard)
+    await bot.send_message(call.message.chat.id, _(call.message.chat.id)('get_screen'), reply_markup=send_screen_keyboard)
 
 
 # Выводим список всех значений выбранного селектора
 async def get_selector_values(call: CallbackQuery, state: FSMContext):
-    language = ''
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-
     selector_name = call.data.split(':')[2]
     selector_type = call.data.split(':')[1]
     selector_ctl_name = ''
@@ -87,7 +81,7 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
             selector_values_keyboard.add(selector_values_button)
 
         if selector_type == 'mult':
-            await bot.edit_message_text(text=_(language)('sel_val_mult').format(selector_name),
+            await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_mult').format(selector_name),
                                         chat_id=call.message.chat.id,
                                         message_id=call.message.message_id,
                                         reply_markup=selector_values_keyboard)
@@ -97,7 +91,7 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
             except Exception as e:
                 await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
         else:
-            await bot.edit_message_text(text=_(language)('sel_val_wo_mult').format(selector_name),
+            await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_wo_mult').format(selector_name),
                                         chat_id=call.message.chat.id,
                                         message_id=call.message.message_id,
                                         reply_markup=selector_values_keyboard)
@@ -108,20 +102,16 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
                     await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
 
         choice_keyboard = InlineKeyboardMarkup()
-        choose_selector_button = InlineKeyboardButton(_(language)('more_selectors'), callback_data='yesFilter')
-        choose_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
+        choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
+        choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
         choice_keyboard.add(choose_selector_button, choose_screen_button)
         await bot.send_message(chat_id=call.message.chat.id,
-                               text=_(language)('set_sel_val'),
+                               text=_(call.message.chat.id)('set_sel_val'),
                                reply_markup=choice_keyboard)
 
 
 # Запоминаем выбранное значение(-я) у селектора
 async def set_selector_value(call: CallbackQuery, state: FSMContext):
-    language = ''
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-
     selector_type = call.data.split(':')[1]
     selector_value_name = call.data.split(':')[2]
     selected_values = []
@@ -137,11 +127,11 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
             selected_values.append(list(value_name.values())[0])
 
         choice_keyboard = InlineKeyboardMarkup()
-        choose_selector_button = InlineKeyboardButton(_(language)('more_selectors'), callback_data='yesFilter')
-        choose_screen_button = InlineKeyboardButton(_(language)('get_screen'), callback_data='getScreen')
+        choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
+        choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
         choice_keyboard.add(choose_selector_button, choose_screen_button)
 
-        await bot.send_message(chat_id=call.message.chat.id, text=_(language)('selector_set').format("; ".join(selected_values)))
+        await bot.send_message(chat_id=call.message.chat.id, text=_(call.message.chat.id)('selector_set').format("; ".join(selected_values)))
 
 
 def register_handlers_set_selectors(dp: Dispatcher):

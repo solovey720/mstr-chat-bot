@@ -13,12 +13,9 @@ from translate import _
 
 # Функция, срабатывающая при нажатии на кнопку "Найти другой отчет"
 async def find_another_report(call: CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-        await close_browser(User.get_current().id)
-        #TODO: оставить из глобального словаря только язык
-        await state.reset_state(with_data=False)
-        await bot.send_message(call.message.chat.id, _(language)('type_search'))
+    await close_browser(User.get_current().id)
+    await state.reset_state(with_data=False)
+    await bot.send_message(call.message.chat.id, _(call.message.chat.id)('type_search'))
 
 
 def register_handlers_find_another_report(dp: Dispatcher):

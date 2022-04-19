@@ -43,7 +43,7 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
         new_filters_sel[ctlkey] = sel_values
 
     sched_options['filters'] = new_filters_sel
-    await bot.send_message(user_id, _(options.get('language','ru'))('your_scheduler'))
+    await bot.send_message(user_id, _(user_id)('your_scheduler'))
     await send_filter_screen(user_id, options=sched_options, new_browser=page)
     await new_browser.close()
 

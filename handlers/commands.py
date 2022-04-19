@@ -28,35 +28,23 @@ async def start_command(message: Message, state: FSMContext):
     #     data['filters'] = {}
 
     db.insert_new_user(User.get_current().id)
-    language_keyboard = InlineKeyboardMarkup()
-    rus_lang_button = InlineKeyboardButton('rus', callback_data='lang:ru')
-    eng_lang_button = InlineKeyboardButton('eng', callback_data='lang:en')
-    language_keyboard.add(rus_lang_button, eng_lang_button)
-    await bot.send_message(chat_id=message.from_user.id,
-                           text='Выберите язык\n Choose language',
-                           reply_markup=language_keyboard)
-    await GetInfo.set_language.set()
+    await bot.send_message(message.from_user.id, text=_(message.from_user.id)('begin'))
+    
 
 
 # Команда помощи
 async def help_command(message: Message, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-        await bot.send_message(message.from_user.id, _(language)('command_list'))
+    await bot.send_message(message.from_user.id, _(message.from_user.id)('command_list'))
 
 
 # Команда для поиска отчета
 async def search_command(message: Message, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-    await bot.send_message(message.from_user.id, _(language)('file_name'))
+    await bot.send_message(message.from_user.id, _(message.from_user.id)('file_name'))
     await GetInfo.find_file.set()
 
 
 # Команда для вывода всех избранных отчетов
 async def favorite_command(message: Message, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
     await state.reset_state(with_data=False)
     all_favorites = db.get_favorite(User.get_current().id)
     all_favorites_keyboard = InlineKeyboardMarkup()
@@ -64,7 +52,7 @@ async def favorite_command(message: Message, state: FSMContext):
         file_id_button = InlineKeyboardButton(text=file_id, callback_data='fav:'+file_id)
         all_favorites_keyboard.add(file_id_button)
 
-    await bot.send_message(message.from_user.id, _(language)('favorites'), reply_markup=all_favorites_keyboard)
+    await bot.send_message(message.from_user.id, _(message.from_user.id)('favorites'), reply_markup=all_favorites_keyboard)
 
 
 def register_handlers_commands(dp: Dispatcher):

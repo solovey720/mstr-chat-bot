@@ -17,3 +17,9 @@ find_another_report.register_handlers_find_another_report(dp)
 
 # Запускаем поллинг
 executor.start_polling(dp)
+
+
+# TODO Сохранение в базу языка бота
+# TODO Мониторинг выбивания сессии
+# TODO Добавить ссылку на сам отчет в боте
+

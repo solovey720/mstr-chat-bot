@@ -13,9 +13,7 @@ from translate import _
 
 # Функция отправки скриншота отчета из избранного
 async def get_screen_favorite(call: CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        language = data.get('language','ru')
-        await bot.send_message(call.message.chat.id, _(language)('send_favorite'))
+    await bot.send_message(call.message.chat.id, _(call.message.chat.id)('send_favorite'))
     all_favorites = db.get_favorite(User.get_current().id)
     file_id = call.data.split(':')[1]
     await create_page(User.get_current().id, {'docID': file_id})
@@ -23,15 +21,15 @@ async def get_screen_favorite(call: CallbackQuery, state: FSMContext):
             await send_filter_screen(User.get_current().id, {'filters': all_favorites[file_id], 'security': db.get_security(User.get_current().id)}, is_ctlkey=False)
     except KeyError as e:
         if e.args[0] == 'S_security':
-            await bot.send_message(call.message.chat.id, _(language)('security_key_error'))
-            await bot.send_message(call.message.chat.id, _(language)('file_name'))
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('security_key_error'))
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
     yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
-    yes_button = InlineKeyboardButton(_(language)('yes'), callback_data='yesFilter')
-    no_button = InlineKeyboardButton(_(language)('no'), callback_data='noFilter')
+    yes_button = InlineKeyboardButton(_(call.message.chat.id)('yes'), callback_data='yesFilter')
+    no_button = InlineKeyboardButton(_(call.message.chat.id)('no'), callback_data='noFilter')
     yes_no_keyboard.add(yes_button, no_button)
-    await bot.send_message(call.message.chat.id, _(language)('add_filter'), reply_markup=yes_no_keyboard)
+    await bot.send_message(call.message.chat.id, _(call.message.chat.id)('add_filter'), reply_markup=yes_no_keyboard)
     await GetInfo.set_filters.set()
 
 

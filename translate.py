@@ -1,4 +1,5 @@
 import gettext
+from create_bot_and_conn import db
 
 en = gettext.translation("tg_botEN", localedir="locale", languages=['en'])
 ru = gettext.translation("tg_botRU", localedir="locale", languages=['ru'])
@@ -9,8 +10,10 @@ en_translate = en.gettext
 ru_translate = ru.gettext
 
 
-def _(language: str = 'ru'):
-    return en_translate if language == 'en' else ru_translate if language == 'ru' else None
+def _(user_id: str = 'ru'):
+    lan = db.get_language(user_id)
+    return en_translate if lan == 'en' else ru_translate if lan == 'ru' else None
+
 
 # _(local)('text')
 # local ='ru'

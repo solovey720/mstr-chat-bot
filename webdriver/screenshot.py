@@ -47,8 +47,6 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
         page = new_browser
     
 
-    page.user_id = user_id
-
     await page.goto(path, {'timeout': timeout_long})
     ############################ press 'continue'
     #await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
