@@ -12,24 +12,26 @@ from translate import _
 
 # Функция добавления избранного отчета в базу данных
 async def add_scheduler(call: CallbackQuery, state: FSMContext):
-    print('')
-    #scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=17, minute=46, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
-    # file_id = ''
-    # async with state.proxy() as data:
-    #     language = data.get('language','ru')
-    #     file_id = data['file_id']
-    #     if data.get('filters', None):
-    #         json_string = {file_id: {}}
-    #         for selector in data['filters']:
-    #             val_list = []
-    #             for val in data['filters'][selector]:
-    #                 val_list.append(list(val.values())[0])
-    #             json_string[file_id].update({selector.split(';')[1]: val_list})
-    #         db.concat_favorite(User.get_current().id, json_string)
-    #     else:
-    #         db.concat_favorite(User.get_current().id, {file_id: None})
+    #scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=11, minute=46, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+    file_id = ''
+    filters = {}
+    async with state.proxy() as data:
+        language = data.get('language','ru')
+        file_id = data['file_id']
+        if data.get('filters', None):
+            #json_string = {file_id: {}}
+            for selector in data['filters']:
+                val_list = []
+                for val in data['filters'][selector]:
+                    val_list.append(list(val.values())[0])
+                filters = filters | {selector.split(';')[1]: val_list}
+                #json_string[file_id].update({selector.split(';')[1]: val_list})
+        #     db.concat_favorite(User.get_current().id, json_string)
+        # else:
+        #     db.concat_favorite(User.get_current().id, {file_id: None})
+        scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-fri', hour=12, minute=56, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters, 'language': language}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
 
-    #     await bot.send_message(User.get_current().id, _(language)('added_to_favorite'))
+        await bot.send_message(User.get_current().id, _(language)('added_to_scheduler'))
     
 
 

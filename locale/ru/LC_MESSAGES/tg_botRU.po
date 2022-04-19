@@ -98,3 +98,9 @@ msgstr "Добавить подписку"
 
 msgid "nothing_found"
 msgstr "Ничего не найдено, повторите ввод"
+
+msgid "your_scheduler"
+msgstr "Ваша подписка:"
+
+msgid "added_to_scheduler"
+msgstr "Документ добавлен в подписки"

@@ -17,6 +17,10 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
     language = ''
     async with state.proxy() as data:
         language = data.get('language','ru')
+        # data['selectors_wo_multi'] = {}
+        # data['selectors_multi'] = {}
+        # data['filters'] = {}
+
     await call.message.delete()
 
     selectors_multi, selectors_wo_multi = await get_selectors(User.get_current().id)

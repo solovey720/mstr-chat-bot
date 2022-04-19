@@ -17,6 +17,9 @@ async def search_file(message: Message, state: FSMContext):
     language = ''
     async with state.proxy() as data:
         language = data.get('language','ru')
+        data['selectors_wo_multi'] = {}
+        data['selectors_multi'] = {}
+        data['filters'] = {}
 
     all_reports = search_report(conn, message.text)
     all_documents = search_document(conn, message.text)
@@ -67,7 +70,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(_(language)('send_report'), chat_id=call.message.chat.id,
                                 message_id=call.message.message_id)
     # await call.answer('Отправляем скриншот отчета...', show_alert=True)
-    await create_page(User.get_current().id, {'docID': file_id})
+    await create_page(User.get_current().id, {'docID': file_id, 'headless': True})
     try:
         await send_filter_screen(User.get_current().id, {'security': db.get_security(User.get_current().id)})
     except KeyError as e:

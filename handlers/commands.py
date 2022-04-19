@@ -22,10 +22,10 @@ async def language_command(message: Message):
 
 # Команда запуска бота
 async def start_command(message: Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['selectors_wo_multi'] = {}
-        data['selectors_multi'] = {}
-        data['filters'] = {}
+    # async with state.proxy() as data:
+    #     data['selectors_wo_multi'] = {}
+    #     data['selectors_multi'] = {}
+    #     data['filters'] = {}
 
     db.insert_new_user(User.get_current().id)
     language_keyboard = InlineKeyboardMarkup()

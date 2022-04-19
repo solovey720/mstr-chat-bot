@@ -45,7 +45,7 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
     add_to_favorite = InlineKeyboardButton(_(language)('add_to_favorite'), callback_data='add_favorite')
     add_scheduler = InlineKeyboardButton(_(language)('add_scheduler'), callback_data='add_scheduler')
     choice_keyboard.row(change_selectors_button, find_another_button)
-    choice_keyboard.add(change_selectors_button, find_another_button, add_to_favorite, add_scheduler)
+    choice_keyboard.add(add_to_favorite, add_scheduler)
     await bot.send_message(chat_id=call.message.chat.id, text=_(language)('wtd'), reply_markup=choice_keyboard)
 
 

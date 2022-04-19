@@ -2,6 +2,8 @@ from webdriver.screenshot import *
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
+from translate import _
+
 jobstores = {
     'default': SQLAlchemyJobStore(url='sqlite:///database/jobs.sqlite')
 }
@@ -20,6 +22,7 @@ scheduler.remove_all_jobs()
 # scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=15, minute=44, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
 
 async def _sem_scheduler_dashboard(user_id: int, options=dict()):
+    
     new_browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose': False,
                                 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await new_browser.pages())[0]
@@ -40,6 +43,7 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
         new_filters_sel[ctlkey] = sel_values
 
     sched_options['filters'] = new_filters_sel
+    await bot.send_message(user_id, _(options.get('language','ru'))('your_scheduler'))
     await send_filter_screen(user_id, options=sched_options, new_browser=page)
     await new_browser.close()
 
@@ -64,6 +68,7 @@ async def scheduler_dashboard(user_id: int, options=dict()):
     * ``security`` (list): values to apply of security selector 
     * ``filters`` (dict): dict of ``selector``(str): ``values name``(list) to apply  
     * ``docType`` (str): type of the document
+    * ``language`` (str): language of bot
 
     Available options to scheduler.add_job:
 
