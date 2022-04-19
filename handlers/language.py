@@ -16,7 +16,7 @@ async def change_language(call: CallbackQuery, state: FSMContext):
     # async with state.proxy() as data:
     #     data['language'] = language
     db.insert_language(call.message.chat.id, language)
-    await bot.send_message(call.message.chat.id, text=_(call.message.chat.id)('vybran drugoy yazyk'))
+    await bot.send_message(call.message.chat.id, text=_(call.message.chat.id)('language_changed'))
     await state.reset_state(with_data=False)
 
 

@@ -101,7 +101,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     else: 
         page = new_browser
 
-    if not is_session_alive(user_id,  new_browser = None):
+    if not (await is_session_alive(user_id,  new_browser)):
         if not new_browser:
             await close_browser(user_id)
         else: 
