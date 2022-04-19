@@ -25,11 +25,17 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
     await bot.send_message(call.message.chat.id, _(call.message.chat.id)('send_report'))
     try:
         await send_filter_screen(User.get_current().id, {'filters': filters, 'security': db.get_security(User.get_current().id)})
-    except errors.TimeoutError:
+    except errors.TimeoutError as e:
         await bot.send_message(call.message.chat.id, _(call.message.chat.id)('no_data'))
     except KeyError as e:
         if e.args[0] == 'S_security':
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('security_key_error'))
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
+            await GetInfo.find_file.set()
+            return
+    except TimeoutError as e:
+        if e.args[0] == 'Session is dead':
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('session_is_dead'))
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return

@@ -28,7 +28,7 @@ async def add_scheduler(call: CallbackQuery, state: FSMContext):
         #     db.concat_favorite(User.get_current().id, json_string)
         # else:
         #     db.concat_favorite(User.get_current().id, {file_id: None})
-        scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-fri', hour=13, minute=5, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+        scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-fri', hour=18, minute=0, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
 
         await bot.send_message(User.get_current().id, _(User.get_current().id)('added_to_scheduler'))
     

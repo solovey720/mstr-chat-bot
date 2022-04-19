@@ -75,6 +75,12 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
+    except TimeoutError as e:
+        if e.args[0] == 'Session is dead':
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('session_is_dead'))
+            await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
+            await GetInfo.find_file.set()
+            return
 
     if file_type == 'report':
         await bot.send_message(call.message.chat.id, _(call.message.chat.id)('type_search'))

@@ -107,3 +107,6 @@ msgstr "Document added to subscriptions"
 
 msgid "language_changed"
 msgstr "language changed successfully"
+
+msgid "session_is_dead"
+msgstr "Your MicroStrategy session has timed out due to inactivity, and you have been automatically logged out. Please open dashboard again"

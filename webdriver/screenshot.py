@@ -101,6 +101,14 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     else: 
         page = new_browser
 
+    if not is_session_alive(user_id,  new_browser = None):
+        if not new_browser:
+            await close_browser(user_id)
+        else: 
+            page.browser.close()
+        raise TimeoutError('Session is dead')
+
+
     timeout_long = options.get('timeout_long', 60000)
     timeout_short = options.get('timeout_short', 3000)
     docType = options.get('docType', 'document')

@@ -134,6 +134,22 @@ async def apply_selectors(user_id, new_browser = None):
 
     await page.evaluate('mstrApp.docModel.controller.refresh()')
 
+async def is_session_alive(user_id, new_browser = None):
+    """Check session timeout
+
+    Available options are:
+
+    * ``user_id`` (int): userID from TG
+    """ 
+    if not new_browser:
+        page = await get_browsers_page(user_id)
+    else: 
+        page = new_browser
+
+    session_timeout = int(await page.evaluate('mstrApp.sessionManager.remainingTime'))
+
+    return session_timeout > 30
+
 
 def list_to_str(value: list) -> str:
     val = value.copy()

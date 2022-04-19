@@ -107,3 +107,6 @@ msgstr "Документ добавлен в подписки"
 
 msgid "language_changed"
 msgstr "Язык успешно изменен"
+
+msgid "session_is_dead"
+msgstr "Сессия MicroStrategy была отключена из-за бездействия. Пожалуйста, откройте документ повторно"
