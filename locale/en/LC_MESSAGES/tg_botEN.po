@@ -110,3 +110,51 @@ msgstr "language changed successfully"
 
 msgid "session_is_dead"
 msgstr "Your MicroStrategy session has timed out due to inactivity, and you have been automatically logged out. Please open dashboard again"
+
+msgid "AM"
+msgstr "a.m."
+
+msgid "PM"
+msgstr "p.m."
+
+msgid "mon"
+msgstr "monday"
+
+msgid "tue"
+msgstr "tuesday"
+
+msgid "wed"
+msgstr "wednesday"
+
+msgid "thu"
+msgstr "thursday"
+
+msgid "fri"
+msgstr "friday"
+
+msgid "sat"
+msgstr "saturday"
+
+msgid "sun"
+msgstr "sunday"
+
+msgid "continue"
+msgstr "continue"
+
+msgid "set_day_of_week"
+msgstr "Select the days of the week when you want to receive the document"
+
+msgid "set_hour"
+msgstr "Select time (hour) \nFirst button toggles period"
+
+msgid "set_minute"
+msgstr "Select time (minute)"
+
+msgid "confirmation_of_scheduler"
+msgstr "Current settings:\nDays of the week - {0}\nTime - {1}\nIs that right?"
+
+msgid "scheduler_created"
+msgstr "Subscription created successfully"
+
+msgid "Сhosen"
+msgstr "Сhosen:"

@@ -1,8 +1,9 @@
 
 from aiogram import Dispatcher
-from aiogram.types import CallbackQuery, User
+from aiogram.types import CallbackQuery, User, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+
 
 from create_bot_and_conn import GetInfo, db, bot
 
@@ -10,9 +11,100 @@ from webdriver.scheduler import scheduler, scheduler_dashboard
 
 from translate import _
 
-# Функция добавления избранного отчета в базу данных
+# AM = 'До полудня'
+# PM = 'После полудня'
+
+# Функция добавления подписки
 async def add_scheduler(call: CallbackQuery, state: FSMContext):
-    #scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=11, minute=46, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+    await bot.answer_callback_query(call.id)
+    async with state.proxy() as data:
+        data['days'] = []
+        data['time'] = {}
+
+    # day_buttons.append(InlineKeyboardButton(_(User.get_current().id)(day), callback_data=f'day_of_week:{day}'))
+    # day_of_week_keyboard.inline_keyboard.append(day_buttons)
+
+    day_of_week_keyboard = InlineKeyboardMarkup(row_width=3)
+    day_of_week=['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+    for day in day_of_week:
+        day_of_week_keyboard.insert(InlineKeyboardButton(_(User.get_current().id)(day), callback_data=f'day_of_week:{day}'))
+    day_of_week_keyboard.row(InlineKeyboardButton(_(User.get_current().id)('continue'), callback_data=f'get_hour'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('set_day_of_week'), reply_markup=day_of_week_keyboard)
+
+
+#Сохранение дня
+async def set_scheduler_day(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    async with state.proxy() as data:
+        day = call.data.split(':')[1]
+        if day not in data['days']:
+            data['days'].append(day)
+        
+        await call.message.edit_text(f"{_(User.get_current().id)('set_day_of_week')}\n{_(User.get_current().id)('сhosen')} {', '.join(list(map(_(User.get_current().id), data['days'])))}",
+                                        reply_markup=call.message.reply_markup)
+        
+#запрос часов
+async def get_scheduler_hour(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    hour_keyboard = InlineKeyboardMarkup(row_width=6)
+    hour_keyboard.row(InlineKeyboardButton(_(User.get_current().id)('AM'), callback_data=f'AM_PM_switch:'))
+    hour_keyboard.row()
+    for hour in range (1,13):
+        hour_keyboard.insert(InlineKeyboardButton(hour, callback_data=f'hour:{hour}'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('set_hour'), reply_markup=hour_keyboard)
+    
+
+# Переключение до/после полудня
+async def set_scheduler_AM_PM(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    AM_PM = call.message.reply_markup.inline_keyboard[0][0].text
+    if AM_PM == _(User.get_current().id)('AM'):
+        AM_PM = _(User.get_current().id)('PM')
+    else:
+        AM_PM = _(User.get_current().id)('AM')
+    call.message.reply_markup.inline_keyboard[0][0].text = AM_PM
+    await call.message.edit_reply_markup(call.message.reply_markup)
+
+
+#Сохранение часов, запрос минут
+async def set_scheduler_hour(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    async with state.proxy() as data:
+        AM_PM = call.message.reply_markup.inline_keyboard[0][0].text
+        hour = int(call.data.split(':')[1])
+        if AM_PM == _(User.get_current().id)('PM'): 
+            hour += 12
+        data['time']['hour'] = hour
+    minute_keyboard = InlineKeyboardMarkup(row_width=6)
+    for minute in range (0,60,5):
+        minute_keyboard.insert(InlineKeyboardButton(minute, callback_data=f'minute:{minute}'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('set_minute'), reply_markup=minute_keyboard)
+
+
+
+#Сохранение минут, Вопрос о правильности даты
+async def set_scheduler_minute(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    time=''
+    days=''
+    async with state.proxy() as data:
+        data['time']['minute'] = int(call.data.split(':')[1])
+        days = ', '.join(list(map(_(User.get_current().id), data['days'])))
+        minute = data['time']['minute']
+        minute = minute if minute > 9 else '0' + str(minute)
+        hour = data['time']['hour']
+        hour = hour if hour > 9 else '0' + str(hour)
+        time = f"{hour}:{minute}"
+
+    yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
+    yes_no_keyboard.insert(InlineKeyboardButton( _(User.get_current().id)('yes'), callback_data=f'create_scheduler'))
+    yes_no_keyboard.insert(InlineKeyboardButton( _(User.get_current().id)('no'), callback_data=f'add_scheduler'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('confirmation_of_scheduler').format(days, time), reply_markup=yes_no_keyboard)
+
+
+#создание подписки
+async def create_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
     file_id = ''
     filters = {}
     async with state.proxy() as data:
@@ -24,16 +116,26 @@ async def add_scheduler(call: CallbackQuery, state: FSMContext):
                 for val in data['filters'][selector]:
                     val_list.append(list(val.values())[0])
                 filters = filters | {selector.split(';')[1]: val_list}
-                #json_string[file_id].update({selector.split(';')[1]: val_list})
-        #     db.concat_favorite(User.get_current().id, json_string)
-        # else:
-        #     db.concat_favorite(User.get_current().id, {file_id: None})
-        scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-fri', hour=18, minute=0, misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+        scheduler.add_job(scheduler_dashboard, "cron", day_of_week=(','.join(data['days'])), hour=data['time']['hour'], minute=data['time']['minute'], misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+        await bot.send_message(User.get_current().id, _(User.get_current().id)('scheduler_created'))
+        
 
-        await bot.send_message(User.get_current().id, _(User.get_current().id)('added_to_scheduler'))
-    
+
+        
+
+
+
 
 
 def register_handlers_search_and_screen(dp: Dispatcher):
-    dp.register_callback_query_handler(add_scheduler, Text(equals='add_scheduler'),
-                                       state=GetInfo.set_filters)
+    dp.register_callback_query_handler(add_scheduler, Text(equals='add_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(set_scheduler_day, Text(startswith='day_of_week:'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(get_scheduler_hour, Text(startswith='get_hour'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(set_scheduler_hour, Text(startswith='hour:'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(set_scheduler_AM_PM, Text(startswith='AM_PM_switch:'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(set_scheduler_minute, Text(startswith='minute:'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(create_scheduler, Text(equals='create_scheduler'), state=GetInfo.set_filters)
+
+
+# def register_handlers_language(dp: Dispatcher):
+#     dp.register_callback_query_handler(change_language, Text(startswith='lang:'), state=GetInfo.set_language)

@@ -94,7 +94,7 @@ msgid "added_to_favorite"
 msgstr "Документ был добавлен в избранное"
 
 msgid "add_scheduler"
-msgstr "Добавить подписки"
+msgstr "Добавить подписку"
 
 msgid "nothing_found"
 msgstr "Ничего не найдено, повторите ввод"
@@ -110,3 +110,51 @@ msgstr "Язык успешно изменен"
 
 msgid "session_is_dead"
 msgstr "Сессия MicroStrategy была отключена из-за бездействия. Пожалуйста, откройте документ повторно"
+
+msgid "AM"
+msgstr "До полудня"
+
+msgid "PM"
+msgstr "После полудня"
+
+msgid "mon"
+msgstr "понедельник"
+
+msgid "tue"
+msgstr "вторник"
+
+msgid "wed"
+msgstr "среда"
+
+msgid "thu"
+msgstr "четверг"
+
+msgid "fri"
+msgstr "пятница"
+
+msgid "sat"
+msgstr "суббота"
+
+msgid "sun"
+msgstr "воскресенье"
+
+msgid "continue"
+msgstr "Продолжить"
+
+msgid "set_day_of_week"
+msgstr "Выберите дни недели, когда вы хотите получать документ"
+
+msgid "set_hour"
+msgstr "Выберете время (час) \nПервая кнопка переключает период"
+
+msgid "set_minute"
+msgstr "Выберете время (минуты)"
+
+msgid "confirmation_of_scheduler"
+msgstr "Текущие настройки:\nДни недели - {0}\nВремя - {1}\nВсе верно?"
+
+msgid "scheduler_created"
+msgstr "Подписка создана успешно"
+
+msgid "сhosen"
+msgstr "Выбрано:"
