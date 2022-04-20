@@ -43,3 +43,5 @@ PASSWORD = os.environ.get('PASSWORD')
 HARD_SECURITY_MODE = False
 # Максимально разрешенное количество одновременно запущеных процессов по отправке скриншота
 RUN_LIMIT = 10
+#количество выводимых значений селектора
+COUNT_VALUES = 8

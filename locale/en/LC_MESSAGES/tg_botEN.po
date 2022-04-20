@@ -58,7 +58,7 @@ msgid "more_selectors"
 msgstr "Choose another selector"
 
 msgid "set_sel_val"
-msgstr "Set selector's value"
+msgstr "After selecting the desired values, request a screenshot or install another selector"
 
 msgid "no_data"
 msgstr "Выбранные фильтры исключают все данные (только на англ)"
@@ -158,3 +158,12 @@ msgstr "Subscription created successfully"
 
 msgid "Сhosen"
 msgstr "Сhosen:"
+
+msgid "previus_page"
+msgstr "\u2b05\ufe0f"
+
+msgid "next_page"
+msgstr "\u27a1\ufe0f"
+
+msgid "current_page"
+msgstr "{0}"

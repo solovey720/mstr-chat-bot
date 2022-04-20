@@ -58,7 +58,7 @@ msgid "more_selectors"
 msgstr "Выбрать еще селектор"
 
 msgid "set_sel_val"
-msgstr "Установите значение селектора"
+msgstr "После выбора нужных значений запросите скриншот или установите еще селектор"
 
 msgid "no_data"
 msgstr "Выбранные фильтры исключают все данные"
@@ -79,10 +79,10 @@ msgid "selector_set"
 msgstr "Селектор установлен в {0}"
 
 msgid "favorites"
-msgstr "Ваши любимчики:"
+msgstr "Список избранного:"
 
 msgid "send_favorite"
-msgstr "Отправляем отчет любимчика..."
+msgstr "Отправляем избранный отчет..."
 
 msgid "add_to_favorite"
 msgstr "Добавить в избранное"
@@ -145,10 +145,10 @@ msgid "set_day_of_week"
 msgstr "Выберите дни недели, когда вы хотите получать документ"
 
 msgid "set_hour"
-msgstr "Выберете время (час) \nПервая кнопка переключает период"
+msgstr "Выберите время (час) \nПервая кнопка переключает период"
 
 msgid "set_minute"
-msgstr "Выберете время (минуты)"
+msgstr "Выберите время (минуты)"
 
 msgid "confirmation_of_scheduler"
 msgstr "Текущие настройки:\nДни недели - {0}\nВремя - {1}\nВсе верно?"
@@ -158,3 +158,13 @@ msgstr "Подписка создана успешно"
 
 msgid "сhosen"
 msgstr "Выбрано:"
+
+msgid "previus_page"
+msgstr "\u2b05\ufe0f"
+
+msgid "next_page"
+msgstr "\u27a1\ufe0f"
+
+msgid "current_page"
+msgstr "{0}"
+

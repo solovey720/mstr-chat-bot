@@ -1,10 +1,12 @@
 
+import math
 from aiogram import Dispatcher
+from aiogram.utils.exceptions import MessageNotModified
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, User
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from create_bot_and_conn import GetInfo, bot
+from create_bot_and_conn import GetInfo, bot, COUNT_VALUES
 
 from webdriver.scheduler import get_selectors, get_values
 
@@ -19,6 +21,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
         # data['selectors_multi'] = {}
         # data['filters'] = {}
 
+    await bot.answer_callback_query(call.id)
     await call.message.delete()
 
     selectors_multi, selectors_wo_multi = await get_selectors(User.get_current().id)
@@ -55,6 +58,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
 
 # Выводим список всех значений выбранного селектора
 async def get_selector_values(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
     selector_name = call.data.split(':')[2]
     selector_type = call.data.split(':')[1]
     selector_ctl_name = ''
@@ -73,33 +77,52 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
     selector_values = await get_values(User.get_current().id, selector_ctl_name.split(';')[0])
     async with state.proxy() as data:
         data['selector_values'] = selector_values
+        data['selector_values_keys'] = list(selector_values.keys())
 
     if selector_values:
         selector_values_keyboard = InlineKeyboardMarkup()
-        for value in selector_values:
+        for value in data['selector_values_keys'][0:COUNT_VALUES]:
             selector_values_button = InlineKeyboardButton(value, callback_data=f'val:{selector_type}:{value}')
             selector_values_keyboard.add(selector_values_button)
 
-        if selector_type == 'mult':
-            await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_mult').format(selector_name),
+        # sliced_selector_values_keyboard = InlineKeyboardMarkup()
+        # sliced_selector_values_keyboard.inline_keyboard = selector_values_keyboard.inline_keyboard[0:COUNT_VALUES]
+        # AM_PM = call.message.reply_markup.inline_keyboard[0][0].text
+        
+        current_page = InlineKeyboardButton(_(call.message.chat.id)('current_page').format(f"1 / {math.ceil(len(data['selector_values_keys'])/COUNT_VALUES)}"), callback_data='number_of_page:0')
+        previus_page = InlineKeyboardButton(_(call.message.chat.id)('previus_page'), callback_data=f'number_of_page:0')
+        next_page = InlineKeyboardButton(_(call.message.chat.id)('next_page'), callback_data=f'number_of_page:2')
+        selector_values_keyboard.row(previus_page, current_page, next_page)
+
+        await bot.send_message(text=_(call.message.chat.id)('sel_val_mult' if selector_type == 'mult' else 'sel_val_wo_mult').format(selector_name),
                                         chat_id=call.message.chat.id,
-                                        message_id=call.message.message_id,
-                                        reply_markup=selector_values_keyboard)
-            try:
-                await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
-                await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
-            except Exception as e:
-                await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
-        else:
-            await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_wo_mult').format(selector_name),
-                                        chat_id=call.message.chat.id,
-                                        message_id=call.message.message_id,
                                         reply_markup=selector_values_keyboard)
 
-            await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
-            async with state.proxy() as data:
-                if data['selectors_multi']:
-                    await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
+        # if selector_type == 'mult':
+        #     tst = InlineKeyboardMarkup()
+        #     #tst = selector_values_keyboard
+        #     #selector_values_keyboard.inline_keyboard=selector_values_keyboard.inline_keyboard[0:10]
+        #     tst.inline_keyboard = selector_values_keyboard.inline_keyboard[0:10]
+        #     print(selector_values_keyboard.inline_keyboard)
+        #     await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_mult').format(selector_name),
+        #                                 chat_id=call.message.chat.id,
+        #                                 message_id=call.message.message_id,
+        #                                 reply_markup=tst)
+        #     try:
+        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
+        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
+        #     except Exception as e:
+        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
+        # else:
+        #     await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_wo_mult').format(selector_name),
+        #                                 chat_id=call.message.chat.id,
+        #                                 message_id=call.message.message_id,
+        #                                 reply_markup=selector_values_keyboard)
+
+        #     await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
+        #     async with state.proxy() as data:
+        #         if data['selectors_multi']:
+        #             await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
 
         choice_keyboard = InlineKeyboardMarkup()
         choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
@@ -112,11 +135,13 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
 
 # Запоминаем выбранное значение(-я) у селектора
 async def set_selector_value(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
     selector_type = call.data.split(':')[1]
     selector_value_name = call.data.split(':')[2]
     selected_values = []
 
     async with state.proxy() as data:
+        selector_name = data['active_selector'].split(';')[1]
         selector_value = data['selector_values'][selector_value_name]
         selector_ctl = data['active_selector']
         if selector_type == 'mult':
@@ -126,15 +151,60 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
         for value_name in data['filters'][selector_ctl]:
             selected_values.append(list(value_name.values())[0])
 
-        choice_keyboard = InlineKeyboardMarkup()
-        choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
-        choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
-        choice_keyboard.add(choose_selector_button, choose_screen_button)
+        await call.message.edit_text(f"{_(User.get_current().id)('sel_val_mult' if selector_type == 'mult' else 'sel_val_wo_mult').format(selector_name)}\n{_(User.get_current().id)('сhosen')} {', '.join(selected_values)}",
+                                        reply_markup=call.message.reply_markup)
 
-        await bot.send_message(chat_id=call.message.chat.id, text=_(call.message.chat.id)('selector_set').format("; ".join(selected_values)))
+
+async def switch_values_page(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    page_number = int(call.data.split(':')[1])
+    selector_type = call.message.reply_markup.inline_keyboard[0][0].callback_data.split(':')[1]
+    async with state.proxy() as data:
+        if page_number < 1 or page_number > math.ceil(len(data['selector_values_keys'])/COUNT_VALUES):
+            return
+        call.message.reply_markup.inline_keyboard[-1][0].callback_data = f"number_of_page:{(page_number - 1)}"
+        call.message.reply_markup.inline_keyboard[-1][2].callback_data = f"number_of_page:{(page_number + 1)}"
+        call.message.reply_markup.inline_keyboard[-1][1].text = _(call.message.chat.id)('current_page').format(f"{page_number} / {math.ceil(len(data['selector_values_keys'])/COUNT_VALUES)}") #(page_number + 1) if page_number < math.ceil(len(data['selector_values_keys'])/COUNT_VALUES) else math.ceil(data['selector_values_keys']/COUNT_VALUES)
+        if page_number < math.ceil(len(data['selector_values_keys'])/COUNT_VALUES):
+            for i in range(len(call.message.reply_markup.inline_keyboard) - 1):
+                call.message.reply_markup.inline_keyboard[i][0].text = data['selector_values_keys'][(page_number - 1) * COUNT_VALUES + i]
+                call.message.reply_markup.inline_keyboard[i][0].callback_data = f"val:{selector_type}:{data['selector_values_keys'][(page_number - 1) * COUNT_VALUES + i]}"
+        else: 
+            for i in range(len(call.message.reply_markup.inline_keyboard) - 1):
+                call.message.reply_markup.inline_keyboard[-i-2][0].text = data['selector_values_keys'][-i-1]
+                call.message.reply_markup.inline_keyboard[-i-2][0].callback_data = f"val:{selector_type}:{data['selector_values_keys'][-i-1]}"
+        try:
+            await call.message.edit_reply_markup(call.message.reply_markup)
+        except MessageNotModified:
+            pass
+
+
+
+
+    #     for value in data['selector_values'][(page_number - 1) * COUNT_VALUES : page_number * COUNT_VALUES]:
+    #         selector_values_button = InlineKeyboardButton(value, callback_data=f'val:{selector_type}:{value}')
+    #         selector_values_keyboard.add(selector_values_button)
+
+    # async with state.proxy() as data:
+    #     selector_value = data['selector_values'][selector_value_name]
+    #     selector_ctl = data['active_selector']
+    #     if selector_type == 'mult':
+    #         data['filters'][selector_ctl].append({selector_value: selector_value_name})
+    #     else:
+    #         data['filters'][selector_ctl] = [{selector_value: selector_value_name}]
+    #     for value_name in data['filters'][selector_ctl]:
+    #         selected_values.append(list(value_name.values())[0])
+
+    #     choice_keyboard = InlineKeyboardMarkup()
+    #     choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
+    #     choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
+    #     choice_keyboard.add(choose_selector_button, choose_screen_button)
+
+    #     await bot.send_message(chat_id=call.message.chat.id, text=_(call.message.chat.id)('selector_set').format("; ".join(selected_values)))
 
 
 def register_handlers_set_selectors(dp: Dispatcher):
     dp.register_callback_query_handler(get_all_selectors, Text(startswith='yesFilter'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(get_selector_values, Text(startswith='sel:'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(switch_values_page, Text(startswith='number_of_page:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_selector_value, Text(startswith='val:'), state=GetInfo.set_filters)
