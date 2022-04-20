@@ -29,6 +29,28 @@ def search_document(connection, doc_name):
     documents = list_documents(connection, doc_name)
     return documents
 
+def get_document_name_by_id(connection, id):
+    document = list_documents(connection, id=id)
+    if not document:
+        report = list_reports(connection, id=id)
+        if not report:
+            return None
+        else: 
+            return report[0].name
+    else:
+        return document[0].name
+
+    return documents
+def search_report_by_id(connection, id):
+    reports = list_reports(connection, id=id)
+    return reports
+
+
+def search_document_by_id(connection, id):
+    documents = list_documents(connection, id=id)
+    return documents
+
+
 '''
 def get_report(connection, report_id):
     my_report = Report(connection=connection, id=report_id, parallel=False)

@@ -167,3 +167,24 @@ msgstr "\u27a1\ufe0f"
 
 msgid "current_page"
 msgstr "{0}"
+
+msgid "click_to_delete"
+msgstr "What to remove?"
+
+msgid "list_of_scheduler"
+msgstr "Subscription Management"
+
+msgid "list_of_scheduler_is_empty"
+msgstr "Subscription list is empty"
+
+msgid "successfully_deleted"
+msgstr "Successfully deleted"
+
+msgid "info_scheduler"
+msgstr "Subscription details"
+
+msgid "delete_scheduler"
+msgstr "Remove subscription"
+
+msgid "info_about_scheduler"
+msgstr "Choose an action"

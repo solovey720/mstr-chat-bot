@@ -168,3 +168,24 @@ msgstr "\u27a1\ufe0f"
 msgid "current_page"
 msgstr "{0}"
 
+msgid "click_to_delete"
+msgstr "Что удалить?"
+
+msgid "list_of_scheduler"
+msgstr "Управление подписками"
+
+msgid "list_of_scheduler_is_empty"
+msgstr "Список подписок пуст"
+
+msgid "successfully_deleted"
+msgstr "Успешно удалено"
+
+msgid "info_scheduler"
+msgstr "Подробная информация о подписке"
+
+msgid "delete_scheduler"
+msgstr "Удалить подписку"
+
+msgid "info_about_scheduler"
+msgstr "Выберите действие"
+

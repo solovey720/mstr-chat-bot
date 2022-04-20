@@ -23,11 +23,17 @@ async def add_to_favorite(call: CallbackQuery, state: FSMContext):
             db.concat_favorite(User.get_current().id, json_string)
         else:
             db.concat_favorite(User.get_current().id, {file_id: None})
-
         await bot.send_message(User.get_current().id, _(User.get_current().id)('added_to_favorite'))
+
+
+async def delete_favorite(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    file_id = call.data.split(':')[1]
+    db.delete_favorite(User.get_current().id, file_id)
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('successfully_deleted'))
     
 
 
 def register_handlers_search_and_screen(dp: Dispatcher):
-    dp.register_callback_query_handler(add_to_favorite, Text(equals='add_favorite'),
-                                       state=GetInfo.set_filters)
+    dp.register_callback_query_handler(add_to_favorite, Text(equals='add_favorite'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(delete_favorite, Text(startswith='delete_favorite:'), state='*')

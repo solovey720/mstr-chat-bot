@@ -3,6 +3,7 @@ from aiogram import Dispatcher
 from aiogram.types import CallbackQuery, User, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+from numpy import empty
 
 
 from create_bot_and_conn import GetInfo, db, bot
@@ -80,7 +81,10 @@ async def set_scheduler_minute(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     time=''
     days=''
+
     async with state.proxy() as data:
+        if not data['days']:
+            data['days'] = ['mon', 'tue', 'wed', 'thu', 'fri']
         data['time']['minute'] = int(call.data.split(':')[1])
         days = ', '.join(list(map(_(User.get_current().id), data['days'])))
         minute = data['time']['minute']
@@ -113,6 +117,30 @@ async def create_scheduler(call: CallbackQuery, state: FSMContext):
         await bot.send_message(User.get_current().id, _(User.get_current().id)('scheduler_created'))
         
 
+async def info_about_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    id = call.data.split(':')[1]
+    job = scheduler.get_job(id)
+    job_keyboard = InlineKeyboardMarkup()
+    job_keyboard.add(InlineKeyboardButton( _(User.get_current().id)('info_scheduler'), callback_data=f'info_scheduler:{id}'))
+    job_keyboard.add(InlineKeyboardButton( _(User.get_current().id)('delete_scheduler'), callback_data=f'delete_scheduler:{id}'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('info_about_scheduler'), reply_markup=job_keyboard)
+
+
+async def delete_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    id = call.data.split(':')[1]
+    scheduler.remove_job(id)
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('successfully_deleted'))
+
+
+async def info_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    id = call.data.split(':')[1]
+    job = scheduler.get_job(id)
+    await bot.send_message(User.get_current().id, str(job))
+        
+
 def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_callback_query_handler(add_scheduler, Text(equals='add_scheduler'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_day, Text(startswith='day_of_week:'), state=GetInfo.set_filters)
@@ -121,3 +149,6 @@ def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_callback_query_handler(set_scheduler_AM_PM, Text(startswith='AM_PM_switch:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_minute, Text(startswith='minute:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(create_scheduler, Text(equals='create_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(info_about_scheduler, Text(startswith='info_about_scheduler:'), state='*')
+    dp.register_callback_query_handler(info_scheduler, Text(startswith='info_scheduler:'), state='*')
+    dp.register_callback_query_handler(delete_scheduler, Text(startswith='delete_scheduler:'), state='*')
