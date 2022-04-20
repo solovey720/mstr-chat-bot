@@ -11,19 +11,12 @@ from webdriver.scheduler import scheduler, scheduler_dashboard
 
 from translate import _
 
-# AM = 'До полудня'
-# PM = 'После полудня'
-
 # Функция добавления подписки
 async def add_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     async with state.proxy() as data:
         data['days'] = []
         data['time'] = {}
-
-    # day_buttons.append(InlineKeyboardButton(_(User.get_current().id)(day), callback_data=f'day_of_week:{day}'))
-    # day_of_week_keyboard.inline_keyboard.append(day_buttons)
-
     day_of_week_keyboard = InlineKeyboardMarkup(row_width=3)
     day_of_week=['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
     for day in day_of_week:
@@ -120,13 +113,6 @@ async def create_scheduler(call: CallbackQuery, state: FSMContext):
         await bot.send_message(User.get_current().id, _(User.get_current().id)('scheduler_created'))
         
 
-
-        
-
-
-
-
-
 def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_callback_query_handler(add_scheduler, Text(equals='add_scheduler'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_day, Text(startswith='day_of_week:'), state=GetInfo.set_filters)
@@ -135,7 +121,3 @@ def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_callback_query_handler(set_scheduler_AM_PM, Text(startswith='AM_PM_switch:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_minute, Text(startswith='minute:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(create_scheduler, Text(equals='create_scheduler'), state=GetInfo.set_filters)
-
-
-# def register_handlers_language(dp: Dispatcher):
-#     dp.register_callback_query_handler(change_language, Text(startswith='lang:'), state=GetInfo.set_language)
