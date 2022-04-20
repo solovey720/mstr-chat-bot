@@ -94,7 +94,7 @@ msgid "added_to_favorite"
 msgstr "Документ был добавлен в избранное"
 
 msgid "add_scheduler"
-msgstr "Добавить подписку"
+msgstr "Добавить подписки"
 
 msgid "nothing_found"
 msgstr "Ничего не найдено, повторите ввод"
