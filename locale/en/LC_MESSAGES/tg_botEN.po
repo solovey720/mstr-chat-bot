@@ -177,6 +177,9 @@ msgstr "Subscription Management"
 msgid "list_of_scheduler_is_empty"
 msgstr "Subscription list is empty"
 
+msgid "list_of_favorite_is_empty"
+msgstr "Favorite list is empty"
+
 msgid "successfully_deleted"
 msgstr "Successfully deleted"
 

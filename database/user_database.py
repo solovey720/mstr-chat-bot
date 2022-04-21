@@ -236,7 +236,7 @@ class DB:
             print("Error: ", err)
         else:
             tmp = self.cursor.fetchone()[0]
-            return json.loads(tmp)
+            return None if tmp == None else json.loads(tmp)
 
     def get_subscription(self, user_id: int):
         try:

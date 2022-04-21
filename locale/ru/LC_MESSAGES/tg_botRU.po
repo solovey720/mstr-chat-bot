@@ -177,6 +177,9 @@ msgstr "Управление подписками"
 msgid "list_of_scheduler_is_empty"
 msgstr "Список подписок пуст"
 
+msgid "list_of_favorite_is_empty"
+msgstr "Список избранного пуст"
+
 msgid "successfully_deleted"
 msgstr "Успешно удалено"
 

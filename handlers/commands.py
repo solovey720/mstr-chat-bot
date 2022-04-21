@@ -53,25 +53,28 @@ async def search_command(message: Message, state: FSMContext):
 async def favorite_command(message: Message, state: FSMContext):
     await state.reset_state(with_data=False)
     all_favorites = db.get_favorite(User.get_current().id)
-    all_favorites_keyboard = InlineKeyboardMarkup()
-    for file_id in all_favorites:
+    if all_favorites:
+        all_favorites_keyboard = InlineKeyboardMarkup()
+        for file_id in all_favorites:
+            file_id_button = InlineKeyboardButton(text=get_document_name_by_id(conn, file_id), callback_data='fav:'+file_id)
+            all_favorites_keyboard.add(file_id_button)
+        await bot.send_message(message.from_user.id, _(message.from_user.id)('favorites'), reply_markup=all_favorites_keyboard)
+    else:
+        await bot.send_message(message.from_user.id, _(message.from_user.id)('list_of_favorite_is_empty'))
 
-        
-        file_id_button = InlineKeyboardButton(text=get_document_name_by_id(conn, file_id), callback_data='fav:'+file_id)
-        all_favorites_keyboard.add(file_id_button)
-
-    await bot.send_message(message.from_user.id, _(message.from_user.id)('favorites'), reply_markup=all_favorites_keyboard)
 
 # Команда для вывода всех избранных отчетов
 async def delete_favorite_command(message: Message, state: FSMContext):
     await state.reset_state(with_data=False)
     all_favorites = db.get_favorite(User.get_current().id)
-    all_favorites_keyboard = InlineKeyboardMarkup()
-    for file_id in all_favorites:
-        file_id_button = InlineKeyboardButton(text=get_document_name_by_id(conn, file_id), callback_data='delete_favorite:'+file_id)
-        all_favorites_keyboard.add(file_id_button)
-
-    await bot.send_message(message.from_user.id, _(message.from_user.id)('click_to_delete'), reply_markup=all_favorites_keyboard)
+    if all_favorites:
+        all_favorites_keyboard = InlineKeyboardMarkup()
+        for file_id in all_favorites:
+            file_id_button = InlineKeyboardButton(text=get_document_name_by_id(conn, file_id), callback_data='delete_favorite:'+file_id)
+            all_favorites_keyboard.add(file_id_button)
+        await bot.send_message(message.from_user.id, _(message.from_user.id)('click_to_delete'), reply_markup=all_favorites_keyboard)
+    else:
+        await bot.send_message(message.from_user.id, _(message.from_user.id)('list_of_favorite_is_empty'))
 
 
 #список всех подписок
