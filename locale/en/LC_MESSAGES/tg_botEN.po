@@ -19,7 +19,7 @@ msgid "begin"
 msgstr "Enter /search to find report,\n/help for list of available commands"
 
 msgid "command_list"
-msgstr "List of available commands:\n /search - find report \n /language - change language\n /favorite - list of favorite\n /subscription - list of subscription"
+msgstr "List of available commands:\n /search - find report \n /language - change language\n /favorite - list of favorite\n /delete_favorite - deleting favorite reports\n /subscription - list of subscription"
 
 msgid "file_name"
 msgstr "Enter report name:"

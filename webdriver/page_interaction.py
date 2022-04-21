@@ -20,7 +20,8 @@ async def close_browser(user_id: int):
 async def get_browsers_page(user_id: int) -> Page:
     page = (await _browsers_list[user_id].pages())[0]
     return page
-   
+
+
 
 async def get_selectors(user_id, new_browser = None):
     """Get all dashboard's selector
@@ -34,23 +35,40 @@ async def get_selectors(user_id, new_browser = None):
     else: 
         page = new_browser
 
-    HTML = await page.evaluate('document.body.innerHTML')
-    select_multi = dict()
-    select_wo_multi = dict()
-    find_111 = HTML.find('\"t\":111') + 1
-    while find_111 != 0:
-        HTML = HTML[find_111:]
-        HTML = HTML[HTML.find('\"n\":\"') + 5:]
-        name = HTML[:HTML.find('\"')]
-        HTML = HTML[HTML.find('\"ckey\":\"') + 8:]
-        ckey = HTML[:HTML.find('\"')]
-        
-        HTML = HTML[HTML.find('\"multi\":') + 8:]
-        if HTML[0]=='t':
-            select_multi[name] = ckey
-        else:
-            select_wo_multi[name] = ckey
-        find_111 = HTML.find('\"t\":111') + 1
+    select_multi = await page.evaluate('''
+                                arr_1 = new Object();
+                                Object.keys(mstrmojo.all).forEach(function(key) {
+
+                                    try
+                                    {
+                                        if (mstrmojo.all[key].t == 111 && mstrmojo.all[key].multi){
+                                            arr_1[mstrmojo.all[key].n] = mstrmojo.all[key].ckey;
+                                        }
+                                    }
+                                    catch 
+                                    {
+                                        console.log('1')
+                                    }
+                                });
+                                arr_1
+                            ''')
+    select_wo_multi = await page.evaluate('''
+                                arr_2 = new Object();
+                                Object.keys(mstrmojo.all).forEach(function(key) {
+
+                                    try
+                                    {
+                                        if (mstrmojo.all[key].t == 111 && !mstrmojo.all[key].multi){
+                                            arr_2[mstrmojo.all[key].n] = mstrmojo.all[key].ckey;
+                                        }
+                                    }
+                                    catch 
+                                    {
+                                        console.log('1')
+                                    }
+                                });
+                                arr_2
+                            ''')
     return select_multi, select_wo_multi 
 
 
@@ -66,7 +84,18 @@ async def get_values(user_id, ckey, new_browser = None):
         page = await get_browsers_page(user_id)
     else: 
         page = new_browser
-
+    """
+    val = await page.evaluate(f'''
+    bbb = new Object()
+    z=mstrApp.docModel.getNodeDataByKey('{ckey}').data.elms
+    for (i in z)
+        {{
+            bbb[z[i].n]=z[i].v
+        }}
+    bbb
+    ''')
+    """ 
+    
     HTML = await page.evaluate('document.body.innerHTML')
     val = dict()
     HTML = HTML[HTML.find('\"k\":\"' + ckey + '\"'):]
@@ -82,7 +111,7 @@ async def get_values(user_id, ckey, new_browser = None):
         val[name] = value
     return val
 
-
+    
 async def request_set_selector(user_id, options=dict(), new_browser=None):
     """Send request to change selector's value
 

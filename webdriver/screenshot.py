@@ -160,7 +160,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
         print('filter error')
 
     await apply_selectors(user_id, new_browser=page)
-    
+
     await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
     try:
         i = 0

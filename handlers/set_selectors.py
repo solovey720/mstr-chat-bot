@@ -7,6 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from create_bot_and_conn import GetInfo, bot, COUNT_VALUES
+from webdriver.page_interaction import get_selectors
 
 from webdriver.scheduler import get_selectors, get_values
 
