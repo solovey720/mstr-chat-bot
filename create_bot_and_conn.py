@@ -20,7 +20,6 @@ class GetInfo(StatesGroup):
     set_filters = State()
     final = State()
 
-
 dotenv.load_dotenv('keys.env')
 
 # Инициализируем бота и подключение к MSTR
