@@ -98,32 +98,6 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
                                         chat_id=call.message.chat.id,
                                         reply_markup=selector_values_keyboard)
 
-        # if selector_type == 'mult':
-        #     tst = InlineKeyboardMarkup()
-        #     #tst = selector_values_keyboard
-        #     #selector_values_keyboard.inline_keyboard=selector_values_keyboard.inline_keyboard[0:10]
-        #     tst.inline_keyboard = selector_values_keyboard.inline_keyboard[0:10]
-        #     print(selector_values_keyboard.inline_keyboard)
-        #     await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_mult').format(selector_name),
-        #                                 chat_id=call.message.chat.id,
-        #                                 message_id=call.message.message_id,
-        #                                 reply_markup=tst)
-        #     try:
-        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
-        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
-        #     except Exception as e:
-        #         await bot.delete_message(call.message.chat.id, call.message.message_id + 2)
-        # else:
-        #     await bot.edit_message_text(text=_(call.message.chat.id)('sel_val_wo_mult').format(selector_name),
-        #                                 chat_id=call.message.chat.id,
-        #                                 message_id=call.message.message_id,
-        #                                 reply_markup=selector_values_keyboard)
-
-        #     await bot.delete_message(call.message.chat.id, call.message.message_id + 1)
-        #     async with state.proxy() as data:
-        #         if data['selectors_multi']:
-        #             await bot.delete_message(call.message.chat.id, call.message.message_id - 1)
-
         choice_keyboard = InlineKeyboardMarkup()
         choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
         choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
@@ -140,21 +114,35 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
     selector_value_name = call.data.split(':')[2]
     selected_values = []
 
+
     async with state.proxy() as data:
         selector_name = data['active_selector'].split(';')[1]
         selector_value = data['selector_values'][selector_value_name]
         selector_ctl = data['active_selector']
         if selector_type == 'mult':
-            data['filters'][selector_ctl].append({selector_value: selector_value_name})
+            if selector_value_name.lower() in ['all', 'все']:
+                data['filters'][selector_ctl]=[{selector_value: selector_value_name}]
+            elif data['filters'][selector_ctl]:
+                if {selector_value: selector_value_name} not in data['filters'][selector_ctl]:
+                    if list(data['filters'][selector_ctl][0].values())[0].lower() in ['all', 'все']:
+                        data['filters'][selector_ctl]=[{selector_value: selector_value_name}]
+                    else:
+                        data['filters'][selector_ctl].append({selector_value: selector_value_name})
+            else:
+                data['filters'][selector_ctl]=[{selector_value: selector_value_name}]
+
         else:
             data['filters'][selector_ctl] = [{selector_value: selector_value_name}]
         for value_name in data['filters'][selector_ctl]:
             selected_values.append(list(value_name.values())[0])
-
-        await call.message.edit_text(f"{_(User.get_current().id)('sel_val_mult' if selector_type == 'mult' else 'sel_val_wo_mult').format(selector_name)}\n{_(User.get_current().id)('сhosen')} {', '.join(selected_values)}",
+        try:
+            await call.message.edit_text(f"{_(User.get_current().id)('sel_val_mult' if selector_type == 'mult' else 'sel_val_wo_mult').format(selector_name)}\n{_(User.get_current().id)('сhosen')} {', '.join(selected_values)}",
                                         reply_markup=call.message.reply_markup)
+        except MessageNotModified:
+            pass
+        
 
-
+# переключение страниц значений селектора
 async def switch_values_page(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     page_number = int(call.data.split(':')[1])
@@ -178,29 +166,6 @@ async def switch_values_page(call: CallbackQuery, state: FSMContext):
         except MessageNotModified:
             pass
 
-
-
-
-    #     for value in data['selector_values'][(page_number - 1) * COUNT_VALUES : page_number * COUNT_VALUES]:
-    #         selector_values_button = InlineKeyboardButton(value, callback_data=f'val:{selector_type}:{value}')
-    #         selector_values_keyboard.add(selector_values_button)
-
-    # async with state.proxy() as data:
-    #     selector_value = data['selector_values'][selector_value_name]
-    #     selector_ctl = data['active_selector']
-    #     if selector_type == 'mult':
-    #         data['filters'][selector_ctl].append({selector_value: selector_value_name})
-    #     else:
-    #         data['filters'][selector_ctl] = [{selector_value: selector_value_name}]
-    #     for value_name in data['filters'][selector_ctl]:
-    #         selected_values.append(list(value_name.values())[0])
-
-    #     choice_keyboard = InlineKeyboardMarkup()
-    #     choose_selector_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')
-    #     choose_screen_button = InlineKeyboardButton(_(call.message.chat.id)('get_screen'), callback_data='getScreen')
-    #     choice_keyboard.add(choose_selector_button, choose_screen_button)
-
-    #     await bot.send_message(chat_id=call.message.chat.id, text=_(call.message.chat.id)('selector_set').format("; ".join(selected_values)))
 
 
 def register_handlers_set_selectors(dp: Dispatcher):

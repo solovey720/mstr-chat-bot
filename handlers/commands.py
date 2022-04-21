@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 
 from create_bot_and_conn import bot, GetInfo, db, conn
 
-from webdriver.scheduler import get_user_jobs
+from webdriver.scheduler import get_user_jobs, close_browser
 
 from mstr_connect import get_document_name_by_id
 
@@ -45,6 +45,7 @@ async def help_command(message: Message, state: FSMContext):
 # Команда для поиска отчета
 async def search_command(message: Message, state: FSMContext):
     await bot.send_message(message.from_user.id, _(message.from_user.id)('file_name'))
+    await close_browser(message.from_user.id)
     await GetInfo.find_file.set()
 
 

@@ -3,7 +3,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, C
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from create_bot_and_conn import GetInfo, conn, bot, db
+from create_bot_and_conn import GetInfo, conn, bot, db, HEADLESS_MODE
 
 from mstr_connect import search_report, search_document
 
@@ -66,7 +66,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(_(call.message.chat.id)('send_report'), chat_id=call.message.chat.id,
                                 message_id=call.message.message_id)
     # await call.answer('Отправляем скриншот отчета...', show_alert=True)
-    await create_page(User.get_current().id, {'docID': file_id, 'headless': True})
+    await create_page(User.get_current().id, {'docID': file_id, 'headless': HEADLESS_MODE})
     try:
         await send_filter_screen(User.get_current().id, {'security': db.get_security(User.get_current().id)})
     except KeyError as e:

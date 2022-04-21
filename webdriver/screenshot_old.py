@@ -1,5 +1,5 @@
 from webdriver.page_interaction import *
-from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
+from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT
 from aiogram.types import InputFile
 import logging
 import os
@@ -48,28 +48,26 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
     
 
     await page.goto(path, {'timeout': timeout_long})
+    ############################ press 'continue'
+    #await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
+    #await page.click('#\\33 054')
+    ############################
     
-    await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else ('#UniqueReportID' if docType == 'report' else None)
+    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else ('#divWaitBox' if docType == 'report' else None)
+
+    # selector_1 = '#pageLoadingWaitBox' if (docType == 'document') or (docType == 'dossier') else ('#UniqueReportID' if docType == 'report' else 'ERROR')
+    # selector_2 = '#pageLoadingWaitBox' if (docType == 'document') or (docType == 'dossier') else ('#divWaitBox' if docType == 'report' else 'ERROR')
+
     try:
-        i = 0
-        j = 0
-        while i < COUNT_CHECK_PAGE_LOAD:
-            page_loading_flag = await page.evaluate('''
-                                                if (typeof mstrApp !== 'undefined') {
-                                                    mstrApp.isWaiting()
-                                                }
-                                                else {
-                                                    true
-                                                }
-                                                ''')
-            if not page_loading_flag:
-                i += 1
-            else:
-                i = 0
-            await page.waitFor(1000)
-            j += 1
-            if j > MAX_TIME_CHECK_PAGE_LOAD:
-                raise errors.TimeoutError(j)
+        await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+        for i in range(5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
+            try:
+                await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
+            except:
+                return
+            await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:
         logging.exception(e)
         print('error')
@@ -159,37 +157,43 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     except:
         print('filter error')
 
-    await apply_selectors(user_id, new_browser=page)
+        #pageLoadingWaitBox
+    selector_1 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
+        '#UniqueReportID' if docType == 'report' else None)
+    selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else (
+        '#divWaitBox' if docType == 'report' else None)
+    # selector_1 = '#pageLoadingWaitBox' if (docType == 'document') or (docType == 'dossier') else ('#UniqueReportID' if docType == 'report' else 'ERROR')
+    # selector_2 = '#waitBox > div.mstrmojo-Editor.mstrWaitBox.modal' if (docType == 'document') or (docType == 'dossier') else ('#divWaitBox' if docType == 'report' else None)
     
-    await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+    await apply_selectors(user_id, new_browser=page)
+ 
     try:
-        i = 0
-        j = 0
-        while i < COUNT_CHECK_PAGE_LOAD:
-            page_loading_flag = await page.evaluate('''
-                                                if (typeof mstrApp !== 'undefined') {
-                                                    mstrApp.isWaiting()
-                                                }
-                                                else {
-                                                    true
-                                                }
-                                                ''')
-            if not page_loading_flag:
-                i += 1
-            else:
-                i = 0
-            await page.waitFor(1000)
-            j += 1
-            if j > MAX_TIME_CHECK_PAGE_LOAD:
-                raise errors.TimeoutError(j)
+        await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
+        try:
+            await page.waitForSelector(selector_1, {'timeout': timeout_short})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        except:
+            await page.screenshot({'path': screen_name})
+            await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+            os.remove(screen_name)
+            return 
+        print('1')
+        await page.waitForSelector(selector_1, {'timeout': timeout_long, 'visible': True})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+        await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})  # ждем пока пропадет окно загрузки данных
 
-        await page.screenshot({'path': screen_name})
-        await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
-        os.remove(screen_name)
-        return 
+        for i in range(5):  # Проверяем на фантомную пропажу окна загрузки. Если окно загрузки не появляется 3 сек, делаем скрин и выходим из цикла. иначе ждем менее 60 секунд, пока окно пропадет и возвращаемся в цикл
+            try:
+                await page.waitForSelector(selector_2, {'timeout': timeout_short, 'visible': True})
+            except:
+                await page.screenshot({'path': screen_name})
+                await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+                os.remove(screen_name)
+                return 
+            await page.waitForSelector(selector_2, {'timeout': timeout_long, 'hidden': True})
     except Exception as e:
         logging.exception(e)
         print('error')
+    
     return 
 
 async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):  

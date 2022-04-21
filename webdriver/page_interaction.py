@@ -6,14 +6,15 @@ _browsers_list = dict()
 
 
 async def create_browser(user_id: int, headless = True) -> Page:
-    _browsers_list[user_id] = await launch({ 'headless': headless, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
+    _browsers_list[user_id] = await launch({'headless': headless, 'ignoreHTTPSErrors': True, 'autoClose':False, 'defaultViewport': {'width': 1920, 'height': 1080}})
     page = (await _browsers_list[user_id].pages())[0]
     return page 
 
 
 async def close_browser(user_id: int):
-    await _browsers_list[user_id].close()
-    _browsers_list.pop(user_id)
+    if user_id in _browsers_list:
+        await _browsers_list[user_id].close()
+        _browsers_list.pop(user_id)
 
 
 async def get_browsers_page(user_id: int) -> Page:
@@ -118,6 +119,7 @@ async def request_set_selector(user_id, options=dict(), new_browser=None):
     body:"taskId={taskid}&rwb={rwb}&messageID={messageID}&stateID=-1&params=%7B%22actions%22%3A%5B%7B%22act%22%3A%22setSelectorElements%22%2C%22keyContext%22%3A%22{keyContext}%22%2C%22ctlKey%22%3A%22{ctlKey}%22%2C%22elemList%22%3A%22{elemList}%22%2C%22isVisualization%22%3Afalse%2C%22include%22%3Atrue%2C%22tks%22%3A%22W12390BF5EDEF41D8A507193CEF784240%22%7D%5D%2C%22partialUpdate%22%3A%7B%22selectors%22%3A%5B%22W5121A375615A451CA272FD10697EA8EA%22%5D%7D%2C%22style%22%3A%7B%22params%22%3A%7B%22treesToRender%22%3A3%7D%2C%22name%22%3A%22RWDocumentMojoStyle%22%7D%7D&zoomFactor=1&styleName=RWDocumentMojoStyle&taskContentType=json&taskEnv=xhr&xts={mstr_now}&mstrWeb={servlet}"
     }})   
     ''')
+    
 
 
 async def apply_selectors(user_id, new_browser = None):
