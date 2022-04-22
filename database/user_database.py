@@ -135,7 +135,7 @@ class DB:
                 {"user_id": user_id}
             )
             tmp = self.cursor.fetchall()[0][0]
-            if (tmp == None):
+            if (tmp == None or tmp == 'null'):
                 tmp = security
             else:
                 tmp = f'{tmp};{security}'
@@ -160,11 +160,11 @@ class DB:
                 {"user_id": user_id}
             )
             tmp = self.cursor.fetchall()[0][0]
-            if (tmp == None):
+            if (tmp == None or tmp == 'null'):
                 tmp = favorite
             else:
                 cur_favorite = json.loads(tmp)
-                tmp = cur_favorite | favorite
+                tmp = cur_favorite.update(favorite)
 
             tmp = json.dumps(tmp)
 

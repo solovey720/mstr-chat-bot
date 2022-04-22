@@ -34,7 +34,7 @@ def get_document_name_by_id(connection, id):
     if not document:
         report = list_reports(connection, id=id)
         if not report:
-            return None
+            return "not found"
         else: 
             return report[0].name
     else:

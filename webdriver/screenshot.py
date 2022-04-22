@@ -129,7 +129,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
         return
 
     a, b = await get_selectors(user_id, new_browser=page)
-    all_selectors = a | b
+    all_selectors = a.update(b)
 
     try:
         if security_val:
