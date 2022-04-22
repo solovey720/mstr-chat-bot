@@ -14,7 +14,7 @@ async def create_browser(user_id: int, headless = True) -> Page:
 async def close_browser(user_id: int):
     if user_id in _browsers_list:
         await _browsers_list[user_id].close()
-        _browsers_list.pop(user_id)
+        _browsers_list.pop(user_id, None)
 
 
 async def get_browsers_page(user_id: int) -> Page:

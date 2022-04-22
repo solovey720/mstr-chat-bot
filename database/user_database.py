@@ -275,7 +275,7 @@ class DB:
             )
             tmp = self.cursor.fetchall()[0][0]
             cur_favorite = json.loads(tmp)
-            cur_favorite.pop(documentID)
+            cur_favorite.pop(documentID, None)
             tmp = json.dumps(cur_favorite)
 
             self.cursor.execute(

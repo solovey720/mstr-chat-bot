@@ -11,7 +11,23 @@ import asyncio
 sem = asyncio.Semaphore(RUN_LIMIT)
 
 
+DOC_PAGE_COMPLITE_JS = '''
+                    if (typeof mstrApp !== 'undefined') {
+                        mstrApp.isWaiting()
+                    }
+                    else {
+                        true
+                    }
+                    '''
 
+REP_PAGE_COMPLITE_JS = '''
+                    if (typeof (document.readyState) !== 'undefined' && document.readyState == 'complete') {
+                        false 
+                    }
+                    else {
+                        true
+                    }
+                    '''
 
 async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
@@ -49,19 +65,13 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
     await page.goto(path, {'timeout': timeout_long})
     
-    await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+    if (docType == 'document'): 
+        await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
     try:
         i = 0
         j = 0
         while i < COUNT_CHECK_PAGE_LOAD:
-            page_loading_flag = await page.evaluate('''
-                                                if (typeof mstrApp !== 'undefined') {
-                                                    mstrApp.isWaiting()
-                                                }
-                                                else {
-                                                    true
-                                                }
-                                                ''')
+            page_loading_flag = await page.evaluate(DOC_PAGE_COMPLITE_JS if docType == 'document' else REP_PAGE_COMPLITE_JS)
             if not page_loading_flag:
                 i += 1
             else:
@@ -122,7 +132,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
 
     filters_sel = options.get('filters', {})
 
-    if not (security_val or filters_sel):
+    if (not (security_val or filters_sel)) or docType == 'report':
         await page.screenshot({'path': screen_name})
         await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
@@ -161,19 +171,13 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
 
     await apply_selectors(user_id, new_browser=page)
 
-    await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
+    if (docType == 'document'): 
+        await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
     try:
         i = 0
         j = 0
         while i < COUNT_CHECK_PAGE_LOAD:
-            page_loading_flag = await page.evaluate('''
-                                                if (typeof mstrApp !== 'undefined') {
-                                                    mstrApp.isWaiting()
-                                                }
-                                                else {
-                                                    true
-                                                }
-                                                ''')
+            page_loading_flag = await page.evaluate(DOC_PAGE_COMPLITE_JS if docType == 'document' else REP_PAGE_COMPLITE_JS)
             if not page_loading_flag:
                 i += 1
             else:
