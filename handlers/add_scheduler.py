@@ -112,7 +112,7 @@ async def create_scheduler(call: CallbackQuery, state: FSMContext):
                 val_list = []
                 for val in data['filters'][selector]:
                     val_list.append(list(val.values())[0])
-                filters = filters | {selector.split(';')[1]: val_list}
+                filters = filters.update({selector.split(';')[1]: val_list})
         scheduler.add_job(scheduler_dashboard, "cron", day_of_week=(','.join(data['days'])), hour=data['time']['hour'], minute=data['time']['minute'], misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png', 'security': db.get_security(User.get_current().id),'filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
         await bot.send_message(User.get_current().id, _(User.get_current().id)('scheduler_created'))
         

@@ -33,7 +33,7 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
     filters_sel = options.get('filters', {})
     new_filters_sel = dict()
     a, b = await get_selectors(user_id, new_browser=page)
-    all_selectors = a | b
+    all_selectors = a.update(b)
     for i in filters_sel.keys():
         ctlkey = all_selectors[i]
         all_values = await get_values(user_id, ctlkey, new_browser=page)
