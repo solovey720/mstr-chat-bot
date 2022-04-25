@@ -10,6 +10,7 @@ from translate import _
 
 # Функция добавления избранного отчета в базу данных
 async def add_to_favorite(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
     file_id = ''
     async with state.proxy() as data:
         file_id = data['file_id']
@@ -19,7 +20,7 @@ async def add_to_favorite(call: CallbackQuery, state: FSMContext):
                 val_list = []
                 for val in data['filters'][selector]:
                     val_list.append(list(val.values())[0])
-                json_string[file_id].update({selector.split(';')[1]: val_list})
+                json_string[file_id] = {**json_string[file_id], **{selector.split(';')[1]: val_list}}
             db.concat_favorite(User.get_current().id, json_string)
         else:
             db.concat_favorite(User.get_current().id, {file_id: None})

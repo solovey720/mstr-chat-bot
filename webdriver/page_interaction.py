@@ -98,7 +98,7 @@ async def get_values(user_id, ckey, new_browser = None):
     
     HTML = await page.evaluate('document.body.innerHTML')
     val = dict()
-    HTML = HTML[HTML.find('\"k\":\"' + ckey + '\"'):]
+    HTML = HTML[HTML.find('\"k\":\"' + ckey + '\",\"wid\"'):]
     begin = HTML.find('\"elms\":[') + 9
     end = HTML[begin:].find(']') - 1
     values = HTML[begin:begin + end].split('},{')

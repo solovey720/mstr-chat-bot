@@ -35,7 +35,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
                 selectors_multi_button = InlineKeyboardButton(selector, callback_data=f'sel:mult:{selector}')
                 selectors_multi_keyboard.add(selectors_multi_button)
                 async with state.proxy() as data:
-                    data['selectors_multi'].update({selector: selectors_multi[selector]})
+                    data['selectors_multi'] = {**data['selectors_multi'], **{selector: selectors_multi[selector]}}
         await bot.send_message(call.message.chat.id, _(call.message.chat.id)('mult_selectors'),
                                reply_markup=selectors_multi_keyboard)
 
@@ -47,7 +47,7 @@ async def get_all_selectors(call: CallbackQuery, state: FSMContext):
                 selectors_wo_multi_button = InlineKeyboardButton(selector, callback_data=f'sel:womult:{selector}')
                 selectors_wo_multi_keyboard.add(selectors_wo_multi_button)
                 async with state.proxy() as data:
-                    data['selectors_wo_multi'].update({selector: selectors_wo_multi[selector]})
+                    data['selectors_wo_multi'] = {**data['selectors_wo_multi'], **{selector: selectors_wo_multi[selector]}}
         await bot.send_message(call.message.chat.id, _(call.message.chat.id)('wo_mult_selectors'),
                                reply_markup=selectors_wo_multi_keyboard)
 
@@ -73,7 +73,7 @@ async def get_selector_values(call: CallbackQuery, state: FSMContext):
     # добавляем ctl селектора в словарь filters
     async with state.proxy() as data:
         data['active_selector'] = selector_ctl_name
-        data['filters'].update({selector_ctl_name: []})
+        data['filters'] = {**data['filters'], **{selector_ctl_name: []}}
 
     selector_values = await get_values(User.get_current().id, selector_ctl_name.split(';')[0])
     async with state.proxy() as data:

@@ -164,7 +164,7 @@ class DB:
                 tmp = favorite
             else:
                 cur_favorite = json.loads(tmp)
-                tmp = cur_favorite.update(favorite)
+                tmp = {**cur_favorite, **favorite}
 
             tmp = json.dumps(tmp)
 
