@@ -1,4 +1,4 @@
-from pyppeteer import launch, errors
+from pyppeteer import launch
 from pyppeteer.page import Page
 from create_bot_and_conn import SERVER_LINK
 

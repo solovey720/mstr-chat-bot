@@ -3,8 +3,6 @@ from aiogram import Dispatcher
 from aiogram.types import CallbackQuery, User, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from numpy import empty
-
 
 from create_bot_and_conn import GetInfo, db, bot
 

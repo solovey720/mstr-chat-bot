@@ -1,5 +1,5 @@
 from mstrio.connection import Connection
-from mstrio.project_objects import list_reports, Report, list_documents
+from mstrio.project_objects import list_reports, list_documents
 
 import dotenv
 

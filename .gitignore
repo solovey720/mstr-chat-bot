@@ -156,4 +156,6 @@ demo/
 *.png
 *.env
 *.bak
+*.sqlite
+*.po
 TODO.txt

@@ -8,7 +8,7 @@ from create_bot_and_conn import GetInfo, bot, db
 
 from translate import _
 
-from webdriver.scheduler import send_filter_screen, errors
+from webdriver.scheduler import send_filter_screen
 
 
 # Функция отправки скриншота с фильтрами
