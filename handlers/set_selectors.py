@@ -16,11 +16,6 @@ from translate import _
 
 # Выводим список всех селекторов
 async def get_all_selectors(call: CallbackQuery, state: FSMContext):
-    # TODO: сделать обнуление словарей selectors_multi, selectors_wo_multi
-    # async with state.proxy() as data:
-        # data['selectors_wo_multi'] = {}
-        # data['selectors_multi'] = {}
-        # data['filters'] = {}
 
     await bot.answer_callback_query(call.id)
     await call.message.delete()
