@@ -191,3 +191,24 @@ msgstr "Remove subscription"
 
 msgid "info_about_scheduler"
 msgstr "Choose an action"
+
+msgid "start_command"
+msgstr "Start bot"
+
+msgid "language_command"
+msgstr "Choose bot language"
+
+msgid "help_command"
+msgstr "List of available commands"
+
+msgid "search_command"
+msgstr "Find report"
+
+msgid "favorite_command"
+msgstr "List of favorite"
+
+msgid "delete_favorite_command"
+msgstr "Deleting favorite reports"
+
+msgid "subscription_command"
+msgstr "List of subscription"
