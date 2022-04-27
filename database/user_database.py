@@ -252,6 +252,8 @@ class DB:
             return self.cursor.fetchone()
 
     def get_language(self, user_id: int):
+        if user_id not in self.get_users():
+            return None
         try:
             self.cursor.execute(
                 '''
@@ -307,7 +309,7 @@ class DB:
 
     def drop_user(self, user_id: int):
         users = self.get_users()
-        if (user_id,) not in users:
+        if user_id not in users:
             return
         self.cursor.execute(
             '''
@@ -319,7 +321,7 @@ class DB:
             for i in tables:
                 self.cursor.execute(
                     f'''
-                    delete from {i} where ID = :user_id;
+                    delete from {i[0]} where ID = :user_id;
                     ''',
                     {"user_id": user_id}
                 )
@@ -374,6 +376,15 @@ class DB:
         self.cursor.close()
         self.connect.close()
 
+
+
+
+
+if __name__ == '__main__':
+    a = DB('database/bot_database.sqlite')
+    # a.insert_new_user(449977514)
+    a.drop_user(449977514)
+    print(1)
 
 # a = DB('database/bot_database.sqlite')
 

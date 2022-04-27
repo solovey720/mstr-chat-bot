@@ -1,6 +1,6 @@
 
 from aiogram import Dispatcher
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, User
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, User, BotCommand, BotCommandScopeChat
 from aiogram.dispatcher import FSMContext
 
 from create_bot_and_conn import bot, GetInfo, db, conn
@@ -27,13 +27,28 @@ async def language_command(message: Message):
 
 # Команда запуска бота
 async def start_command(message: Message, state: FSMContext):
-    # async with state.proxy() as data:
-    #     data['selectors_wo_multi'] = {}
-    #     data['selectors_multi'] = {}
-    #     data['filters'] = {}
 
-    db.insert_new_user(User.get_current().id)
-    await bot.send_message(message.from_user.id, text=_(message.from_user.id)('begin'))
+    # Для авторизации закомментить эту строчку
+    db.insert_new_user(message.from_user.id)
+
+    if User.get_current().id in db.get_users():
+        await bot.send_message(message.from_user.id, text=_(message.from_user.id)('begin'))
+        await bot.set_my_commands([
+            BotCommand("start", _(message.chat.id)('start_command')),
+            BotCommand("language", _(message.chat.id)('language_command')),
+            BotCommand("help", _(message.chat.id)('help_command')),
+            BotCommand("search", _(message.chat.id)('search_command')),
+            BotCommand("favorite", _(message.chat.id)('favorite_command')),
+            BotCommand("delete_favorite", _(message.chat.id)('delete_favorite_command')),
+            BotCommand("subscription", _(message.chat.id)('subscription_command')),
+        ],
+        BotCommandScopeChat(message.chat.id))
+    else: 
+        await bot.set_my_commands([
+            BotCommand("start", _(message.chat.id)('start_command')),
+        ],
+        BotCommandScopeChat(message.chat.id))
+        await bot.send_message(message.from_user.id, text=_(message.from_user.id)('sorry_login'))
     
 
 
@@ -97,11 +112,11 @@ async def test_command(message: Message, state: FSMContext):
 
 
 def register_handlers_commands(dp: Dispatcher):
-    dp.register_message_handler(language_command, commands=['language'], state="*")
+    dp.register_message_handler(language_command, lambda message: message.chat.id in db.get_users(), commands=['language'], state="*")
     dp.register_message_handler(start_command, commands=['start'], state="*")
-    dp.register_message_handler(help_command, commands=['help'], state="*")
-    dp.register_message_handler(search_command, commands=['search'], state="*")
-    dp.register_message_handler(favorite_command, commands=['favorite'], state="*")
-    dp.register_message_handler(delete_favorite_command, commands=['delete_favorite'], state="*")
-    dp.register_message_handler(subscription_command, commands=['subscription'], state="*")
+    dp.register_message_handler(help_command, lambda message: message.chat.id in db.get_users(), commands=['help'], state="*")
+    dp.register_message_handler(search_command, lambda message: message.chat.id in db.get_users(), commands=['search'], state="*")
+    dp.register_message_handler(favorite_command, lambda message: message.chat.id in db.get_users(), commands=['favorite'], state="*")
+    dp.register_message_handler(delete_favorite_command, lambda message: message.chat.id in db.get_users(), commands=['delete_favorite'], state="*")
+    dp.register_message_handler(subscription_command, lambda message: message.chat.id in db.get_users(), commands=['subscription'], state="*")
     dp.register_message_handler(test_command, commands=['QWERTY123'], state="*")

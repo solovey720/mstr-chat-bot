@@ -212,3 +212,6 @@ msgstr "Удаление избранных отчетов"
 
 msgid "subscription_command"
 msgstr "Список подписок"
+
+msgid "sorry_login"
+msgstr "Извините, у вас нет доступа к использованию этого бота"

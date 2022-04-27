@@ -212,3 +212,6 @@ msgstr "Deleting favorite reports"
 
 msgid "subscription_command"
 msgstr "List of subscription"
+
+msgid "sorry_login"
+msgstr "Sorry you don't have access to use this bot"
