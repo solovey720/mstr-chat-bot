@@ -3,7 +3,7 @@ from aiogram import Dispatcher
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, User, BotCommand, BotCommandScopeChat
 from aiogram.dispatcher import FSMContext
 
-from create_bot_and_conn import bot, GetInfo, db, conn
+from create_bot_and_conn import bot, GetInfo, db, conn, AUTO_CREATE_NEW_USER
 
 from webdriver.scheduler import get_user_jobs, close_browser
 
@@ -28,8 +28,8 @@ async def language_command(message: Message):
 # Команда запуска бота
 async def start_command(message: Message, state: FSMContext):
 
-    # Для авторизации закомментить эту строчку
-    # db.insert_new_user(message.from_user.id)
+    if AUTO_CREATE_NEW_USER:
+        db.insert_new_user(message.from_user.id)
 
     if User.get_current().id in db.get_users():
         await bot.send_message(message.from_user.id, text=_(message.from_user.id)('begin'))

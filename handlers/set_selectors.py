@@ -13,6 +13,8 @@ from webdriver.scheduler import get_selectors, get_values
 
 from translate import _
 
+from log.create_loggers import bot_logger
+
 
 # Выводим список всех селекторов
 async def get_all_selectors(call: CallbackQuery, state: FSMContext):
@@ -136,6 +138,10 @@ async def set_selector_value(call: CallbackQuery, state: FSMContext):
                                         reply_markup=call.message.reply_markup)
         except MessageNotModified:
             pass
+        except:
+            bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
+
+
         
 
 # переключение страниц значений селектора
@@ -161,6 +167,9 @@ async def switch_values_page(call: CallbackQuery, state: FSMContext):
             await call.message.edit_reply_markup(call.message.reply_markup)
         except MessageNotModified:
             pass
+        except: 
+            bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
+
 
 
 

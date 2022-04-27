@@ -1,6 +1,6 @@
 import sqlite3
 import json
-
+from log.create_loggers import database_logger
 
 class DB:
     """
@@ -28,18 +28,19 @@ class DB:
         self.connect = sqlite3.connect(path)
         self.connect.row_factory = sqlite3.Row
         self.cursor = self.connect.cursor()
+        database_logger.info(f'Create connection to database: {path}')
 
     def insert_new_user(self, user_id: int):
         users = self.get_users()
         if user_id in users:
             return
-        self.cursor.execute(
-            '''
-            SELECT name from sqlite_master where type= "table"
-            '''
-        )
-        tables = self.cursor.fetchall()
         try:
+            self.cursor.execute(
+                '''
+                SELECT name from sqlite_master where type= "table"
+                '''
+            )
+            tables = self.cursor.fetchall()
             for i in tables:
                 self.cursor.execute(
                     f'''
@@ -48,7 +49,7 @@ class DB:
                     {"user_id": user_id}
                 )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -60,7 +61,7 @@ class DB:
                 '''
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception()
         else:
             users_list = []
             for row in self.cursor.fetchall():
@@ -76,7 +77,7 @@ class DB:
                 {"user_id": user_id, "security": security}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -90,7 +91,7 @@ class DB:
                 {"user_id": user_id, "favorite": favorite}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -110,7 +111,7 @@ class DB:
                     {"user_id": user_id, "subs": subscription.get(i, None)}
                 )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -123,7 +124,7 @@ class DB:
                 {"user_id": user_id, "language": language}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -148,7 +149,7 @@ class DB:
                 {"user_id": user_id, "security": f"{tmp}"}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -176,7 +177,7 @@ class DB:
                 {"user_id": user_id, "favorite": f"{tmp}"}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -203,7 +204,7 @@ class DB:
                     {"user_id": user_id, "subs": f'{tmp};{subscription.get(i, None)}'}
                 )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -216,7 +217,7 @@ class DB:
                 {"user_id": user_id}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             
             z = self.cursor.fetchone()[0]
@@ -234,7 +235,7 @@ class DB:
                 {"user_id": user_id}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             tmp = self.cursor.fetchone()[0]
             return None if tmp == None else json.loads(tmp)
@@ -248,7 +249,7 @@ class DB:
                 {"user_id": user_id}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             return self.cursor.fetchone()
 
@@ -263,7 +264,7 @@ class DB:
                 {"user_id": user_id}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             z = self.cursor.fetchone()[0]
             return z
@@ -288,7 +289,7 @@ class DB:
                 {"user_id": user_id, "favorite": f"{tmp}"}
             )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -303,7 +304,7 @@ class DB:
                 '''
             )   
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else: 
             return self.cursor.fetchall()
     """
@@ -327,7 +328,7 @@ class DB:
                     {"user_id": user_id}
                 )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception(f'\tuser_ID:{user_id}')
         else:
             self.connect.commit()
 
@@ -346,7 +347,7 @@ class DB:
                     '''
                 )
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception()
         else:
             self.connect.commit()
 
@@ -371,7 +372,7 @@ class DB:
                     print()
                 print('\n')
         except sqlite3.DatabaseError as err:
-            print("Error: ", err)
+            database_logger.exception()
 
     def __del__(self):
         self.cursor.close()

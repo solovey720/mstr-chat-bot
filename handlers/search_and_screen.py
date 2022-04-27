@@ -11,6 +11,7 @@ from webdriver.scheduler import send_filter_screen, create_page
 
 from translate import _
 
+from log.create_loggers import bot_logger
 
 # Выводим список доступных отчетов
 async def search_file(message: Message, state: FSMContext):
@@ -81,6 +82,8 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
+    finally:
+        bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
 
     if file_type == 'report':
         await bot.send_message(call.message.chat.id, _(call.message.chat.id)('type_search'))

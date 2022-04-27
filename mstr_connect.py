@@ -5,6 +5,7 @@ import dotenv
 
 import os
 
+from log.create_loggers import connection_logger
 
 dotenv.load_dotenv('keys.env')
 
@@ -15,9 +16,14 @@ project_name = os.environ.get('PROJECT')
 
 
 def get_connection():
-    conn = Connection(base_url=url, username=mstr_username, password=mstr_password, login_mode=1,
-                      project_name=project_name)
-    return conn
+    try:
+        conn = Connection(base_url=url, username=mstr_username, password=mstr_password, login_mode=1, project_name=project_name)
+        connection_logger.info(f'Create connection to MSTR: {url}')
+        return conn
+    except Exception as e:
+        connection_logger.exception(f"Connection to MSTR {url} is failed ({project_name}, {mstr_username})")
+        raise e
+        
 
 
 def search_report(connection, report_name):
@@ -34,13 +40,13 @@ def get_document_name_by_id(connection, id):
     if not document:
         report = list_reports(connection, id=id)
         if not report:
-            return "not found"
+            return "Not found"
         else: 
             return report[0].name
     else:
         return document[0].name
 
-    return documents
+
 def search_report_by_id(connection, id):
     reports = list_reports(connection, id=id)
     return reports

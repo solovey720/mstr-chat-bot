@@ -128,8 +128,10 @@ async def info_about_scheduler(call: CallbackQuery, state: FSMContext):
 async def delete_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     id = call.data.split(':')[1]
-    scheduler.remove_job(id)
+    if scheduler.get_job(id):
+        scheduler.remove_job(id)
     await bot.send_message(User.get_current().id, _(User.get_current().id)('successfully_deleted'))
+    
 
 
 async def info_scheduler(call: CallbackQuery, state: FSMContext):

@@ -4,6 +4,8 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 from translate import _
 
+from log.create_loggers import webdriver_logger
+
 jobstores = {
     'default': SQLAlchemyJobStore(url='sqlite:///database/jobs.sqlite')
 }
@@ -54,7 +56,9 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
         if e.args[0] == 'Session is dead':
             await bot.send_message(user_id, _(user_id)('session_is_dead'))
             return
-    await new_browser.close()
+    finally:
+        webdriver_logger.exception(f'\tuser_ID:{user_id}')
+        await new_browser.close()
 
 
 async def scheduler_dashboard(user_id: int, options=dict()):

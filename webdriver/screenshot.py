@@ -1,12 +1,11 @@
 from webdriver.page_interaction import *
 from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
 from aiogram.types import InputFile
-import logging
 import os
 
 import asyncio
 
-
+from log.create_loggers import webdriver_logger
 
 sem = asyncio.Semaphore(RUN_LIMIT)
 
@@ -81,8 +80,7 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
             if j > MAX_TIME_CHECK_PAGE_LOAD:
                 raise errors.TimeoutError(j)
     except Exception as e:
-        logging.exception(e)
-        print('error')
+        webdriver_logger.exception(f'\tuser_ID:{user_id}')
     
 async def create_page(user_id, options=dict(), new_browser = None): 
     """Create new browser.
@@ -150,6 +148,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
                 security_ctl_val.append(tmp[i])
             await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(security_ctl_val)}, new_browser=page)
     except Exception as e:
+        webdriver_logger.warning(f'\tuser_ID:{user_id}', exc_info = True)
         if HARD_SECURITY_MODE:
             raise e
 
@@ -167,7 +166,8 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
                         ctl_val.append(tmp[j])
                     await request_set_selector(user_id, {'ctlKey': f'{ctlkey}', 'elemList': list_to_str(ctl_val)}, new_browser=page)
     except:
-        print('filter error')
+        webdriver_logger.warning(f'\tuser_ID:{user_id}', exc_info = True)
+
 
     await apply_selectors(user_id, new_browser=page)
 
@@ -192,9 +192,9 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
         os.remove(screen_name)
         return 
     except Exception as e:
-        logging.exception(e)
-        print('error')
+        webdriver_logger.exception(f'\tuser_ID:{user_id}')
     return 
+
 
 async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):  
     """Send screenshot of the document with filters

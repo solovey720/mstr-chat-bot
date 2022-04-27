@@ -1,4 +1,3 @@
-
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
@@ -10,7 +9,6 @@ from database.user_database import DB
 import dotenv
 
 import os
-
 
 # Класс для машины состояний
 class GetInfo(StatesGroup):
@@ -50,3 +48,5 @@ HEADLESS_MODE = False
 COUNT_CHECK_PAGE_LOAD = 4
 # Количество секунд на проверку 1 страницы
 MAX_TIME_CHECK_PAGE_LOAD = 80
+# закрывать ли доступ пользователям не из базы данных
+AUTO_CREATE_NEW_USER = True
