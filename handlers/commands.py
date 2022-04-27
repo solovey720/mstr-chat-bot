@@ -29,7 +29,7 @@ async def language_command(message: Message):
 async def start_command(message: Message, state: FSMContext):
 
     # Для авторизации закомментить эту строчку
-    db.insert_new_user(message.from_user.id)
+    # db.insert_new_user(message.from_user.id)
 
     if User.get_current().id in db.get_users():
         await bot.send_message(message.from_user.id, text=_(message.from_user.id)('begin'))
@@ -48,7 +48,7 @@ async def start_command(message: Message, state: FSMContext):
             BotCommand("start", _(message.chat.id)('start_command')),
         ],
         BotCommandScopeChat(message.chat.id))
-        await bot.send_message(message.from_user.id, text=_(message.from_user.id)('sorry_login'))
+        await bot.send_message(message.from_user.id, text=_(message.from_user.id)('sorry_login').format(message.from_user.id))
     
 
 
