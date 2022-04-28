@@ -215,3 +215,18 @@ msgstr "Список подписок"
 
 msgid "sorry_login"
 msgstr "Извините, у вас нет доступа к использованию этого бота \nВаш телеграм ID: {0}\nОтправьте запрос !!!вот сюда!!! для подключения"
+
+msgid "time_scheduler"
+msgstr "Подписка по времени"
+
+msgid "trigger_scheduler"
+msgstr "Подписка по событию"
+
+msgid "set_type_of_scheduler"
+msgstr "Выберите тип подписки"
+
+msgid "choose_trigger"
+msgstr "Выберите тригер"
+
+msgid ""
+msgstr ""

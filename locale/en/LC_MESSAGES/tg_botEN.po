@@ -215,3 +215,15 @@ msgstr "List of subscription"
 
 msgid "sorry_login"
 msgstr "Sorry, you do not have access to use this bot \nYour telegram ID: {0}\nSend a request !!!here!!! to connect"
+
+msgid "time_scheduler"
+msgstr "Subscription by time"
+
+msgid "trigger_scheduler"
+msgstr "Event subscription"
+
+msgid "set_type_of_scheduler"
+msgstr "Choose a subscription type"
+
+msgid "choose_trigger"
+msgstr "Choose an event"

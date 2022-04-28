@@ -10,8 +10,47 @@ from webdriver.scheduler import scheduler, scheduler_dashboard
 
 from translate import _
 
+
 # Функция добавления подписки
 async def add_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    time_or_trigger_keyboard = InlineKeyboardMarkup(row_width=2)
+    time_or_trigger_keyboard.insert(InlineKeyboardButton(_(User.get_current().id)('time_scheduler'), callback_data=f'add_time_scheduler'))
+    time_or_trigger_keyboard.insert(InlineKeyboardButton(_(User.get_current().id)('trigger_scheduler'), callback_data=f'add_trigger_scheduler'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('set_type_of_scheduler'), reply_markup=time_or_trigger_keyboard)
+
+
+
+# Функция добавления подписки
+async def add_trigger_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    #######################
+    triggers_list = db.get_triggers()
+    triggers_keyboard = InlineKeyboardMarkup()
+    for trigger in triggers_list:
+        triggers_keyboard.row(InlineKeyboardButton(trigger, callback_data=f'create_trigger_scheduler:{trigger}'))
+    await bot.send_message(User.get_current().id, _(User.get_current().id)('choose_trigger'), reply_markup=triggers_keyboard)
+
+
+#создание подписки
+async def create_trigger_scheduler(call: CallbackQuery, state: FSMContext):
+    await bot.answer_callback_query(call.id)
+    trigger_name = call.data.split(':')[1]
+    async with state.proxy() as data:
+        file_id = data['file_id']
+        filters = {}
+        if data.get('filters', None):
+            for selector in data['filters']:
+                val_list = []
+                for val in data['filters'][selector]:
+                    val_list.append(list(val.values())[0])
+                filters = {**filters, **{selector.split(';')[1]: val_list}}
+        db.insert_trigger_scheduler(trigger_name, User.get_current().id, file_id, filters)
+        # scheduler.add_job(scheduler_dashboard, "cron", day_of_week=(','.join(data['days'])), hour=data['time']['hour'], minute=data['time']['minute'], misfire_grace_time = None, replace_existing=True, args=[User.get_current().id, {'docID': file_id, 'path_screenshot':f'{User.get_current().id}_{file_id}.png','filters': filters}],id=f'{User.get_current().id}_{file_id}', name=f'{file_id}')
+        await bot.send_message(User.get_current().id, _(User.get_current().id)('scheduler_created'))
+
+
+async def add_time_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     async with state.proxy() as data:
         data['days'] = []
@@ -92,13 +131,13 @@ async def set_scheduler_minute(call: CallbackQuery, state: FSMContext):
         time = f"{hour}:{minute}"
 
     yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
-    yes_no_keyboard.insert(InlineKeyboardButton( _(User.get_current().id)('yes'), callback_data=f'create_scheduler'))
+    yes_no_keyboard.insert(InlineKeyboardButton( _(User.get_current().id)('yes'), callback_data=f'create_time_scheduler'))
     yes_no_keyboard.insert(InlineKeyboardButton( _(User.get_current().id)('no'), callback_data=f'add_scheduler'))
     await bot.send_message(User.get_current().id, _(User.get_current().id)('confirmation_of_scheduler').format(days, time), reply_markup=yes_no_keyboard)
 
 
 #создание подписки
-async def create_scheduler(call: CallbackQuery, state: FSMContext):
+async def create_time_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     file_id = ''
     filters = {}
@@ -143,12 +182,15 @@ async def info_scheduler(call: CallbackQuery, state: FSMContext):
 
 def register_handlers_search_and_screen(dp: Dispatcher):
     dp.register_callback_query_handler(add_scheduler, Text(equals='add_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(add_trigger_scheduler, Text(equals='add_trigger_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(add_time_scheduler, Text(equals='add_time_scheduler'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_day, Text(startswith='day_of_week:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(get_scheduler_hour, Text(startswith='get_hour'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_hour, Text(startswith='hour:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_AM_PM, Text(startswith='AM_PM_switch:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(set_scheduler_minute, Text(startswith='minute:'), state=GetInfo.set_filters)
-    dp.register_callback_query_handler(create_scheduler, Text(equals='create_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(create_time_scheduler, Text(equals='create_time_scheduler'), state=GetInfo.set_filters)
+    dp.register_callback_query_handler(create_trigger_scheduler, Text(startswith='create_trigger_scheduler:'), state=GetInfo.set_filters)
     dp.register_callback_query_handler(info_about_scheduler, Text(startswith='info_about_scheduler:'), state='*')
     dp.register_callback_query_handler(info_scheduler, Text(startswith='info_scheduler:'), state='*')
     dp.register_callback_query_handler(delete_scheduler, Text(startswith='delete_scheduler:'), state='*')

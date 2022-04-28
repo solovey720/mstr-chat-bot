@@ -1,8 +1,8 @@
 import sqlite3
 import json
 
-# import sys
-# sys.path.insert(1, 'C:\\Users\\user\\Desktop\\mstr_bot\\git\\mstr-chat-bot')
+import sys
+sys.path.insert(1, 'C:\\Users\\user\\Desktop\\mstr_bot\\git\\mstr-chat-bot')
 
 from log.create_loggers import database_logger
 
@@ -72,6 +72,38 @@ class DB:
             for row in self.cursor.fetchall():
                 users_list.append(row[0])
             return users_list
+
+    def get_triggers(self):
+        try:
+            self.cursor.execute(
+                '''
+                select distinct trigger_name from trigger_scheduler
+                '''
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception()
+        else:
+            triggers_list = []
+            for row in self.cursor.fetchall():
+                triggers_list.append(row[0])
+            return triggers_list
+
+    def insert_trigger_scheduler(self, trigger_name, user_id, document_id, document_filters):
+        try:
+            document_filters = json.dumps(document_filters)
+
+            self.cursor.execute(
+                    '''
+                    insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters)  values (:trigger_name, :user_id, :document_id, :document_filters);
+                    ''',
+                    {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters}
+                )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception()
+        else:
+            self.connect.commit()
+# tmp = self.cursor.fetchone()[0]
+#             return None if tmp == None else json.loads(tmp)
 
     def insert_security(self, user_id: int, security: str):
         try:
@@ -391,9 +423,17 @@ if __name__ == '__main__':
     a = DB('database/bot_database.sqlite')
     # a.insert_new_user(449977514)
     # a.drop_user(449977514)
-    a.get_security(1723464345)
-    a.insert_security(1723464345, 'null')
-    a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
+    # a.get_security(1723464345)
+    # a.insert_security(1723464345, 'null')
+    # a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
+    # a.cursor.execute(
+    #         '''
+    #         INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
+    #         '''
+    #     )
+    # a.connect.commit()
+
+    print(a.get_triggers())
     print(1)
 
 # a = DB('database/bot_database.sqlite')
