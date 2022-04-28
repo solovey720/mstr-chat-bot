@@ -4,7 +4,7 @@ from webdriver.screenshot import *
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
-from translate import _
+from create_bot_and_conn import TRIGGER_CHECKER_TIMEOUT
 
 from log.create_loggers import webdriver_logger
 
@@ -17,11 +17,11 @@ scheduler.start()
 
 
 ################################
-#scheduler.remove_all_jobs()
-
+# scheduler.remove_all_jobs()
 ################################
-#######################################################################Примеры запусков
 
+
+#######################################################################Примеры запусков
 # scheduler.add_job(scheduler_dashboard,  "interval", seconds=1, replace_existing=True, args=[user_id, {'path_screenshot':f'{user_id}_sec_withsec_withfiltr1.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr1', name='sec_withsec_withfiltr1')
 # scheduler.add_job(scheduler_dashboard, "cron", day_of_week='mon-sun', hour=15, minute=44, misfire_grace_time = None, replace_existing=True, args=[user_id, {'docID': '18C63CAE4B8268E07E3DAEA5E275BCC3', 'path_screenshot':f'{user_id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB']}}],id=f'{user_id}_sec_withsec_withfiltr', name=f'sec_withsec_withfiltr')
 
@@ -49,8 +49,7 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
     sched_options['filters'] = new_filters_sel
     sched_options['security'] = db.get_security(user_id)
     try:
-        await bot.send_message(user_id, _(user_id)('your_scheduler'))
-        await send_filter_screen(user_id, options=sched_options, new_browser=page)
+        await send_filter_screen(user_id, options=sched_options, new_browser=page, is_scheduler = True)
     except KeyError as e:
         if e.args[0] == 'S_security':
             await bot.send_message(user_id, _(user_id)('security_key_error'))
@@ -110,21 +109,21 @@ async def scheduler_dashboard(user_id: int, options=dict()):
 
 
 async def _sem_trigger_scheduler():
-    
+    webdriver_logger.info('Checking trigger is started')
     all_triggers = db.get_all_triggers()
-    print('start_tr')
     for row in all_triggers:
-        if not row['date_trigger']:
-            continue
-
-        if row['date_trigger'] > row['date_last_update']:
-            print('send ',row['document_id'])
-
-            options = {'docID': row['document_id'], 'path_screenshot': f"{row['ID']}+{row['document_id']}.png", 'filters': None if row['document_filters'] else json.loads(row['document_filters'])}
-            asyncio.get_event_loop().create_task(scheduler_dashboard(row['user_id'], options=options))
-            db.insert_date_last_update(row['ID'], datetime.datetime.now())
+        try:
+            if not row['date_trigger']:
+                continue
+            if row['date_trigger'] > row['date_last_update']:
+                options = {'docID': row['document_id'], 'path_screenshot': f"{row['ID']}_{row['document_id']}.png", 'filters': json.loads(row['document_filters'])}
+                asyncio.get_event_loop().create_task(scheduler_dashboard(row['user_id'], options=options))
+                db.insert_date_last_update(row['ID'], datetime.datetime.now())
+        except:
+            webdriver_logger.exception(f"Trigger_id:{row['ID']}")
+    webdriver_logger.info('Checking trigger is complete')
     
-scheduler.add_job(_sem_trigger_scheduler, "interval", minutes=1, misfire_grace_time = None, replace_existing=True, id = 'trigger_scheduler_minute=1')
+scheduler.add_job(_sem_trigger_scheduler, "interval", minutes=TRIGGER_CHECKER_TIMEOUT, misfire_grace_time = None, replace_existing=True, id = f'trigger_scheduler')
 
 def get_user_jobs(user_id: str) -> list:
     '''Get list of user's job

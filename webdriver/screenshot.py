@@ -3,6 +3,8 @@ from create_bot_and_conn import db, bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, 
 from aiogram.types import InputFile
 import os
 
+from translate import _
+
 import asyncio
 
 from log.create_loggers import webdriver_logger
@@ -110,7 +112,7 @@ async def create_page(user_id, options=dict(), new_browser = None):
         await _sem_create_page(user_id, options, new_browser)
 
 
-async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):
+async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True, is_scheduler = False):
     if not new_browser:
         page = await get_browsers_page(user_id)
     else: 
@@ -136,6 +138,8 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
 
     if (not (security_val or filters_sel)) or docType == 'report':
         await page.screenshot({'path': screen_name})
+        if is_scheduler:
+            await bot.send_message(user_id, _(user_id)('your_scheduler'))
         await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return
@@ -192,6 +196,8 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
                 raise errors.TimeoutError(j)
 
         await page.screenshot({'path': screen_name})
+        if is_scheduler:
+            await bot.send_message(user_id, _(user_id)('your_scheduler'))
         await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return 
@@ -200,7 +206,7 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     return 
 
 
-async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True):  
+async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctlkey = True, is_scheduler = False):  
     """Send screenshot of the document with filters
 
     Available options are:
@@ -220,4 +226,4 @@ async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctl
     """ 
     async with sem_bot:
         #print('start send')
-        await _sem_send_filter_screen(user_id, options, new_browser = new_browser, is_ctlkey = is_ctlkey)
+        await _sem_send_filter_screen(user_id, options, new_browser = new_browser, is_ctlkey = is_ctlkey, is_scheduler = is_scheduler)

@@ -18,6 +18,7 @@ def log_settings(logger, handler):
 webdriver_handler = logging.FileHandler('log\\webdriver.log') #создаем лог-файл
 webdriver_logger.addHandler(webdriver_handler) #соотносим лог-файл с логгером
 log_settings(webdriver_logger, webdriver_handler) #задаем настройки
+webdriver_logger.setLevel(logging.INFO)
 
 database_handler = logging.FileHandler('log\\database.log')
 database_logger.addHandler(database_handler)
