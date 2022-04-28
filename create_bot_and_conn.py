@@ -53,4 +53,4 @@ MAX_TIME_CHECK_PAGE_LOAD = 80
 # закрывать ли доступ пользователям не из базы данных
 AUTO_CREATE_NEW_USER = True
 # закрывать ли доступ пользователям не из базы данных
-TRIGGER_CHECKER_TIMEOUT = 10
+TRIGGER_CHECKER_TIMEOUT = 1

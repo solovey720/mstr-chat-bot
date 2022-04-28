@@ -58,8 +58,9 @@ async def _sem_scheduler_dashboard(user_id: int, options=dict()):
         if e.args[0] == 'Session is dead':
             await bot.send_message(user_id, _(user_id)('session_is_dead'))
             return
-    finally:
+    except:
         webdriver_logger.exception(f'\tuser_ID:{user_id}')
+    finally:
         await new_browser.close()
 
 
