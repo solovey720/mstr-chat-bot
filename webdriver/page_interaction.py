@@ -178,12 +178,17 @@ async def is_session_alive(user_id, new_browser = None):
         page = new_browser
     
     session_timeout = int(await page.evaluate('''
-                if (typeof (mstrApp) !== 'undefined') {
-                        mstrApp.sessionManager.remainingTime
+                try{
+                    if (typeof (mstrApp) !== 'undefined') {
+                            mstrApp.sessionManager.remainingTime
+                        }
+                        else {
+                            -1
+                        }
                     }
-                    else {
-                        -1
-                    }
+                catch {
+                    -1
+                }
                 '''))
 
     return session_timeout > 30
