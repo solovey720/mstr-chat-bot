@@ -227,3 +227,15 @@ msgstr "Choose a subscription type"
 
 msgid "choose_trigger"
 msgstr "Choose an event"
+
+msgid "time_scheduler"
+msgstr "Temporary subscriptions"
+
+msgid "trigger_scheduler"
+msgstr "Event subscriptions"
+
+msgid "what_type_of_scheduler"
+msgstr "What subscriptions do you want to see?"
+
+msgid "info_about_trigger_scheduler"
+msgstr "Document name: {0}\nTrigger: {1}\nLast run date: {2}"

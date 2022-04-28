@@ -228,5 +228,17 @@ msgstr "Выберите тип подписки"
 msgid "choose_trigger"
 msgstr "Выберите тригер"
 
+msgid "time_scheduler"
+msgstr "Временные подписки"
+
+msgid "trigger_scheduler"
+msgstr "Подписки на события"
+
+msgid "what_type_of_scheduler"
+msgstr "Какие подписки хотите посмотреть?"
+
+msgid "info_about_trigger_scheduler"
+msgstr "Имя документа: {0}\nТриггер: {1}\nДата последнего запуска: {2}"
+
 msgid ""
 msgstr ""

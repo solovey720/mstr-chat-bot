@@ -94,15 +94,10 @@ async def delete_favorite_command(message: Message, state: FSMContext):
 
 #список всех подписок
 async def subscription_command(message: Message, state: FSMContext):
-    await state.reset_state(with_data=False)
-    all_subscription = get_user_jobs(str(message.from_user.id))
-    all_subscription_keyboard = InlineKeyboardMarkup()
-    if all_subscription:
-        for job in all_subscription:
-            all_subscription_keyboard.add(InlineKeyboardButton(text=get_document_name_by_id(conn, job.name), callback_data=f'info_about_scheduler:{job.id}'))
-        await bot.send_message(message.from_user.id, _(message.from_user.id)('list_of_scheduler'), reply_markup=all_subscription_keyboard)
-    else:
-        await bot.send_message(message.from_user.id, _(message.from_user.id)('list_of_scheduler_is_empty'))
+    what_subscription_keyboard = InlineKeyboardMarkup()
+    what_subscription_keyboard.insert(InlineKeyboardButton(text= _(message.from_user.id)('time_scheduler'), callback_data=f'list_of_time_scheduler'))
+    what_subscription_keyboard.insert(InlineKeyboardButton(text= _(message.from_user.id)('trigger_scheduler'), callback_data=f'list_of_trigger_scheduler'))
+    await bot.send_message(message.from_user.id, _(message.from_user.id)('what_type_of_scheduler'), reply_markup=what_subscription_keyboard)
 
 #для тестов
 async def test_command(message: Message, state: FSMContext):

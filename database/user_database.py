@@ -66,7 +66,7 @@ class DB:
                 '''
             )
         except sqlite3.DatabaseError as err:
-            database_logger.exception()
+            database_logger.exception('')
         else:
             users_list = []
             for row in self.cursor.fetchall():
@@ -81,25 +81,67 @@ class DB:
                 '''
             )
         except sqlite3.DatabaseError as err:
-            database_logger.exception()
+            database_logger.exception('')
         else:
             triggers_list = []
             for row in self.cursor.fetchall():
                 triggers_list.append(row[0])
             return triggers_list
 
-    def insert_trigger_scheduler(self, trigger_name, user_id, document_id, document_filters):
+    def get_user_triggers(self, user_id):
+        try:
+            self.cursor.execute(
+                '''
+                select ID, document_name from trigger_scheduler where user_id == (:user_id)
+                ''',
+                {"user_id": user_id}
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            documents_list = {}
+            for row in self.cursor.fetchall():
+                documents_list[row[0]] = row[1]
+            return documents_list
+
+    def get_truggers_by_id(self, ID):
+        try:
+            self.cursor.execute(
+                '''
+                select * from trigger_scheduler where ID == (:ID)
+                ''',
+                {"ID": ID}
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            return self.cursor.fetchone()
+
+    def insert_trigger_scheduler(self, trigger_name, user_id, document_id, document_filters, document_name):
         try:
             document_filters = json.dumps(document_filters)
 
             self.cursor.execute(
                     '''
-                    insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters)  values (:trigger_name, :user_id, :document_id, :document_filters);
+                    insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters, document_name)  values (:trigger_name, :user_id, :document_id, :document_filters, :document_name);
                     ''',
-                    {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters}
+                    {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters, "document_name": document_name}
                 )
         except sqlite3.DatabaseError as err:
-            database_logger.exception()
+            database_logger.exception('')
+        else:
+            self.connect.commit()
+
+    def delete_trigger_scheduler(self, trigger_id):
+        try:
+            self.cursor.execute(
+                    '''
+                    delete from trigger_scheduler where ID = (:ID);
+                    ''',
+                    {"ID": trigger_id}
+                )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
         else:
             self.connect.commit()
 # tmp = self.cursor.fetchone()[0]
@@ -384,7 +426,7 @@ class DB:
                     '''
                 )
         except sqlite3.DatabaseError as err:
-            database_logger.exception()
+            database_logger.exception('')
         else:
             self.connect.commit()
 
@@ -409,7 +451,7 @@ class DB:
                     print()
                 print('\n')
         except sqlite3.DatabaseError as err:
-            database_logger.exception()
+            database_logger.exception('')
 
     def __del__(self):
         self.cursor.close()
@@ -426,14 +468,38 @@ if __name__ == '__main__':
     # a.get_security(1723464345)
     # a.insert_security(1723464345, 'null')
     # a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
+
     # a.cursor.execute(
     #         '''
-    #         INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
+    #         drop table trigger_scheduler
     #         '''
     #     )
     # a.connect.commit()
 
-    print(a.get_triggers())
+
+    # a.cursor.execute(
+    #         '''
+    #         CREATE TABLE trigger_scheduler
+    #            (
+    #             ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    #             trigger_name TEXT,
+    #             date_trigger DATETIME,
+    #             date_last_update DATETIME,
+    #             user_id INTEGER,
+    #             document_id TEXT,
+    #             document_filters TEXT,
+    #             document_name TEXT)
+    #         '''
+    #     )
+    # a.connect.commit()
+
+    a.cursor.execute(
+            '''
+            INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
+            '''
+        )
+    a.connect.commit()
+    print(a.get_user_triggers(1723464345))
     print(1)
 
 # a = DB('database/bot_database.sqlite')
