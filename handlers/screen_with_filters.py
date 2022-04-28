@@ -38,8 +38,9 @@ async def get_screen(call: CallbackQuery, state: FSMContext):
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
-    finally:
+    except:
         bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
+        
     # TODO: подумать над текстом кнопок и сообщений
     choice_keyboard = InlineKeyboardMarkup(row_width=1)
     change_selectors_button = InlineKeyboardButton(_(call.message.chat.id)('more_selectors'), callback_data='yesFilter')

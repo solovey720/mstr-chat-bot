@@ -33,7 +33,7 @@ async def get_screen_favorite(call: CallbackQuery, state: FSMContext):
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
-    finally:
+    except:
         bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
     yes_no_keyboard = InlineKeyboardMarkup(row_width=2)
     yes_button = InlineKeyboardButton(_(call.message.chat.id)('yes'), callback_data='yesFilter')

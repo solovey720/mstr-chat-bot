@@ -82,7 +82,7 @@ async def send_screenshot_wo_filters(call: CallbackQuery, state: FSMContext):
             await bot.send_message(call.message.chat.id, _(call.message.chat.id)('file_name'))
             await GetInfo.find_file.set()
             return
-    finally:
+    except:
         bot_logger.exception(f'\tuser_ID:{call.message.chat.id}')
 
     if file_type == 'report':
