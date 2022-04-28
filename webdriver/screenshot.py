@@ -67,8 +67,8 @@ async def _sem_create_page(user_id, options=dict(), new_browser = None):
 
     await page.goto(path, {'timeout': timeout_long})
     ############################ press 'continue'
-    await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
-    await page.click('#\\33 054')
+    # await page.waitForSelector('#\\33 054', {'timeout': timeout_long,'visible': True})
+    # await page.click('#\\33 054')
     ############################
     if (docType == 'document'): 
         await page.waitForSelector('#pageLoadingWaitBox', {'timeout': timeout_long})  # ждем ухода самой загрузки документа и появления загрузки данных борда
