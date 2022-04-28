@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from mstr_connect import get_connection
 
-from database.user_database import DB
+from database.user_database import DB, sqlite3
 
 import dotenv
 
@@ -27,7 +27,7 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 conn = get_connection()
 
 # Подключаем базу данных
-db = DB('database/bot_database.sqlite')
+db = DB('database/bot_database.sqlite', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
 
 # Параметры сервера MSTR
 SERVER_LINK = os.environ.get('SERVER_LINK')
@@ -38,8 +38,10 @@ PASSWORD = os.environ.get('PASSWORD')
 
 #Отправлять ли отчеты без секьюрности 
 HARD_SECURITY_MODE = False
-# Максимально разрешенное количество одновременно запущеных процессов по отправке скриншота
-RUN_LIMIT = 10
+# Максимально разрешенное количество одновременно запущеных процессов по отправке скриншота для бота 
+RUN_LIMIT_BOT = 5
+# Максимально разрешенное количество одновременно запущеных процессов по отправке скриншота для подписок
+RUN_LIMIT_SCHEDULER = 5
 #количество выводимых значений селектора
 COUNT_VALUES = 6
 # запускать ли окна в хедлес режиме

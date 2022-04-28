@@ -1,5 +1,5 @@
 from webdriver.page_interaction import *
-from create_bot_and_conn import db, bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
+from create_bot_and_conn import db, bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT_BOT, RUN_LIMIT_SCHEDULER, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
 from aiogram.types import InputFile
 import os
 
@@ -7,7 +7,8 @@ import asyncio
 
 from log.create_loggers import webdriver_logger
 
-sem = asyncio.Semaphore(RUN_LIMIT)
+sem_bot = asyncio.Semaphore(RUN_LIMIT_BOT)
+sem_scheduler = asyncio.Semaphore(RUN_LIMIT_SCHEDULER)
 
 
 DOC_PAGE_COMPLITE_JS = '''
@@ -101,7 +102,7 @@ async def create_page(user_id, options=dict(), new_browser = None):
 
     await create_page(aio.types.User.get_current().id, {'docID': 'EA706ACB43C4530927380DB3B07E0889'})
     """ 
-    async with sem:
+    async with sem_bot:
         #print('start create')
         await _sem_create_page(user_id, options, new_browser)
 
@@ -214,6 +215,6 @@ async def send_filter_screen(user_id, options=dict(), new_browser = None, is_ctl
     await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png', 'security': ['ACADEMY DINOSAUR', 'ACE GOLDFINGER'],'filters': {'Актер':['PENELOPE','BOB'], 'Год':['2006']}}, is_ctlkey=False)
     await send_filter_screen(aio.types.User.get_current().id, {'path_screenshot':f'{aio.types.User.get_current().id}_sec_withsec_withfiltr.png','filters': {'IGK719A420311EA16852B700080EF55FCB9':['h4;264614C648E9C743C4283B8137C8D9BA','h5;264614C648E9C743C4283B8137C8D9BA'], 'IGK719A442911EA16852B700080EF55FCB9':['h2006;F65860F746DE5329EC4065B6F888ED7D']}})
     """ 
-    async with sem:
+    async with sem_bot:
         #print('start send')
         await _sem_send_filter_screen(user_id, options, new_browser = new_browser, is_ctlkey = is_ctlkey)

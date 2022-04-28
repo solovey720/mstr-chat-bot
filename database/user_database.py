@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 import json
 
@@ -29,8 +30,8 @@ class DB:
                         }
     }'''
 
-    def __init__(self, path: str):
-        self.connect = sqlite3.connect(path)
+    def __init__(self, path: str, detect_types):
+        self.connect = sqlite3.connect(path, detect_types)
         self.connect.row_factory = sqlite3.Row
         self.cursor = self.connect.cursor()
         database_logger.info(f'Create connection to database: {path}')
@@ -104,7 +105,7 @@ class DB:
                 documents_list[row[0]] = row[1]
             return documents_list
 
-    def get_truggers_by_id(self, ID):
+    def get_triggers_by_id(self, ID):
         try:
             self.cursor.execute(
                 '''
@@ -116,6 +117,18 @@ class DB:
             database_logger.exception('')
         else:
             return self.cursor.fetchone()
+    
+    def get_all_triggers(self):
+        try:
+            self.cursor.execute(
+                '''
+                select * from trigger_scheduler
+                '''
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            return self.cursor.fetchall()
 
     def insert_trigger_scheduler(self, trigger_name, user_id, document_id, document_filters, document_name):
         try:
@@ -123,9 +136,9 @@ class DB:
 
             self.cursor.execute(
                     '''
-                    insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters, document_name)  values (:trigger_name, :user_id, :document_id, :document_filters, :document_name);
+                    insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters, document_name, date_last_update, date_trigger)  values (:trigger_name, :user_id, :document_id, :document_filters, :document_name, :date_last_update, :date_trigger);
                     ''',
-                    {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters, "document_name": document_name}
+                    {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters, "document_name": document_name, "date_last_update": datetime.datetime.now(), "date_trigger": datetime.date(1970, 1, 1)}
                 )
         except sqlite3.DatabaseError as err:
             database_logger.exception('')
@@ -462,7 +475,7 @@ class DB:
 
 
 if __name__ == '__main__':
-    a = DB('database/bot_database.sqlite')
+    a = DB('database/bot_database.sqlite', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
     # a.insert_new_user(449977514)
     # a.drop_user(449977514)
     # a.get_security(1723464345)

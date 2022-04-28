@@ -56,7 +56,7 @@ async def info_about_trigger_scheduler(call: CallbackQuery, state: FSMContext):
 async def info_trigger_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     scheduler_id = call.data.split(':')[1]
-    scheduler_info = db.get_truggers_by_id(scheduler_id)
+    scheduler_info = db.get_triggers_by_id(scheduler_id)
     await bot.send_message(User.get_current().id, _(User.get_current().id)('info_about_trigger_scheduler').format(scheduler_info['document_name'], scheduler_info['trigger_name'], scheduler_info['date_last_update']))
 
 
