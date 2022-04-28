@@ -1,3 +1,5 @@
+import datetime
+import json
 from webdriver.screenshot import *
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -110,49 +112,19 @@ async def scheduler_dashboard(user_id: int, options=dict()):
 async def _sem_trigger_scheduler():
     
     all_triggers = db.get_all_triggers()
-
+    print('start_tr')
     for row in all_triggers:
-        if not (row['date_trigger'] and row['date_last_update']):
+        if not row['date_trigger']:
             continue
+
+        if row['date_trigger'] > row['date_last_update']:
+            print('send ',row['document_id'])
+
+            options = {'docID': row['document_id'], 'path_screenshot': f"{row['ID']}+{row['document_id']}.png", 'filters': None if row['document_filters'] else json.loads(row['document_filters'])}
+            asyncio.get_event_loop().create_task(scheduler_dashboard(row['user_id'], options=options))
+            db.insert_date_last_update(row['ID'], datetime.datetime.now())
     
-#         if 
-# ######################################################################################################################################
-#     new_browser = await launch({'headless': True, 'ignoreHTTPSErrors': True, 'autoClose': False,
-#                                 'defaultViewport': {'width': 1920, 'height': 1080}})
-#     page = (await new_browser.pages())[0]
-#     sched_options = options.copy()
-
-#     await create_page(user_id, options=sched_options, new_browser=page)
-
-#     filters_sel = options.get('filters', {})
-#     new_filters_sel = dict()
-#     a, b = await get_selectors(user_id, new_browser=page)
-#     all_selectors = {**a, **b}
-#     for i in filters_sel.keys():
-#         ctlkey = all_selectors[i]
-#         all_values = await get_values(user_id, ctlkey, new_browser=page)
-#         sel_values = []
-#         for j in filters_sel[i]:
-#             sel_values.append(all_values[j])
-#         new_filters_sel[ctlkey] = sel_values
-
-#     sched_options['filters'] = new_filters_sel
-#     sched_options['security'] = db.get_security(user_id)
-#     try:
-#         await bot.send_message(user_id, _(user_id)('your_scheduler'))
-#         await send_filter_screen(user_id, options=sched_options, new_browser=page)
-#     except KeyError as e:
-#         if e.args[0] == 'S_security':
-#             await bot.send_message(user_id, _(user_id)('security_key_error'))
-#             return
-#     except TimeoutError as e:
-#         if e.args[0] == 'Session is dead':
-#             await bot.send_message(user_id, _(user_id)('session_is_dead'))
-#             return
-#     finally:
-#         webdriver_logger.exception(f'\tuser_ID:{user_id}')
-#         await new_browser.close()
-
+scheduler.add_job(_sem_trigger_scheduler, "interval", minutes=1, misfire_grace_time = None, replace_existing=True, id = 'trigger_scheduler_minute=1')
 
 def get_user_jobs(user_id: str) -> list:
     '''Get list of user's job

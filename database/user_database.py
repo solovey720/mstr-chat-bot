@@ -157,8 +157,34 @@ class DB:
             database_logger.exception('')
         else:
             self.connect.commit()
-# tmp = self.cursor.fetchone()[0]
-#             return None if tmp == None else json.loads(tmp)
+
+    def insert_date_last_update(self, ID: int, date_last_update):
+        try:
+            self.cursor.execute(
+                '''
+                UPDATE trigger_scheduler SET date_last_update = :date_last_update WHERE ID = :ID
+                ''',
+                {"ID": ID, "date_last_update": date_last_update}
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception(f'\ttrigger_ID:{ID}')
+        else:
+            self.connect.commit()
+
+    def insert_date_trigger(self, ID: int, date_trigger):
+        try:
+            self.cursor.execute(
+                '''
+                UPDATE trigger_scheduler SET date_trigger = :date_trigger WHERE ID = :ID
+                ''',
+                {"ID": ID, "date_trigger": date_trigger}
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception(f'\ttrigger_ID:{ID}')
+        else:
+            self.connect.commit()
+
+
 
     def insert_security(self, user_id: int, security: str):
         try:
@@ -506,13 +532,14 @@ if __name__ == '__main__':
     #     )
     # a.connect.commit()
 
-    a.cursor.execute(
-            '''
-            INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
-            '''
-        )
-    a.connect.commit()
-    print(a.get_user_triggers(1723464345))
+    # a.cursor.execute(
+    #         '''
+    #         INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
+    #         '''
+    #     )
+    # a.connect.commit()
+    #a.insert_new_user(1723464345)
+    # print(a.get_user_triggers(1723464345))
     print(1)
 
 # a = DB('database/bot_database.sqlite')
