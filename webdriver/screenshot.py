@@ -1,5 +1,5 @@
 from webdriver.page_interaction import *
-from create_bot_and_conn import bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
+from create_bot_and_conn import db, bot, SERVER_LINK, LOGIN, PASSWORD, PROJECT, SERVER, HARD_SECURITY_MODE, RUN_LIMIT, COUNT_CHECK_PAGE_LOAD, MAX_TIME_CHECK_PAGE_LOAD
 from aiogram.types import InputFile
 import os
 

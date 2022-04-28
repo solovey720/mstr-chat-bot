@@ -1,6 +1,11 @@
 import sqlite3
 import json
+
+# import sys
+# sys.path.insert(1, 'C:\\Users\\user\\Desktop\\mstr_bot\\git\\mstr-chat-bot')
+
 from log.create_loggers import database_logger
+
 
 class DB:
     """
@@ -385,7 +390,10 @@ class DB:
 if __name__ == '__main__':
     a = DB('database/bot_database.sqlite')
     # a.insert_new_user(449977514)
-    a.drop_user(449977514)
+    # a.drop_user(449977514)
+    a.get_security(1723464345)
+    a.insert_security(1723464345, 'null')
+    a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
     print(1)
 
 # a = DB('database/bot_database.sqlite')
