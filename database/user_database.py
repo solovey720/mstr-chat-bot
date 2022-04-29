@@ -48,12 +48,13 @@ class DB:
             )
             tables = self.cursor.fetchall()
             for i in tables:
-                self.cursor.execute(
-                    f'''
-                    insert into {i['name']} (ID) values (:user_id);
-                    ''',
-                    {"user_id": user_id}
-                )
+                if i['name'] != 'trigger_scheduler':
+                    self.cursor.execute(
+                        f'''
+                        insert into {i['name']} (ID) values (:user_id);
+                        ''',
+                        {"user_id": user_id}
+                    )
         except sqlite3.DatabaseError as err:
             database_logger.exception(f'\tuser_ID:{user_id}')
         else:
@@ -502,7 +503,9 @@ class DB:
 
 if __name__ == '__main__':
     a = DB('database/bot_database.sqlite', detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-    # a.insert_new_user(449977514)
+    # a.drop_all_users()
+    # a.insert_new_user(1723464345)
+    # a.concat_security(1723464345, 'ACADEMY DINOSAUR;ACE GOLDFINGER')
     # a.drop_user(449977514)
     # a.get_security(1723464345)
     # a.insert_security(1723464345, 'null')
@@ -534,7 +537,7 @@ if __name__ == '__main__':
 
     # a.cursor.execute(
     #         '''
-    #         INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_5');
+    #         INSERT INTO trigger_scheduler (trigger_name) VALUES ('trigger_3');
     #         '''
     #     )
     # a.connect.commit()
