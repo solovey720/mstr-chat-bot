@@ -118,6 +118,20 @@ class DB:
             database_logger.exception('')
         else:
             return self.cursor.fetchone()
+
+    
+    def get_triggers_by_name(self, name):
+        try:
+            self.cursor.execute(
+                '''
+                select * from trigger_scheduler where trigger_name == (:name) and user_id is not NULL
+                ''',
+                {"name": name}
+            )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            return self.cursor.fetchall()
     
     def get_all_triggers(self):
         try:
@@ -140,6 +154,19 @@ class DB:
                     insert into trigger_scheduler (trigger_name, user_id, document_id, document_filters, document_name, date_last_update, date_trigger)  values (:trigger_name, :user_id, :document_id, :document_filters, :document_name, :date_last_update, :date_trigger);
                     ''',
                     {"trigger_name": trigger_name, "user_id": user_id, "document_id": document_id, "document_filters": document_filters, "document_name": document_name, "date_last_update": datetime.datetime.now(), "date_trigger": datetime.date(1970, 1, 1)}
+                )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            self.connect.commit()
+
+    def insert_new_trigger(self, trigger_name):
+        try:
+            self.cursor.execute(
+                    '''
+                    insert into trigger_scheduler (trigger_name)  values (:trigger_name);
+                    ''',
+                    {"trigger_name": trigger_name}
                 )
         except sqlite3.DatabaseError as err:
             database_logger.exception('')

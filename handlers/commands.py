@@ -5,10 +5,9 @@ from aiogram.dispatcher import FSMContext
 
 from create_bot_and_conn import bot, GetInfo, db, conn, AUTO_CREATE_NEW_USER
 
-from webdriver.scheduler import get_user_jobs, close_browser
+from webdriver.scheduler import close_browser
 
-from mstr_connect import get_document_name_by_id
-
+from mstr_connect import get_document_name_by_id, get_list_subscription
 
 from translate import _
 
@@ -101,8 +100,37 @@ async def subscription_command(message: Message, state: FSMContext):
 
 #для тестов
 async def test_command(message: Message, state: FSMContext):
+    list = get_list_subscription(conn)
+    # print(list[1].list_properties())
+    # list[0].alter(recipients={ 
+    #     'id': '54F3D26011D2896560009A8E67019608',
+    #     'isGroup': False,
+    #     'name': 'Administrator',
+    #     'type': 'user',
+    #     'addressId': '018EB8BA754ECCFA249E6790DD785133',
+    #     'addressName': 'asd'
+    # })
+    
+    tmp=[]
+    for x in list:
+        if x.name=='qq #tg':
+            print(x.add_recipient(recipient_id= '4DE80642E446C57DBD899EB1EF98B5EC', recipient_type="personal_address"))
+
+            # print(x.remove_recipient(['54F3D26011D2896560009A8E67019608']))
+        #     x.alter(recipients={ 
+        # 'id': '54F3D26011D2896560009A8E67019608',
+        # 'addressId': '1A342A93DC421179AC3C4E879D7FBA35',
+        # 'addressName': 'anton.shuvalov@ceo.ru.com'
+        #     },   asd 018EB8BA754ECCFA249E6790DD785133
+        #     email_subject = f'{x.name};{{&Date}};{{&Time}}',
+        #     email_send_content_as = 'link_and_history_list'
+        #     )
+    print(tmp)
+    # tmp = list(map(lambda x: x.name, get_list_subscription(conn)))
+    # await bot.send_message(message.from_user.id, '\n'.join(tmp))
+
     #all_reports = search_document_by_id(conn, '8CD564B54D2ED4AFD358F3853610D647')
-    pass
+    # pass
     #print(all_reports)
 
 
@@ -114,4 +142,4 @@ def register_handlers_commands(dp: Dispatcher):
     dp.register_message_handler(favorite_command, lambda message: message.chat.id in db.get_users(), commands=['favorite'], state="*")
     dp.register_message_handler(delete_favorite_command, lambda message: message.chat.id in db.get_users(), commands=['delete_favorite'], state="*")
     dp.register_message_handler(subscription_command, lambda message: message.chat.id in db.get_users(), commands=['subscription'], state="*")
-    dp.register_message_handler(test_command, commands=['QWERTY123'], state="*")
+    dp.register_message_handler(test_command, commands=['qwerty'], state="*")

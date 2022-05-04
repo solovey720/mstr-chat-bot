@@ -1,5 +1,7 @@
 from mstrio.connection import Connection
 from mstrio.project_objects import list_reports, list_documents
+from mstrio.distribution_services import list_subscriptions
+from mstrio.distribution_services.subscription.email_subscription import EmailSubscription
 
 import dotenv
 
@@ -23,8 +25,12 @@ def get_connection():
     except Exception as e:
         connection_logger.exception(f"Connection to MSTR {url} is failed ({project_name}, {mstr_username})")
         raise e
-        
 
+
+def get_list_subscription(connection, **filters):
+    all_subs = list_subscriptions(connection=connection, project_name=project_name, **filters)
+    return all_subs
+        
 
 def search_report(connection, report_name):
     reports = list_reports(connection, name_begins=report_name)
