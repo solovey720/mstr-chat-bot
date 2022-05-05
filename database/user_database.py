@@ -186,6 +186,19 @@ class DB:
         else:
             self.connect.commit()
 
+    def delete_all_trigger_with_name(self, name):
+        try:
+            self.cursor.execute(
+                    '''
+                    delete from trigger_scheduler where trigger_name = (:name);
+                    ''',
+                    {"name": name}
+                )
+        except sqlite3.DatabaseError as err:
+            database_logger.exception('')
+        else:
+            self.connect.commit()
+
     def insert_date_last_update(self, ID: int, date_last_update):
         try:
             self.cursor.execute(

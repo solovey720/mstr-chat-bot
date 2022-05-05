@@ -12,31 +12,35 @@ from mstr_connect import get_document_name_by_id, get_list_subscription
 
 from translate import _
 
-def create_all_triggers():
+def update_all_triggers():
     list_subscription = get_list_subscription(conn)
     base_triggers = db.get_triggers()
+    sub_triggers=[]
     for sub in list_subscription:
         if '#tg' in sub.name.lower():
             trigger = sub.name.replace('#tg', '').replace('#TG', '').strip()
+            sub_triggers.append(trigger)
             if trigger not in base_triggers:
                 db.insert_new_trigger(trigger)
+                for user in sub.available_recipients():
+                    if user['name'] == 'TG_bot':
+                        recipient = user
+                        break
                 sub.alter(
-                    # recipients={ 
-                    # 'id': '54F3D26011D2896560009A8E67019608',
-                    # 'addressId': '1A342A93DC421179AC3C4E879D7FBA35',
-                    # 'addressName': 'asd'
-                    #     }, 
+                    recipients=recipient, 
                     email_subject = f'{trigger};{{&Date}};{{&Time}}',
                     email_send_content_as = 'link_and_history_list'
                     )
-    
+    for trigger in base_triggers:
+        if trigger not in sub_triggers:
+            db.delete_all_trigger_with_name(trigger)
     
 
 # Функция добавления подписки
 async def add_trigger_scheduler(call: CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(call.id)
     #######################
-    create_all_triggers()
+    update_all_triggers()
     triggers_list = db.get_triggers()
     triggers_keyboard = InlineKeyboardMarkup()
     for trigger in triggers_list:

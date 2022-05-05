@@ -113,13 +113,18 @@ async def test_command(message: Message, state: FSMContext):
     
     tmp=[]
     for x in list:
-        if x.name=='qq #tg':
-            print(x.add_recipient(recipient_id= '4DE80642E446C57DBD899EB1EF98B5EC', recipient_type="personal_address"))
-
-            # print(x.remove_recipient(['54F3D26011D2896560009A8E67019608']))
+        if x.name=='qaz':
+            for user in x.available_recipients():
+                if user['name'] == 'TG_bot':
+                    recipient = user
+                    break
+            
+            x.alter(recipients = recipient)
+            x.execute()
+                        # print(x.remove_recipient(['54F3D26011D2896560009A8E67019608']))
         #     x.alter(recipients={ 
         # 'id': '54F3D26011D2896560009A8E67019608',
-        # 'addressId': '1A342A93DC421179AC3C4E879D7FBA35',
+        # 'addressId': '1A342A93DC421179AC3C4E879D7FBA35',     .add_recipient(recipient_id= '4DE2E446C57DBD899EB1EF98B5EC', recipient_type="personal_address")
         # 'addressName': 'anton.shuvalov@ceo.ru.com'
         #     },   asd 018EB8BA754ECCFA249E6790DD785133
         #     email_subject = f'{x.name};{{&Date}};{{&Time}}',
