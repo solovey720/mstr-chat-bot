@@ -4,10 +4,13 @@ from email import policy
 import datetime
 from time import sleep
 from database.user_database import DB, sqlite3
+import dotenv, os
+
+dotenv.load_dotenv('keys.env')
 
 CHECK_TIMEOUT_SEC = 10
-FROM_EMAIL  = "microstrategySubscription@gmail.com"
-FROM_PWD    = "Ceo143566!@"
+FROM_EMAIL  = os.environ.get('EMAIL')
+FROM_PWD    = os.environ.get('EMAIL_PASSWORD')
 SMTP_SERVER = "imap.gmail.com"
 SMTP_PORT   = 993
 
@@ -15,7 +18,7 @@ db = DB('database/bot_database.sqlite', detect_types=sqlite3.PARSE_DECLTYPES | s
 
 def read_email_from_gmail():
     try:
-        mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+        mail = imaplib.IMAP4_SSL(SMTP_SERVER, SMTP_PORT)
         mail.login(FROM_EMAIL, FROM_PWD)
         
         mail.select('inbox')

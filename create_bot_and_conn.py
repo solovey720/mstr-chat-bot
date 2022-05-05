@@ -52,5 +52,5 @@ COUNT_CHECK_PAGE_LOAD = 4
 MAX_TIME_CHECK_PAGE_LOAD = 80
 # закрывать ли доступ пользователям не из базы данных
 AUTO_CREATE_NEW_USER = True
-# закрывать ли доступ пользователям не из базы данных
+# таймаут подписки на события
 TRIGGER_CHECKER_TIMEOUT = 1
