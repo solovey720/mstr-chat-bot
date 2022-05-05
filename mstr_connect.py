@@ -3,6 +3,9 @@ from mstrio.project_objects import list_reports, list_documents
 from mstrio.distribution_services import list_subscriptions
 from mstrio.distribution_services.subscription.email_subscription import EmailSubscription
 
+import mstrio.config as conf
+conf.verbose = False
+
 import dotenv
 
 import os

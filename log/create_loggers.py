@@ -9,10 +9,11 @@ webdriver_logger = logging.getLogger('webdriver')
 database_logger = logging.getLogger('database')
 connection_logger = logging.getLogger('connection')
 bot_logger = logging.getLogger('bot')
+gmail_logger = logging.getLogger('gmail')
 
 #сюда можно впихнуть общие настройки, пока уровень логирования и формат сообщений
 def log_settings(logger, handler):
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.INFO)
     handler.setFormatter(formatter)
 
 webdriver_handler = logging.FileHandler('log\\webdriver.log') #создаем лог-файл
@@ -32,6 +33,9 @@ bot_handler = logging.FileHandler('log\\bot.log')
 bot_logger.addHandler(bot_handler)
 log_settings(bot_logger, bot_handler) 
 
+gmail_handler = logging.FileHandler('log\\gmail.log')
+gmail_logger.addHandler(gmail_handler)
+log_settings(gmail_logger, gmail_handler) 
 
 
 #тут маленький пример, как можно вынести текст ошибки

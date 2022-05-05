@@ -7,7 +7,7 @@ from create_bot_and_conn import bot, GetInfo, db, conn, AUTO_CREATE_NEW_USER
 
 from webdriver.scheduler import close_browser
 
-from mstr_connect import get_document_name_by_id, get_list_subscription
+from mstr_connect import get_document_name_by_id, get_list_subscription, EmailSubscription
 
 from translate import _
 
@@ -100,27 +100,42 @@ async def subscription_command(message: Message, state: FSMContext):
 
 #для тестов
 async def test_command(message: Message, state: FSMContext):
-    list = get_list_subscription(conn)
-    # print(list[1].list_properties())
-    # list[0].alter(recipients={ 
-    #     'id': '54F3D26011D2896560009A8E67019608',
-    #     'isGroup': False,
-    #     'name': 'Administrator',
-    #     'type': 'user',
-    #     'addressId': '018EB8BA754ECCFA249E6790DD785133',
-    #     'addressName': 'asd'
-    # })
     
-    tmp=[]
-    for x in list:
-        if x.name=='qaz':
-            for user in x.available_recipients():
-                if user['name'] == 'TG_bot':
-                    recipient = user
-                    break
+    list_subscription = get_list_subscription(conn)
+    base_triggers = db.get_triggers()
+    sub_triggers=[]
+    for sub in list_subscription:
+        if '#tg' in sub.name.lower():
+            trigger = sub.name.replace('#tg', '').replace('#TG', '').strip()
+            sub_triggers.append(trigger)
+            if trigger not in base_triggers:
+                db.insert_new_trigger(trigger)
+                print(trigger)
+                print(sub.recipients)
+                # for user in sub.available_recipients():
+                #     if user['name'] == 'TG_bot':
+                #         recipient = user
+                #         break
+                # print(recipient)
+            # sub.alter()
+            sub.delete(True)
             
-            x.alter(recipients = recipient)
-            x.execute()
+            # create an email subscription
+            EmailSubscription.create(
+                connection=conn,
+                name=sub.name,
+                project_name='CEO_Projects',
+                contents=sub.contents,
+                schedules=sub.schedules,
+                recipients=['8F0716DA459A3061A25E73B84F9AFA22'],
+                email_subject=f'{trigger};{{&Date}};{{&Time}}',
+                email_send_content_as = 'link_and_history_list'
+                )
+                
+
+    for trigger in base_triggers:
+        if trigger not in sub_triggers:
+            db.delete_all_trigger_with_name(trigger)
                         # print(x.remove_recipient(['54F3D26011D2896560009A8E67019608']))
         #     x.alter(recipients={ 
         # 'id': '54F3D26011D2896560009A8E67019608',
@@ -130,7 +145,6 @@ async def test_command(message: Message, state: FSMContext):
         #     email_subject = f'{x.name};{{&Date}};{{&Time}}',
         #     email_send_content_as = 'link_and_history_list'
         #     )
-    print(tmp)
     # tmp = list(map(lambda x: x.name, get_list_subscription(conn)))
     # await bot.send_message(message.from_user.id, '\n'.join(tmp))
 

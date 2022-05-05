@@ -4,11 +4,11 @@ from aiogram.types import CallbackQuery, User, InlineKeyboardMarkup, InlineKeybo
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from create_bot_and_conn import GetInfo, db, bot, conn
+from create_bot_and_conn import GetInfo, db, bot, conn, PROJECT, TG_MSTR_USER_RECIPIENTS
 
 from webdriver.scheduler import scheduler, scheduler_dashboard
 
-from mstr_connect import get_document_name_by_id, get_list_subscription
+from mstr_connect import get_document_name_by_id, get_list_subscription, EmailSubscription
 
 from translate import _
 
@@ -22,15 +22,22 @@ def update_all_triggers():
             sub_triggers.append(trigger)
             if trigger not in base_triggers:
                 db.insert_new_trigger(trigger)
-                for user in sub.available_recipients():
-                    if user['name'] == 'TG_bot':
-                        recipient = user
-                        break
-                sub.alter(
-                    recipients=recipient, 
-                    email_subject = f'{trigger};{{&Date}};{{&Time}}',
+                # for user in sub.available_recipients():
+                #     if user['name'] == 'TG_bot':
+                #         recipient = user
+                #         break
+                EmailSubscription.create(
+                    connection=conn,
+                    name=sub.name,
+                    project_name=PROJECT,
+                    contents=sub.contents,
+                    schedules=sub.schedules,
+                    recipients=[TG_MSTR_USER_RECIPIENTS],
+                    email_subject=f'{trigger};{{&Date}};{{&Time}}',
                     email_send_content_as = 'link_and_history_list'
                     )
+                sub.delete(True)
+
     for trigger in base_triggers:
         if trigger not in sub_triggers:
             db.delete_all_trigger_with_name(trigger)
