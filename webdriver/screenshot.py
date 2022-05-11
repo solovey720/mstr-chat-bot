@@ -139,8 +139,10 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
     if (not (security_val or filters_sel)) or docType == 'report':
         await page.screenshot({'path': screen_name})
         if is_scheduler:
-            await bot.send_message(user_id, _(user_id)('your_scheduler'))
-        await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+            await bot.send_document(chat_id=user_id, document=InputFile(screen_name), caption=_(user_id)('your_scheduler'))
+            # await bot.send_message(user_id, _(user_id)('your_scheduler'))
+        else:
+            await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return
 
@@ -197,8 +199,10 @@ async def _sem_send_filter_screen(user_id, options=dict(), new_browser = None, i
 
         await page.screenshot({'path': screen_name})
         if is_scheduler:
-            await bot.send_message(user_id, _(user_id)('your_scheduler'))
-        await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
+            await bot.send_document(chat_id=user_id, document=InputFile(screen_name), caption=_(user_id)('your_scheduler'))
+            # await bot.send_message(user_id, _(user_id)('your_scheduler'))
+        else:
+            await bot.send_document(chat_id=user_id, document=InputFile(screen_name))
         os.remove(screen_name)
         return 
     except Exception as e:

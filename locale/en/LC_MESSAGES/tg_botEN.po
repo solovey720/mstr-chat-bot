@@ -100,7 +100,7 @@ msgid "nothing_found"
 msgstr "Nothing found, please try again"
 
 msgid "your_scheduler"
-msgstr "Your subscription:"
+msgstr "Your subscription"
 
 msgid "added_to_scheduler"
 msgstr "Document added to subscriptions"
