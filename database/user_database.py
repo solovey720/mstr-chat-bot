@@ -48,7 +48,7 @@ class DB:
             )
             tables = self.cursor.fetchall()
             for i in tables:
-                if i['name'] != 'trigger_scheduler':
+                if i['name'] != 'trigger_scheduler' and i['name'] != 'sqlite_sequence':
                     self.cursor.execute(
                         f'''
                         insert into {i['name']} (ID) values (:user_id);
